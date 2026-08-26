@@ -114,6 +114,15 @@ private slots:
     void updateSize();
 
 private:
+    /**
+     * Re-splice the dynamically created component edit widget's own
+     * tab-focus chain into its correct visual position (between
+     * componentWidgetContainer and cancelButton), correcting for the fact
+     * that Qt appends reparented widget trees to the end of the top-level
+     * window's default tab-focus chain instead of at their visual position.
+     */
+    void fixTabOrder();
+
     bool m_isComponentAdded = false;
     Page m_previousPage = Page::AddNew;
     QPointer<QWidget> m_componentWidget;

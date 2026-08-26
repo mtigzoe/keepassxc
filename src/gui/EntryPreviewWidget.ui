@@ -245,6 +245,12 @@
                   <property name="text">
                    <string notr="true"/>
                   </property>
+                  <property name="toolTip">
+                   <string>Toggle password visibility</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Toggle password visibility</string>
+                  </property>
                   <property name="iconSize">
                    <size>
                     <width>14</width>
@@ -402,6 +408,12 @@
                   <property name="text">
                    <string/>
                   </property>
+                  <property name="toolTip">
+                   <string>Toggle notes visibility</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Toggle notes visibility</string>
+                  </property>
                   <property name="iconSize">
                    <size>
                     <width>14</width>
@@ -471,6 +483,12 @@
                  <widget class="QToolButton" name="toggleUsernameButton">
                   <property name="text">
                    <string/>
+                  </property>
+                  <property name="toolTip">
+                   <string>Toggle username visibility</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Toggle username visibility</string>
                   </property>
                   <property name="iconSize">
                    <size>
@@ -1119,6 +1137,12 @@
                  <widget class="QToolButton" name="toggleGroupNotesButton">
                   <property name="text">
                    <string/>
+                  </property>
+                  <property name="toolTip">
+                   <string>Toggle notes visibility</string>
+                  </property>
+                  <property name="accessibleName">
+                   <string>Toggle notes visibility</string>
                   </property>
                   <property name="checkable">
                    <bool>true</bool>

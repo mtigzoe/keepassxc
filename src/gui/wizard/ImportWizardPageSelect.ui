@@ -270,6 +270,12 @@
           <property name="text">
            <string notr="true"/>
           </property>
+          <property name="toolTip">
+           <string>Open remote database download command help</string>
+          </property>
+          <property name="accessibleName">
+           <string>Open remote database download command help</string>
+          </property>
          </widget>
         </item>
        </layout>

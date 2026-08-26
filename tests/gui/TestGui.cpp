@@ -274,8 +274,21 @@ void TestGui::testCreateDatabase()
         QTest::keyClick(passwordEdit, Qt::Key::Key_Tab);
         QTest::keyClicks(passwordRepeatEdit, "test");
 
-        // add key file
+        // Regression test for a keyboard-focus trap: Tab from the last
+        // (repeat) password field must advance to the next visible control
+        // on the page rather than looping back into the password fields or
+        // leaving focus stuck. See KeyComponentWidget::fixTabOrder() --
+        // componentEditWidget() implementations build the password fields
+        // as a widget that is reparented into the page after construction,
+        // which by default gets appended to the end of the window's
+        // tab-focus chain instead of being spliced in where it visually
+        // sits.
         auto* additionalOptionsButton = wizard->currentPage()->findChild<QPushButton*>("additionalKeyOptionsToggle");
+        QVERIFY(additionalOptionsButton);
+        QTest::keyClick(passwordRepeatEdit, Qt::Key::Key_Tab);
+        QTRY_COMPARE(qApp->focusWidget(), static_cast<QWidget*>(additionalOptionsButton));
+
+        // add key file
         auto* keyFileWidget = wizard->currentPage()->findChild<KeyFileEditWidget*>();
         QVERIFY(additionalOptionsButton->isVisible());
         QTest::mouseClick(additionalOptionsButton, Qt::MouseButton::LeftButton);
