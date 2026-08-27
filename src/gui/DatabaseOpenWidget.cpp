@@ -83,6 +83,18 @@ DatabaseOpenWidget::DatabaseOpenWidget(QWidget* parent)
     connect(m_ui->buttonBox, SIGNAL(rejected()), SLOT(reject()));
 
     connect(m_ui->addKeyFileLinkLabel, &QLabel::linkActivated, this, &DatabaseOpenWidget::browseKeyFile);
+    // This is a QLabel styled to look and behave like a link (rich-text
+    // <a> + Qt::LinksAccessibleByKeyboard), not a real QPushButton/QLabel
+    // hyperlink control. Qt has no built-in "Link" accessible role for
+    // that pattern, so it's exposed to screen readers as plain static
+    // text -- JAWS reads the words "I have a key file" with no cue that
+    // pressing Enter/Space on it does anything. accessibleDescription
+    // ("Click to add a key file.") doesn't help here either: like a
+    // QMessageBox's informative text, it isn't announced automatically,
+    // only on a manual "read description" command. Giving it an explicit,
+    // verb-led accessibleName makes the actionability part of what's
+    // actually announced on focus.
+    m_ui->addKeyFileLinkLabel->setAccessibleName(tr("Add a key file"));
     connect(m_ui->keyFileLineEdit, &PasswordWidget::textChanged, this, [&](const QString& text) {
         bool state = !text.isEmpty();
         m_ui->addKeyFileLinkLabel->setVisible(!state);
