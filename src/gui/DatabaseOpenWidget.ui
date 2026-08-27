@@ -427,7 +427,7 @@
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="addKeyFileLinkLabel">
+                <widget class="QPushButton" name="addKeyFileLinkLabel">
                  <property name="cursor">
                   <cursorShape>PointingHandCursor</cursorShape>
                  </property>
@@ -440,17 +440,29 @@
                  <property name="accessibleDescription">
                   <string>Click to add a key file.</string>
                  </property>
+                 <!-- Previously a QLabel with an embedded <a href> styled to
+                      look like a link (see git history). Qt has no built-in
+                      accessible "Link" role for that pattern, so screen
+                      readers exposed it as plain static text with no cue
+                      that it does anything: confirmed against JAWS, where
+                      speech read the text but the braille display showed
+                      nothing at all, consistent with a role most screen
+                      readers don't treat as interactive. A real QPushButton
+                      gets Qt's standard accessible "PushButton" role for
+                      free, handled consistently by both speech and braille,
+                      the same as every other button in this dialog. flat
+                      plus this stylesheet keep the visual link-style look
+                      (compare buttonBrowseFile's sibling refreshHardwareKeys
+                      above, which uses the same transparent/borderless
+                      pattern). -->
+                 <property name="flat">
+                  <bool>true</bool>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QPushButton { background-color: transparent; border: none; text-decoration: underline; color: palette(link); }</string>
+                 </property>
                  <property name="text">
-                  <string>&lt;a href=&quot;#&quot; style=&quot;text-decoration: underline&quot;&gt;I have a key file&lt;/a&gt;</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                 <property name="margin">
-                  <number>1</number>
-                 </property>
-                 <property name="textInteractionFlags">
-                  <set>Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse</set>
+                  <string>I have a key file</string>
                  </property>
                 </widget>
                </item>
