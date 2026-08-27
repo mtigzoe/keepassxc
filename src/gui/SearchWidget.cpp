@@ -38,6 +38,11 @@ SearchWidget::SearchWidget(QWidget* parent)
     m_ui->setupUi(this);
     setFocusProxy(m_ui->searchEdit);
 
+    // placeholderText alone isn't a reliable accessible label -- screen
+    // readers commonly don't announce placeholder text as the control's
+    // name, so without this the field is just announced as "edit".
+    m_ui->searchEdit->setAccessibleName(tr("Search"));
+
     m_helpWidget = new PopupHelpWidget(m_ui->searchEdit);
     Ui::SearchHelpWidget helpUi;
     helpUi.setupUi(m_helpWidget);

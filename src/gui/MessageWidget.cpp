@@ -18,6 +18,7 @@
 
 #include "MessageWidget.h"
 
+#include <QAccessible>
 #include <QDesktopServices>
 #include <QTimer>
 #include <QUrl>
@@ -63,6 +64,17 @@ void MessageWidget::showMessage(const QString& text, KMessageWidget::MessageType
         show();
         emit showAnimationFinished();
     }
+
+    // This banner can appear without moving keyboard focus (e.g. the
+    // "Press ESC again to close this database" warning in
+    // DatabaseOpenWidget, shown while focus stays in the password field).
+    // Without this, a screen reader has no way to know the message
+    // appeared at all -- pressing a key that only produces this warning
+    // looks like it silently did nothing. Firing Alert tells assistive
+    // technology to announce the new text immediately, the same way a
+    // web role="alert" region would be.
+    QAccessibleEvent alertEvent(this, QAccessible::Alert);
+    QAccessible::updateAccessibility(&alertEvent);
 
     if (autoHideTimeout > 0) {
         m_autoHideTimer->start(autoHideTimeout);
