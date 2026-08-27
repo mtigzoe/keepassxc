@@ -789,6 +789,23 @@ void TestGui::testSearchEditEntry()
 
     // Add groups "Good" and "Bad"
     m_dbWidget->createGroup();
+
+    // Regression test for a keyboard-focus trap: QPlainTextEdit inserts a
+    // literal tab character on Tab instead of moving focus by default, which
+    // left keyboard/screen reader users stuck in the Edit Group notes field
+    // with no way to tab onward to the rest of the form. See
+    // EditGroupWidget::EditGroupWidget()'s setTabChangesFocus(true) call on
+    // editNotes.
+    auto* notesEdit = editGroupWidget->findChild<QPlainTextEdit*>("editNotes");
+    auto* expireCheck = editGroupWidget->findChild<QCheckBox*>("expireCheck");
+    QVERIFY(notesEdit);
+    QVERIFY(expireCheck);
+    notesEdit->setFocus();
+    QTRY_COMPARE(qApp->focusWidget(), static_cast<QWidget*>(notesEdit));
+    QTest::keyClick(notesEdit, Qt::Key::Key_Tab);
+    QTRY_COMPARE(qApp->focusWidget(), static_cast<QWidget*>(expireCheck));
+    QVERIFY(notesEdit->toPlainText().isEmpty());
+
     QTest::keyClicks(nameEdit, "Good");
     QTest::mouseClick(editGroupWidgetButtonBox->button(QDialogButtonBox::Ok), Qt::LeftButton);
     m_dbWidget->groupView()->setCurrentGroup(m_db->rootGroup()); // Makes "Good" and "Bad" on the same level

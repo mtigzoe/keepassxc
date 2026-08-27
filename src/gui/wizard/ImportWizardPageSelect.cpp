@@ -33,6 +33,11 @@ ImportWizardPageSelect::ImportWizardPageSelect(QWidget* parent)
 {
     m_ui->setupUi(this);
 
+    // QPlainTextEdit inserts a literal tab character on Tab instead of moving
+    // focus by default, trapping keyboard/screen reader users who tab into
+    // this field (see the same fix applied to EditGroupWidget's notes field).
+    m_ui->downloadCommandInput->setTabChangesFocus(true);
+
     new QListWidgetItem(icons()->icon("csv"), tr("Comma Separated Values (.csv)"), m_ui->importTypeList);
     new QListWidgetItem(icons()->icon("onepassword"), tr("1Password Export (.1pux)"), m_ui->importTypeList);
     new QListWidgetItem(icons()->icon("onepassword"), tr("1Password Vault (.opvault)"), m_ui->importTypeList);

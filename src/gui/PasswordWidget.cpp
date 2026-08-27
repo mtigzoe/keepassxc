@@ -109,6 +109,19 @@ PasswordWidget::~PasswordWidget()
 {
 }
 
+void PasswordWidget::setAccessibleName(const QString& name)
+{
+    // Forward to the focus proxy: this is the widget a screen reader actually
+    // reports when the user tabs into this control.
+    m_ui->passwordEdit->setAccessibleName(name);
+    QWidget::setAccessibleName(name);
+}
+
+QString PasswordWidget::accessibleName() const
+{
+    return m_ui->passwordEdit->accessibleName();
+}
+
 void PasswordWidget::setQualityVisible(bool state)
 {
     m_ui->qualityProgressBar->setVisible(state);

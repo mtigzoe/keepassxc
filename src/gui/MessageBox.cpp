@@ -18,6 +18,7 @@
 
 #include "MessageBox.h"
 
+#include <QAccessible>
 #include <QCheckBox>
 #include <QHash>
 #include <QLayout>
@@ -132,6 +133,18 @@ MessageBox::Button MessageBox::messageBox(QWidget* parent,
             msgBox.raise();
         }
         msgBox.layout()->setSizeConstraint(QLayout::SetMinimumSize);
+
+        // Screen readers (e.g. JAWS) announce the focused control (the default
+        // button) when this dialog receives focus, but do not automatically read
+        // the informative message text -- that requires a manual "read window"
+        // command from the user. Firing an Alert accessibility event once the
+        // dialog is shown tells assistive technology to announce the dialog's
+        // full content (icon role + text) immediately, the same way a web
+        // role="alert" region would be announced without user action.
+        msgBox.show();
+        QAccessibleEvent alertEvent(&msgBox, QAccessible::Alert);
+        QAccessible::updateAccessibility(&alertEvent);
+
         msgBox.exec();
 
         Button returnButton = m_addedButtonLookup[msgBox.clickedButton()];

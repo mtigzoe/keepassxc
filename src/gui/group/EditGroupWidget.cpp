@@ -76,6 +76,13 @@ EditGroupWidget::EditGroupWidget(QWidget* parent)
 {
     m_mainUi->setupUi(m_editGroupWidgetMain);
 
+    // QPlainTextEdit inserts a literal tab character on Tab instead of moving
+    // focus by default. Left uncorrected, keyboard/screen reader users tabbing
+    // into the notes field cannot tab back out to reach expireCheck or the
+    // dialog buttons -- Tab appears to do nothing but is actually editing the
+    // field's text.
+    m_mainUi->editNotes->setTabChangesFocus(true);
+
     addPage(tr("Group"), icons()->icon("document-edit"), m_editGroupWidgetMain);
     addPage(tr("Icon"), icons()->icon("preferences-desktop-icons"), m_editGroupWidgetIcons);
 #if defined(KPXC_FEATURE_BROWSER)
