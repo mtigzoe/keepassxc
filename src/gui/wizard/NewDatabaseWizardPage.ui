@@ -25,7 +25,23 @@
   <property name="subTitle">
    <string>Here you can adjust the database encryption settings. Don't worry, you can change them later in the database settings.</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1">
+   <item>
+    <widget class="QLabel" name="pageHeadingLabel">
+     <property name="focusPolicy">
+      <enum>Qt::TabFocus</enum>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="text">
+      <string notr="true"/>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="QScrollArea" name="pageContent">
      <property name="sizePolicy">

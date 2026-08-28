@@ -69,6 +69,14 @@ void NewDatabaseWizardPage::initializePage()
         return;
     }
 
+    // QWizard's own MacStyle title/subtitle chrome is spoken by JAWS but isn't a
+    // stable widget a braille display can bind focus to (it's private Qt wizard
+    // painting, not a real object in our widget tree). Mirror the same text into
+    // pageHeadingLabel, a real 0x0 focusable label we control, so braille has
+    // something to land on. Kept invisible (0x0) so sighted users don't see the
+    // heading rendered twice.
+    m_ui->pageHeadingLabel->setText(QStringLiteral("%1. %2").arg(title(), subTitle()));
+
     m_pageWidget->loadSettings(m_db);
 }
 
