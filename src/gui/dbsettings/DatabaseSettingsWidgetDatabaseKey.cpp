@@ -238,6 +238,15 @@ void DatabaseSettingsWidgetDatabaseKey::discard()
 void DatabaseSettingsWidgetDatabaseKey::showAdditionalKeyOptions()
 {
     setAdditionalKeyOptionsVisible(true);
+
+    // m_additionalKeyOptionsToggle hides itself as part of showing this section, so the
+    // button a keyboard/screen reader user just activated disappears from under focus with
+    // nowhere sensible for focus to land on its own. Send focus to the first control of the
+    // newly revealed content instead, following the same findChild<QPushButton*>("...")
+    // convention already used above in loadSettings().
+    if (auto* addButton = m_keyFileEditWidget->findChild<QPushButton*>("addButton")) {
+        addButton->setFocus();
+    }
 }
 
 void DatabaseSettingsWidgetDatabaseKey::setAdditionalKeyOptionsVisible(bool show)

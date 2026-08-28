@@ -27,6 +27,7 @@
 #include "gui/osutils/OSUtils.h"
 #include "gui/styles/StateColorPalette.h"
 
+#include <QAccessible>
 #include <QEvent>
 #include <QLineEdit>
 #include <QTimer>
@@ -224,6 +225,7 @@ void PasswordWidget::updateRepeatStatus()
 
     const auto otherPassword = m_parentPasswordWidget->text();
     const auto password = text();
+    QString statusText;
     if (otherPassword != password) {
         bool isCorrect = false;
         StateColorPalette statePalette;
@@ -235,10 +237,28 @@ void PasswordWidget::updateRepeatStatus()
         setStyleSheet(stylesheetTemplate.arg(color.name()));
         m_correctAction->setVisible(isCorrect);
         m_errorAction->setVisible(!isCorrect);
+        statusText = isCorrect ? m_correctAction->toolTip() : m_errorAction->toolTip();
     } else {
         m_correctAction->setVisible(false);
         m_errorAction->setVisible(false);
         setStyleSheet("");
+        statusText = password.isEmpty() ? QString() : tr("Passwords match");
+    }
+
+    // The match state above is otherwise conveyed only by background color and a
+    // trailing icon (m_correctAction/m_errorAction) -- neither perceivable by a
+    // screen reader user typing in this field. accessibleDescription is set from
+    // the fixed strings above, never from password content, so this cannot leak
+    // what was typed. Set it on the focus proxy (m_ui->passwordEdit), since that's
+    // the object a screen reader actually reports on (see setAccessibleName()
+    // above), and fire Alert the same way MessageWidget::showMessage() does so the
+    // change is announced immediately without moving keyboard focus.
+    if (statusText != m_ui->passwordEdit->accessibleDescription()) {
+        m_ui->passwordEdit->setAccessibleDescription(statusText);
+        if (!statusText.isEmpty()) {
+            QAccessibleEvent alertEvent(m_ui->passwordEdit, QAccessible::Alert);
+            QAccessible::updateAccessibility(&alertEvent);
+        }
     }
 }
 
