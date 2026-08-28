@@ -435,6 +435,9 @@
                <property name="focusPolicy">
                 <enum>Qt::WheelFocus</enum>
                </property>
+               <property name="accessibleName">
+                <string>Benchmark transform delay</string>
+               </property>
               </widget>
              </item>
              <item>
