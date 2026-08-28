@@ -132,6 +132,9 @@
        </item>
        <item>
         <widget class="QTabWidget" name="encryptionSettingsTabWidget">
+         <property name="accessibleName">
+          <string>Encryption Settings</string>
+         </property>
          <property name="tabPosition">
           <enum>QTabWidget::North</enum>
          </property>
