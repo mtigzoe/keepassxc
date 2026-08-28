@@ -46,6 +46,10 @@ ImportWizardPageReview::ImportWizardPageReview(QWidget* parent)
     , m_ui(new Ui::ImportWizardPageReview)
     , m_remoteHandler(new RemoteHandler(this))
 {
+    // This page never set a title or subtitle, so it had no visible/accessible in-page
+    // heading at all under MacStyle (see ImportWizardPageSelect for the same fix).
+    setTitle(tr("Review Import"));
+    setSubTitle(tr("Review the entries below before completing the import."));
 }
 
 ImportWizardPageReview::~ImportWizardPageReview()

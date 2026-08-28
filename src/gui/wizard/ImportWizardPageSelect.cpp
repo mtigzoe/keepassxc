@@ -33,6 +33,11 @@ ImportWizardPageSelect::ImportWizardPageSelect(QWidget* parent)
 {
     m_ui->setupUi(this);
 
+    // MacStyle only renders subTitle as a visible/accessible in-page label; title alone
+    // (set in the .ui file) is not exposed as an in-page heading under this wizard style.
+    // Without this, screen reader users get no heading when the page gains focus.
+    setSubTitle(tr("Choose a file to import and where to import it."));
+
     // QPlainTextEdit inserts a literal tab character on Tab instead of moving
     // focus by default, trapping keyboard/screen reader users who tab into
     // this field (see the same fix applied to EditGroupWidget's notes field).

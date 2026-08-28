@@ -669,7 +669,9 @@
   <tabstop>hardwareKeyCombo</tabstop>
   <tabstop>refreshHardwareKeys</tabstop>
   <tabstop>addKeyFileLinkLabel</tabstop>
-  <tabstop>buttonBox</tabstop>
+  <!-- buttonBox intentionally omitted here: DatabaseOpenWidget's
+       constructor sets up explicit tab order through its individual
+       buttons at runtime instead. See the comment there for why. -->
  </tabstops>
  <resources/>
  <connections/>

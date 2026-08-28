@@ -31,6 +31,9 @@
    </property>
    <item>
     <widget class="QListWidget" name="importTypeList">
+     <property name="accessibleName">
+      <string>Import format</string>
+     </property>
      <property name="sizePolicy">
       <sizepolicy hsizetype="MinimumExpanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -253,6 +256,9 @@
             <widget class="QComboBox" name="existingDatabaseChoice">
              <property name="enabled">
               <bool>false</bool>
+             </property>
+             <property name="accessibleName">
+              <string>Existing database to import into</string>
              </property>
             </widget>
            </item>

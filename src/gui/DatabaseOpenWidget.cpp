@@ -82,6 +82,24 @@ DatabaseOpenWidget::DatabaseOpenWidget(QWidget* parent)
     connect(m_ui->buttonBox, SIGNAL(accepted()), SLOT(openDatabase()));
     connect(m_ui->buttonBox, SIGNAL(rejected()), SLOT(reject()));
 
+    // The .ui's <tabstops> ends with a single entry naming buttonBox
+    // itself, not its individual "Unlock"/"Close" buttons. QDialogButtonBox
+    // isn't focusable -- it's a layout container -- so
+    // QWidget::setTabOrder(prev, buttonBox) only reliably wires up the
+    // forward direction into some child of the box; it doesn't reliably
+    // establish the reverse link back out of the box, or the order between
+    // its own buttons. That's exactly the asymmetry reported in testing:
+    // Tab could reach "Close", but Shift+Tab back to it couldn't. Chaining
+    // explicitly through buttonBox->buttons() (which returns the buttons in
+    // their real, platform-correct visual order -- Ok/Cancel order differs
+    // by platform) fixes both directions.
+    QWidget* tabOrderPrev = m_ui->addKeyFileLinkLabel;
+    const auto boxButtons = m_ui->buttonBox->buttons();
+    for (auto* boxButton : boxButtons) {
+        setTabOrder(tabOrderPrev, boxButton);
+        tabOrderPrev = boxButton;
+    }
+
     connect(m_ui->addKeyFileLinkLabel, &QPushButton::clicked, this, &DatabaseOpenWidget::browseKeyFile);
     // Give it a clearer, verb-led accessible name than its visible text
     // ("I have a key file") -- see DatabaseOpenWidget.ui for why this is a
