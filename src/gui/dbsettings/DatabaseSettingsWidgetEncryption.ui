@@ -119,6 +119,9 @@
        </item>
        <item>
         <widget class="QLabel" name="label">
+         <property name="focusPolicy">
+          <enum>Qt::TabFocus</enum>
+         </property>
          <property name="font">
           <font>
            <weight>75</weight>
@@ -127,6 +130,12 @@
          </property>
          <property name="text">
           <string>Encryption Settings:</string>
+         </property>
+         <property name="accessibleName">
+          <string>Encryption Settings</string>
+         </property>
+         <property name="accessibleDescription">
+          <string>Configure the encryption algorithm, key derivation function, and decryption time.</string>
          </property>
         </widget>
        </item>
@@ -536,6 +545,7 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>label</tabstop>
   <tabstop>decryptionTimeSlider</tabstop>
   <tabstop>algorithmComboBox</tabstop>
   <tabstop>kdfComboBox</tabstop>
