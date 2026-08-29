@@ -13,6 +13,9 @@
   <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <widget class="QScrollArea" name="scrollArea">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
@@ -82,6 +85,9 @@
            <property name="accessibleName">
             <string>Database format</string>
            </property>
+           <property name="accessibleDescription">
+            <string>Database Format and Encryption. Choose the database format and configure encryption settings.</string>
+           </property>
           </widget>
          </item>
          <item row="1" column="1">
@@ -127,6 +133,12 @@
          </property>
          <property name="text">
           <string>Encryption Settings:</string>
+         </property>
+         <property name="accessibleName">
+          <string>Encryption Settings</string>
+         </property>
+         <property name="accessibleDescription">
+          <string>Configure the encryption algorithm, key derivation function, and decryption time.</string>
          </property>
         </widget>
        </item>
@@ -536,6 +548,7 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>compatibilitySelection</tabstop>
   <tabstop>decryptionTimeSlider</tabstop>
   <tabstop>algorithmComboBox</tabstop>
   <tabstop>kdfComboBox</tabstop>

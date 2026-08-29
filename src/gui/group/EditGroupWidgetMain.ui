@@ -125,10 +125,13 @@
       <item>
        <widget class="QLabel" name="labelNotes">
         <property name="text">
-         <string>Notes:</string>
+         <string>&amp;Notes:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="buddy">
+         <cstring>editNotes</cstring>
         </property>
        </widget>
       </item>
