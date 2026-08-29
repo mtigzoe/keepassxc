@@ -23,6 +23,7 @@
 #include "gui/dbsettings/DatabaseSettingsWidget.h"
 
 #include <QComboBox>
+#include <QLineEdit>
 
 NewDatabaseWizardPage::NewDatabaseWizardPage(QWidget* parent)
     : QWizardPage(parent)
@@ -80,6 +81,24 @@ void NewDatabaseWizardPage::initializePage()
             tr("Database format. %1").arg(guidance));
         formatCombo->setAccessibleDescription(
             tr("Database Format and Encryption. Choose the database format and configure encryption settings."));
+    }
+    // Same fix, replicated for the MetaData page's first field (the database
+    // name, see DatabaseSettingsWidgetMetaDataSimple.ui) and the DatabaseKey
+    // page's first field (the master password, see PasswordEditWidget.ui,
+    // which is also where loadSettings() below sends initial focus).
+    // findChild() no-ops on pages that don't have a control by that name, so
+    // this is safe to leave unconditional across all three pages.
+    if (auto* nameField = m_pageWidget->findChild<QLineEdit*>(QStringLiteral("databaseName"))) {
+        const QString guidance = tr("%1. %2").arg(title(), subTitle());
+        nameField->setAccessibleName(tr("Database name field. %1").arg(guidance));
+        nameField->setAccessibleDescription(
+            tr("General Database Information. Enter a display name and optional description for your new database."));
+    }
+    if (auto* passwordField = m_pageWidget->findChild<QWidget*>(QStringLiteral("enterPasswordEdit"))) {
+        const QString guidance = tr("%1. %2").arg(title(), subTitle());
+        passwordField->setAccessibleName(tr("Password field. %1").arg(guidance));
+        passwordField->setAccessibleDescription(
+            tr("Database Credentials. Enter and confirm a password to protect your new database."));
     }
     // Also expose on the page itself for ATs that read the container.
     setAccessibleDescription(tr("%1. %2").arg(title(), subTitle()));
