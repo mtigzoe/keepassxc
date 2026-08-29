@@ -71,10 +71,14 @@ void NewDatabaseWizardPage::initializePage()
         return;
     }
 
-    m_ui->formatSectionLabel->setAccessibleName(tr("Database Format and Encryption section"));
-    m_ui->formatSectionLabel->setText(tr("Database Format and Encryption"));
-    m_ui->formatSectionLabel->setAccessibleDescription(
-        tr("This section lets you choose the database format and configure encryption settings."));
+    // JAWS/braille skip standalone QLabels (StaticText role) even with TabFocus.
+    // Put the section landmark text on the first interactive control instead.
+    if (auto* formatCombo = m_pageWidget->findChild<QComboBox*>(QStringLiteral("compatibilitySelection"))) {
+        formatCombo->setAccessibleName(tr("Database format"));
+        formatCombo->setAccessibleDescription(
+            tr("Database Format and Encryption. Choose the database format and configure encryption settings. %1. %2")
+                .arg(title(), subTitle()));
+    }
 
     m_pageWidget->loadSettings(m_db);
 }
