@@ -31,11 +31,14 @@
      <property name="focusPolicy">
       <enum>Qt::TabFocus</enum>
      </property>
-     <property name="maximumSize">
-      <size>
-       <width>0</width>
-       <height>0</height>
-      </size>
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
      <property name="text">
       <string notr="true"/>
