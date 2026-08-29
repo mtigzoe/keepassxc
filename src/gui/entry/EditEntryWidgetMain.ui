@@ -66,7 +66,7 @@
     <item row="1" column="0">
      <widget class="QLabel" name="usernameLabel">
       <property name="text">
-       <string>&#38;Username:</string>
+       <string>Username:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -118,7 +118,7 @@
     <item row="0" column="0">
      <widget class="QLabel" name="titleLabel">
       <property name="text">
-       <string>&#38;Title:</string>
+       <string>Title:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -131,7 +131,7 @@
     <item row="2" column="0">
      <widget class="QLabel" name="passwordLabel">
       <property name="text">
-       <string>&#38;Password:</string>
+       <string>Password:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -216,7 +216,7 @@
     <item row="3" column="0">
      <widget class="QLabel" name="urlLabel">
       <property name="text">
-       <string>UR&#38;L:</string>
+       <string>URL:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -258,7 +258,7 @@
       <item>
        <widget class="QLabel" name="notesLabel">
         <property name="text">
-         <string>&#38;Notes:</string>
+         <string>Notes:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -325,7 +325,7 @@
     <item row="5" column="0">
      <widget class="QLabel" name="tagsLabel">
       <property name="text">
-       <string>T&#38;ags:</string>
+       <string>Tags:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -338,7 +338,7 @@
     <item row="7" column="0">
      <widget class="QLabel" name="expireLabel">
       <property name="text">
-       <string>&#38;Expires:</string>
+       <string>Expires:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
