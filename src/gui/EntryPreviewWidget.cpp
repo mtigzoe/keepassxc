@@ -28,6 +28,7 @@
 #include "keeshare/KeeShare.h"
 #include "keeshare/KeeShareSettings.h"
 
+#include <QAccessible>
 #include <QScrollBar>
 #include <QTabWidget>
 namespace
@@ -434,10 +435,32 @@ void EntryPreviewWidget::updateEntryAdvancedTab()
                 button->setChecked(false);
                 button->setIcon(icons()->onOffIcon("password-show", false));
                 button->setProperty("row", i);
+                button->setProperty("attributeKey", key);
                 button->setIconSize({12, 12});
+                // Each row gets its own reveal button with no visible text, so without
+                // an explicit accessible name JAWS/braille announce it as an unlabeled
+                // "toggle button" and can't tell rows apart. Name and tooltip include
+                // the attribute key and current action; both are refreshed on toggle
+                // (see below) so the label always matches what activating it will do.
+                button->setToolTip(tr("Show %1").arg(key));
+                button->setAccessibleName(tr("Show %1").arg(key));
                 connect(button, &QToolButton::clicked, this, [this](bool state) {
                     auto btn = qobject_cast<QToolButton*>(sender());
+                    const auto attrKey = btn->property("attributeKey").toString();
                     btn->setIcon(icons()->onOffIcon("password-show", state));
+                    const auto label = state ? tr("Hide %1").arg(attrKey) : tr("Show %1").arg(attrKey);
+                    btn->setToolTip(label);
+                    btn->setAccessibleName(label);
+                    // Qt doesn't reliably notify assistive tech of a QToolButton's new
+                    // accessible name or checked state on its own; fire this explicitly
+                    // so JAWS/braille pick up the change immediately, the same way
+                    // PasswordWidget::updateRepeatStatus() announces its state changes.
+                    QAccessibleEvent nameChanged(btn, QAccessible::NameChanged);
+                    QAccessible::updateAccessibility(&nameChanged);
+                    QAccessible::State changedState;
+                    changedState.checked = true;
+                    QAccessibleStateChangeEvent stateChanged(btn, changedState);
+                    QAccessible::updateAccessibility(&stateChanged);
                     auto item = m_ui->entryAttributesTable->item(btn->property("row").toInt(), 2);
                     if (state) {
                         item->setText(item->data(Qt::UserRole).toString());

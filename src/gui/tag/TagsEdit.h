@@ -73,7 +73,15 @@ protected:
 private:
     bool isAcceptableInput(QKeyEvent const* event) const;
 
+    // Chips are hand-painted directly onto the viewport with no underlying
+    // accessible text objects, so nothing in this widget is otherwise visible
+    // to JAWS/braille. These route state through accessibleDescription plus
+    // an explicit Alert event so changes are actually announced.
+    QString tagsSummary() const;
+    void announceTagsState(const QString& message);
+
     struct Impl;
     std::unique_ptr<Impl> impl;
     bool m_readOnly;
+    bool m_usageHintAnnounced = false;
 };
