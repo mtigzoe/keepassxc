@@ -66,7 +66,7 @@
     <item row="1" column="0">
      <widget class="QLabel" name="usernameLabel">
       <property name="text">
-       <string>&amp;Username:</string>
+       <string>&Username:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -103,7 +103,13 @@
          </size>
         </property>
         <property name="accessibleName">
-         <string>Notes field</string>
+         <string>Notes</string>
+        </property>
+        <property name="accessibleDescription">
+         <string>Multi-line notes for this entry. Text you type is shown on braille when focused.</string>
+        </property>
+        <property name="placeholderText">
+         <string>Enter notes for this entry</string>
         </property>
        </widget>
       </item>
@@ -112,7 +118,7 @@
     <item row="0" column="0">
      <widget class="QLabel" name="titleLabel">
       <property name="text">
-       <string>&amp;Title:</string>
+       <string>&Title:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -125,7 +131,7 @@
     <item row="2" column="0">
      <widget class="QLabel" name="passwordLabel">
       <property name="text">
-       <string>&amp;Password:</string>
+       <string>&Password:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -210,7 +216,7 @@
     <item row="3" column="0">
      <widget class="QLabel" name="urlLabel">
       <property name="text">
-       <string>UR&amp;L:</string>
+       <string>UR&L:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -252,7 +258,7 @@
       <item>
        <widget class="QLabel" name="notesLabel">
         <property name="text">
-         <string>&amp;Notes:</string>
+         <string>&Notes:</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -319,7 +325,7 @@
     <item row="5" column="0">
      <widget class="QLabel" name="tagsLabel">
       <property name="text">
-       <string>T&amp;ags:</string>
+       <string>T&ags:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -332,7 +338,7 @@
     <item row="7" column="0">
      <widget class="QLabel" name="expireLabel">
       <property name="text">
-       <string>&amp;Expires:</string>
+       <string>&Expires:</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
