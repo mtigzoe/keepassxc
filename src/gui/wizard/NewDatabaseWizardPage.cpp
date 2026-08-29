@@ -71,14 +71,18 @@ void NewDatabaseWizardPage::initializePage()
         return;
     }
 
-    // JAWS/braille skip standalone QLabels (StaticText role) even with TabFocus.
-    // Put the section landmark text on the first interactive control instead.
+    // JAWS reads QWizard subTitle; braille typically only shows the focused
+    // control's accessibleName. Put the page guidance on the first combo so
+    // both speech and braille get it when Tab lands on Database format.
     if (auto* formatCombo = m_pageWidget->findChild<QComboBox*>(QStringLiteral("compatibilitySelection"))) {
-        formatCombo->setAccessibleName(tr("Database format"));
+        const QString guidance = tr("%1. %2").arg(title(), subTitle());
+        formatCombo->setAccessibleName(
+            tr("Database format. %1").arg(guidance));
         formatCombo->setAccessibleDescription(
-            tr("Database Format and Encryption. Choose the database format and configure encryption settings. %1. %2")
-                .arg(title(), subTitle()));
+            tr("Database Format and Encryption. Choose the database format and configure encryption settings."));
     }
+    // Also expose on the page itself for ATs that read the container.
+    setAccessibleDescription(tr("%1. %2").arg(title(), subTitle()));
 
     m_pageWidget->loadSettings(m_db);
 }
