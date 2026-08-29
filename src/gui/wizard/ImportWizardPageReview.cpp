@@ -50,6 +50,20 @@ ImportWizardPageReview::ImportWizardPageReview(QWidget* parent)
     // heading at all under MacStyle (see ImportWizardPageSelect for the same fix).
     setTitle(tr("Review Import"));
     setSubTitle(tr("Review the entries below before completing the import."));
+
+    // Expose title+subTitle on the page container so JAWS's window
+    // virtualization (Insert+Alt+W) and "say all" pick it up, same as
+    // NewDatabaseWizardPage and ImportWizardPageSelect.
+    //
+    // NOT done here: attaching the guidance to the page's first focusable
+    // control for braille, the way NewDatabaseWizardPageEncryption's combo
+    // and ImportWizardPageSelect's import type list do. initializePage()
+    // below tears down and rebuilds this page's contents per import type
+    // (CSV widget vs. preview table), so "first focusable control" isn't
+    // fixed -- attaching to the wrong one would need to be caught by testing
+    // rather than reasoned out here. Flagging for Miriam rather than
+    // guessing which widget to hang it on.
+    setAccessibleDescription(tr("%1. %2").arg(title(), subTitle()));
 }
 
 ImportWizardPageReview::~ImportWizardPageReview()

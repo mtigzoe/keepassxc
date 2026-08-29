@@ -38,6 +38,20 @@ ImportWizardPageSelect::ImportWizardPageSelect(QWidget* parent)
     // Without this, screen reader users get no heading when the page gains focus.
     setSubTitle(tr("Choose a file to import and where to import it."));
 
+    // Expose title+subTitle on the page container itself. JAWS's window
+    // virtualization (Insert+Alt+W) and "say all" read whatever QAccessible
+    // exposes for the container, same as NewDatabaseWizardPage; without this
+    // the page has no accessible description of its own (see also the combo
+    // box accessibleName fix on NewDatabaseWizardPageEncryption).
+    setAccessibleDescription(tr("%1. %2").arg(title(), subTitle()));
+
+    // Braille displays typically only show the focused control's
+    // accessibleName, not surrounding static text. The import type list is
+    // the fixed first tab stop on this page (selected by default below), so
+    // put the page guidance there for braille users, mirroring the fix on
+    // the Database format combo in NewDatabaseWizardPageEncryption.
+    m_ui->importTypeList->setAccessibleName(tr("Import type. %1").arg(subTitle()));
+
     // QPlainTextEdit inserts a literal tab character on Tab instead of moving
     // focus by default, trapping keyboard/screen reader users who tab into
     // this field (see the same fix applied to EditGroupWidget's notes field).
