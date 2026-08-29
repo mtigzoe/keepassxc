@@ -19,6 +19,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+#include <QAccessible>
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QDir>
@@ -107,6 +108,8 @@ MainWindow::MainWindow()
     if (config()->get(Config::GUI_CompactMode).toBool()) {
         m_ui->toolBar->setIconSize({20, 20});
     }
+
+    m_ui->toolBar->setAccessibleName(tr("Database toolbar"));
 
     // Setup the search widget in the toolbar
     m_searchWidget = new SearchWidget();
@@ -1597,6 +1600,11 @@ void MainWindow::updateEntryCountLabel()
     } else {
         m_statusBarLabel->setText("");
     }
+
+    // QLabel text changes are silent to screen readers by default; fire an
+    // explicit NameChanged event so JAWS/braille announce the updated count.
+    QAccessibleEvent accessibleEvent(m_statusBarLabel, QAccessible::NameChanged);
+    QAccessible::updateAccessibility(&accessibleEvent);
 }
 
 void MainWindow::obtainContextFocusLock()

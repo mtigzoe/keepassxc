@@ -157,10 +157,12 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     m_previewSplitter->setChildrenCollapsible(true);
 
     m_groupView->setObjectName("groupView");
+    m_groupView->setAccessibleName(tr("Groups"));
     m_groupView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_groupView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(emitGroupContextMenuRequested(QPoint)));
 
     m_entryView->setObjectName("entryView");
+    m_entryView->setAccessibleName(tr("Entries"));
     m_entryView->setContextMenuPolicy(Qt::CustomContextMenu);
     m_entryView->displayGroup(m_db->rootGroup());
     connect(m_entryView, SIGNAL(customContextMenuRequested(QPoint)), SLOT(emitEntryContextMenuRequested(QPoint)));
