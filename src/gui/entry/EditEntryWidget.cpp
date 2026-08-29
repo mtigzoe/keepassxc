@@ -199,6 +199,11 @@ void EditEntryWidget::setupMain()
     m_mainUi->setupUi(m_mainWidget);
     addPage(tr("Entry"), icons()->icon("document-edit"), m_mainWidget);
 
+    // QPlainTextEdit swallows Tab as a literal tab character by default,
+    // trapping keyboard/screen-reader users in the field. Match the group
+    // Notes field, which already opts out of that via setTabChangesFocus.
+    m_mainUi->notesEdit->setTabChangesFocus(true);
+
     // Disable mouse wheel grab when scrolling
     m_mainUi->usernameComboBox->installEventFilter(new MouseWheelEventFilter(this));
     m_mainUi->usernameComboBox->setEditable(true);
