@@ -71,17 +71,10 @@ void NewDatabaseWizardPage::initializePage()
         return;
     }
 
-    // Two attempts at a standalone heading QLabel (0x0, then normal size) were both
-    // silently skipped by JAWS/braille -- a Tab stop with accessibility role StaticText
-    // may simply be filtered by screen readers regardless of size or focusPolicy.
-    // Attaching the same title/subtitle text as accessibleDescription on a real,
-    // already-confirmed-reachable control instead: on the Encryption page that's
-    // compatibilitySelection, which the user has verified JAWS and braille both read.
-    // findChild() is a no-op (returns nullptr) on pages that don't have this control,
-    // so this is safe to leave unconditional here rather than duplicated per subclass.
-    if (auto* firstControl = m_pageWidget->findChild<QComboBox*>(QStringLiteral("compatibilitySelection"))) {
-        firstControl->setAccessibleDescription(QStringLiteral("%1. %2").arg(title(), subTitle()));
-    }
+    m_ui->formatSectionLabel->setAccessibleName(tr("Database Format and Encryption section"));
+    m_ui->formatSectionLabel->setText(tr("Database Format and Encryption"));
+    m_ui->formatSectionLabel->setAccessibleDescription(
+        tr("This section lets you choose the database format and configure encryption settings."));
 
     m_pageWidget->loadSettings(m_db);
 }
