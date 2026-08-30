@@ -141,9 +141,37 @@ void DatabaseSettingsWidgetEncryption::initialize()
     m_ui->compatibilitySelection->blockSignals(false);
 
     // Disable KDBX selector if downgrading would lose data
+    //
+    // loadSettings() -> initialize() (this function) reruns every time this
+    // page becomes current again, e.g. Back then Next in the wizard, on the
+    // same long-lived widget instance -- so accessibleDescription needs to
+    // be set from a fixed baseline each time, not read-and-appended-to,
+    // otherwise repeat visits would keep stacking the same explanation onto
+    // itself. kBaseAccessibleDescription mirrors the static text the .ui
+    // file gives compatibilitySelection when it's enabled. Deliberately not
+    // `static`: this needs to re-evaluate tr() on every call in case the UI
+    // language was changed since the first time this page was shown, not
+    // cache a translation from whichever language was active on first
+    // construction.
+    const QString kBaseAccessibleDescription =
+        tr("Database Format and Encryption. Choose the database format and configure encryption settings.");
     if (!isKdbx3 && KeePass2Writer::kdbxVersionRequired(m_db.data(), true, true) >= KeePass2::FILE_VERSION_4) {
         m_ui->compatibilitySelection->setEnabled(false);
         m_ui->formatCannotBeChanged->setVisible(true);
+        // Disabled widgets are excluded from the Tab focus chain (standard
+        // Qt/AT behavior), so a keyboard/screen reader user tabbing through
+        // this page never reaches compatibilitySelection at all once it's
+        // disabled here -- formatCannotBeChanged's explanation is
+        // visible-only and effectively undiscoverable to them by the normal
+        // means (they'd need Insert+Alt+W window virtualization or similar
+        // to ever see it). Fold the real reason into the combo's own
+        // description so anything that does inspect the disabled combo
+        // directly gets the actual reason, not just the generic baseline
+        // text that actively invites choosing something now locked.
+        m_ui->compatibilitySelection->setAccessibleDescription(
+            tr("%1. %2").arg(kBaseAccessibleDescription, m_ui->formatCannotBeChanged->text()));
+    } else {
+        m_ui->compatibilitySelection->setAccessibleDescription(kBaseAccessibleDescription);
     }
 
     // Set up encryption ciphers
