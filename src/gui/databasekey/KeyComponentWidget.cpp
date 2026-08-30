@@ -97,11 +97,27 @@ void KeyComponentWidget::doEdit()
 void KeyComponentWidget::doRemove()
 {
     changeVisiblePage(Page::AddNew);
+    // setCurrentIndex() above hides the previously-focused widget inside the
+    // Edit page (e.g. a password field) without moving focus anywhere else --
+    // Qt does not automatically refocus a sensible visible widget when the
+    // one that currently has focus is hidden. Left alone, keyboard/screen
+    // reader focus is silently orphaned on a widget that no longer exists in
+    // the visible page. addButton is what a keyboard user landing on this
+    // now-visible page would expect to reach.
+    m_ui->addButton->setFocus();
 }
 
 void KeyComponentWidget::cancelEdit()
 {
     m_ui->stackedWidget->setCurrentIndex(m_previousPage);
+    // Same reasoning as doRemove(): hiding the Edit page's focused field
+    // doesn't move focus anywhere on its own. Refocus the primary control of
+    // whichever page we're returning to.
+    if (m_previousPage == Page::LeaveOrRemove) {
+        m_ui->changeButton->setFocus();
+    } else {
+        m_ui->addButton->setFocus();
+    }
     emit editCanceled();
 }
 
