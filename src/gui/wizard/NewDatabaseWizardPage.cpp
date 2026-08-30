@@ -20,6 +20,7 @@
 #include "ui_NewDatabaseWizardPage.h"
 
 #include "core/Database.h"
+#include "gui/PasswordWidget.h"
 #include "gui/dbsettings/DatabaseSettingsWidget.h"
 
 #include <QComboBox>
@@ -94,11 +95,23 @@ void NewDatabaseWizardPage::initializePage()
         nameField->setAccessibleDescription(
             tr("General Database Information. Enter a display name and optional description for your new database."));
     }
-    if (auto* passwordField = m_pageWidget->findChild<QWidget*>(QStringLiteral("enterPasswordEdit"))) {
-        const QString guidance = tr("%1. %2").arg(title(), subTitle());
-        passwordField->setAccessibleName(tr("Password field. %1").arg(guidance));
-        passwordField->setAccessibleDescription(
-            tr("Database Credentials. Enter and confirm a password to protect your new database."));
+    if (auto* passwordField = m_pageWidget->findChild<PasswordWidget*>(QStringLiteral("enterPasswordEdit"))) {
+        // Must be typed as PasswordWidget*, not QWidget*: setAccessibleName()
+        // is non-virtual, and PasswordWidget hides the base implementation to
+        // redirect to its internal QLineEdit (see PasswordWidget.h). Calling
+        // it through a QWidget* -- as findChild<QWidget*> would give you --
+        // silently names the outer container instead, which JAWS never
+        // reports on since focus always proxies to the inner field.
+        //
+        // Deliberately not setting accessibleDescription here (unlike the
+        // other two fields above): PasswordWidget doesn't override it the
+        // way it overrides setAccessibleName, so it wouldn't reach the inner
+        // field either. It's also already used internally by PasswordWidget
+        // itself for live password-match status announcements (see
+        // PasswordWidget.cpp), so a static description set from outside
+        // would fight with that. title()/subTitle() are already folded into
+        // accessibleName below, so nothing is lost.
+        passwordField->setAccessibleName(tr("Password field. %1").arg(tr("%1. %2").arg(title(), subTitle())));
     }
     // Also expose on the page itself for ATs that read the container.
     setAccessibleDescription(tr("%1. %2").arg(title(), subTitle()));
