@@ -172,6 +172,13 @@ void ImportWizardPageReview::setupDatabasePreview()
 
     auto tableWidget = new QTableWidget(entryList.count(), headerLabels.count());
     tableWidget->setHorizontalHeaderLabels(headerLabels);
+    // This table has no static label anywhere on the page (previewLabel just
+    // holds the entry count above it), and unlike the CSV path's widget tree,
+    // nothing else names it. Tab lands here directly for non-CSV imports.
+    tableWidget->setAccessibleName(tr("Import preview"));
+    tableWidget->setAccessibleDescription(
+        tr("Preview of %1 entries to be imported, with columns for group, title, username, password, and URL.")
+            .arg(entryList.count()));
 
     int row = 0;
     for (auto entry : entryList) {

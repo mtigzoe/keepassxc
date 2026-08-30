@@ -42,6 +42,9 @@
        <layout class="QGridLayout" name="gridLayout">
         <item row="4" column="1">
          <widget class="QComboBox" name="urlCombo">
+          <property name="accessibleName">
+           <string>URL column</string>
+          </property>
           <property name="maximumSize">
            <size>
             <width>200</width>
@@ -55,6 +58,9 @@
         </item>
         <item row="2" column="1">
          <widget class="QComboBox" name="usernameCombo">
+          <property name="accessibleName">
+           <string>Username column</string>
+          </property>
           <property name="maximumSize">
            <size>
             <width>200</width>
@@ -125,6 +131,9 @@
         </item>
         <item row="3" column="4">
          <widget class="QComboBox" name="lastModifiedCombo">
+          <property name="accessibleName">
+           <string>Last Modified column</string>
+          </property>
           <property name="maximumSize">
            <size>
             <width>200</width>
@@ -138,6 +147,9 @@
         </item>
         <item row="2" column="4">
          <widget class="QComboBox" name="iconCombo">
+          <property name="accessibleName">
+           <string>Icon column</string>
+          </property>
           <property name="maximumSize">
            <size>
             <width>200</width>
@@ -151,6 +163,9 @@
         </item>
         <item row="1" column="4">
          <widget class="QComboBox" name="totpCombo">
+          <property name="accessibleName">
+           <string>TOTP column</string>
+          </property>
           <property name="maximumSize">
            <size>
             <width>200</width>
@@ -183,6 +198,9 @@
         </item>
         <item row="1" column="1">
          <widget class="QComboBox" name="titleCombo">
+          <property name="accessibleName">
+           <string>Title column</string>
+          </property>
           <property name="maximumSize">
            <size>
             <width>200</width>
@@ -196,6 +214,9 @@
         </item>
         <item row="0" column="4">
          <widget class="QComboBox" name="notesCombo">
+          <property name="accessibleName">
+           <string>Notes column</string>
+          </property>
           <property name="maximumSize">
            <size>
             <width>200</width>
@@ -263,6 +284,9 @@
         </item>
         <item row="4" column="4">
          <widget class="QComboBox" name="createdCombo">
+          <property name="accessibleName">
+           <string>Created column</string>
+          </property>
           <property name="maximumSize">
            <size>
             <width>200</width>
@@ -314,6 +338,9 @@
         </item>
         <item row="3" column="1">
          <widget class="QComboBox" name="passwordCombo">
+          <property name="accessibleName">
+           <string>Password column</string>
+          </property>
           <property name="maximumSize">
            <size>
             <width>200</width>
@@ -365,6 +392,9 @@
         </item>
         <item row="0" column="1">
          <widget class="QComboBox" name="groupCombo">
+          <property name="accessibleName">
+           <string>Group column</string>
+          </property>
           <property name="maximumSize">
            <size>
             <width>200</width>
@@ -394,6 +424,9 @@
         </item>
         <item row="5" column="1">
          <widget class="QComboBox" name="tagsCombo">
+          <property name="accessibleName">
+           <string>Tags column</string>
+          </property>
           <property name="maximumSize">
            <size>
             <width>200</width>
