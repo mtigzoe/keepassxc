@@ -26,6 +26,8 @@
 #include "keys/CompositeKey.h"
 #include "keys/drivers/YubiKeyInterfaceUSB.h"
 
+#include <QAccessible>
+
 YubiKeyEditWidget::YubiKeyEditWidget(QWidget* parent)
     : KeyComponentWidget(parent)
     , m_compUi(new Ui::YubiKeyEditWidget())
@@ -165,6 +167,14 @@ void YubiKeyEditWidget::hardwareKeyResponse(bool found)
                                                       ? tr("Hardware keys found, but no slots are configured")
                                                       : tr("No hardware keys detected"));
         m_isDetected = false;
+        // Detection is asynchronous. initComponentEditWidget() sends focus to
+        // comboChallengeResponse before findValidKeysAsync() completes, so by
+        // the time this result lands the user is already sitting on the
+        // combo waiting -- the only other cue is yubikeyProgress disappearing,
+        // which a screen reader user can't see. Same Alert pattern as
+        // PasswordWidget's live match-status announcement.
+        QAccessibleEvent alertEvent(m_compUi->comboChallengeResponse, QAccessible::Alert);
+        QAccessible::updateAccessibility(&alertEvent);
         return;
     }
 
@@ -177,4 +187,9 @@ void YubiKeyEditWidget::hardwareKeyResponse(bool found)
     m_isDetected = true;
     m_compUi->yubikeyProgress->setVisible(false);
     m_compUi->comboChallengeResponse->setEnabled(true);
+    // Same silent-update problem as the not-found case above: the combo now
+    // has real, selectable entries, but nothing prompts a screen reader to
+    // re-read it.
+    QAccessibleEvent alertEvent(m_compUi->comboChallengeResponse, QAccessible::Alert);
+    QAccessible::updateAccessibility(&alertEvent);
 }
