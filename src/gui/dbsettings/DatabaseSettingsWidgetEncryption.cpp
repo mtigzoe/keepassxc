@@ -288,6 +288,25 @@ bool DatabaseSettingsWidgetEncryption::saveSettings()
 
         QApplication::restoreOverrideCursor();
 
+        if (!ok) {
+            // Database::changeKdf() can fail (e.g. the underlying key
+            // transform errors out) and this is the only place that result
+            // is checked. Previously that failure was silent: saveSettings()
+            // just returned false, validatePage() returned false, and the
+            // wizard stayed on this page with no indication of why -- for
+            // everyone, not just screen reader users, but a sighted user at
+            // least has a chance of noticing nothing happened and retrying;
+            // a screen reader user gets no signal at all. Same
+            // MessageBox::critical pattern as the other failure paths in
+            // this function.
+            MessageBox::critical(this,
+                                 tr("Failed to change encryption settings"),
+                                 tr("Could not update the database encryption settings. Please try again."),
+                                 MessageBox::Ok,
+                                 MessageBox::Ok);
+            return false;
+        }
+
         m_db->metadata()->customData()->set(CD_DECRYPTION_TIME_PREFERENCE_KEY, QString("%1").arg(time));
 
         return ok;
