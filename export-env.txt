@@ -1,0 +1,4 @@
+export QT_LINUX_ACCESSIBILITY_ALWAYS_ON=1
+export QT_ACCESSIBILITY=1
+./build-debug/src/keepassxc & sleep 3
+python3 tests/accessibility/dump_tree.py
