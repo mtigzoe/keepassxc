@@ -1,477 +1,92 @@
 UIA accessible tree for window matching '.*KeePassXC.*'
 ============================================================
-[Window] Needs input — Screen reader testing for KeePassXC - Claude - Google Chrome  -- visible, enabled
-  [Pane] (no accessible name)  -- visible, focusable
-  [Pane] Needs input — Screen reader testing for KeePassXC - Claude - Google Chrome  -- visible, enabled
+[Window] KeePassXC  -- visible, enabled, focusable
+  [Window] Import Wizard  -- visible, enabled, focusable
+    [TitleBar] (no accessible name)  -- visible, enabled, focusable
+      [MenuBar] System  -- visible, enabled, focusable
+        [MenuItem] System  -- visible, enabled, focusable
+      [Button] Close  -- visible, enabled
+    [Group] (no accessible name)  -- visible, enabled
+      [Button] Go Back  -- visible, focusable
+      [Button] Continue  -- visible, focusable
+      [Custom] (no accessible name)  -- visible, enabled
+        [Group] (no accessible name)  -- visible, enabled
+          [List] Import type. Choose a file to import and where to import it.  -- visible, enabled, focusable
+            [ListItem] Comma Separated Values (.csv)  -- visible, enabled, focusable
+            [ListItem] 1Password Export (.1pux)  -- visible, enabled, focusable
+            [ListItem] 1Password Vault (.opvault)  -- visible, enabled, focusable
+            [ListItem] Bitwarden (.json)  -- visible, enabled, focusable
+            [ListItem] Proton Pass (.json)  -- visible, enabled, focusable
+            [ListItem] Remote Database (.kdbx)  -- visible, enabled, focusable
+          [Group] (no accessible name)  -- visible, enabled
+            [Text] Import File:  -- visible, enabled
+            [Edit] Import File:  -- visible, enabled, focusable
+            [Button] Browse for import file  -- visible, enabled, focusable
+            [Text] Password:  -- visible, enabled
+            [Group] Password to unlock import file  -- visible, enabled
+              [Edit] Password to unlock import file  -- visible, enabled, focusable
+                [CheckBox] Toggle Password (Ctrl+H)  -- visible, enabled
+            [Text] Key File:  -- visible, enabled
+            [Edit] Key File:  -- visible, enabled, focusable
+            [Button] Browse for key file  -- visible, enabled, focusable
+            [Text] Import Into:  -- visible, enabled
+            [Group] (no accessible name)  -- visible, enabled
+              [RadioButton] New Database  -- visible, enabled, focusable
+              [RadioButton] Existing Database:  -- visible, focusable
+              [ComboBox] Existing database to import into  -- visible, focusable
+        [Text] Choose a file to import and where to import it.  -- visible, enabled
+      [Button] Cancel  -- visible, enabled, focusable
+      [Text] Import File Selection  -- visible, enabled
+  [TitleBar] (no accessible name)  -- visible, enabled, focusable
+    [MenuBar] System  -- visible, enabled, focusable
+      [MenuItem] System  -- visible, enabled, focusable
+    [Button] Minimize  -- visible, enabled
+    [Button] Maximize  -- visible, enabled
+    [Button] Close  -- visible, enabled
+  [Group] (no accessible name)  -- visible, enabled
     [Pane] (no accessible name)  -- visible, enabled
-      [Pane] (no accessible name)  -- visible, enabled
-        [Pane] (no accessible name)  -- visible, enabled
-          [Button] Minimize  -- visible, enabled, focusable
-          [Button] Maximize  -- visible, enabled, focusable
-          [Button] Close  -- visible, enabled, focusable
-        [Pane] (no accessible name)  -- visible, enabled
-          [Pane] (no accessible name)  -- visible, enabled
-          [Pane] (no accessible name)  -- visible, enabled
-            [ToolBar] (no accessible name)  -- visible, enabled
-              [Button] Back  -- visible, enabled, focusable
-              [Button] Forward  -- visible
-              [Button] Reload  -- visible, enabled, focusable
-              [Group] (no accessible name)  -- visible, enabled
-                [Button] View site information  -- visible, enabled, focusable
-                [Edit] Address and search bar  -- visible, enabled, focusable
-                [Pane] (no accessible name)  -- visible, enabled
-                  [Button] Install Claude  -- visible, enabled, focusable
-                  [Button] Bookmark this tab  -- visible, enabled, focusable
-                [Pane] (no accessible name)  -- visible, enabled
-              [Pane] (no accessible name)  -- visible, enabled
-                [Button] Extensions  -- visible, enabled, focusable
-              [Pane] (no accessible name)  -- visible, enabled
-              [Pane] (no accessible name)  -- visible, enabled
-                [Button] Downloads  -- visible, enabled, focusable
-              [Button] Miriam  -- visible, enabled, focusable
-              [Button] Chrome  -- visible, enabled, focusable
-          [Pane] (no accessible name)  -- visible, enabled
-            [Pane] (no accessible name)  -- visible, enabled
-              [Pane] (no accessible name)  -- visible, enabled
-                [Pane] (no accessible name)  -- visible, enabled
-                [Document] Needs input — Screen reader testing for KeePassXC - Claude  -- visible, enabled, focusable
-                  [Group] (no accessible name)  -- visible, enabled
-                    [Group] (no accessible name)  -- visible, enabled
-                      [Group] Sidebar  -- visible, enabled
-                        [Thumb] Resize sidebar  -- visible, enabled, focusable
-                        [Hyperlink] Claude  -- visible, enabled, focusable
-                        [Hyperlink] New  -- visible, enabled, focusable
-                        [Hyperlink] Projects  -- visible, enabled, focusable
-                        [Hyperlink] Artifacts  -- visible, enabled, focusable
-                        [Hyperlink] Code Upgrade  -- visible, enabled, focusable
-                        [Hyperlink] Customize  -- visible, enabled, focusable
-                        [Button] Chats and tasks  -- visible, enabled, focusable
-                        [Button] View all  -- visible, enabled, focusable
-                        [Button] Group and sort  -- visible, enabled, focusable
-                        [Hyperlink] Awaiting input Screen reader testing for KeePassXC  -- visible, enabled, focusable
-                          [StatusBar] Awaiting input  -- visible, enabled
-                          [Group] (no accessible name)  -- visible, enabled
-                        [Button] More options for Screen reader testing for KeePassXC  -- visible, enabled, focusable
-                        [Hyperlink] Idle Ollama installation and setup workflow  -- visible, enabled, focusable
-                          [Image] Idle  -- visible, enabled
-                          [Group] (no accessible name)  -- visible, enabled
-                        [Button] More options for Ollama installation and setup workflow  -- visible, enabled, focusable
-                        [Hyperlink] Idle August timesheet Excel spreadsheet  -- visible, enabled, focusable
-                          [Image] Idle  -- visible, enabled
-                          [Group] (no accessible name)  -- visible, enabled
-                        [Button] More options for August timesheet Excel spreadsheet  -- visible, enabled, focusable
-                        [Hyperlink] Idle Agent loop message history handling  -- visible, enabled, focusable
-                          [Image] Idle  -- visible, enabled
-                          [Group] (no accessible name)  -- visible, enabled
-                        [Button] More options for Agent loop message history handling  -- visible, enabled, focusable
-                        [Hyperlink] Idle MCP Github connector private repo access  -- visible, enabled, focusable
-                          [Image] Idle  -- visible, enabled
-                          [Group] (no accessible name)  -- visible, enabled
-                        [Button] More options for MCP Github connector private repo access  -- visible, enabled, focusable
-                        [Hyperlink] Idle Adding git capabilities to agent  -- visible, enabled, focusable
-                          [Image] Idle  -- visible, enabled
-                          [Group] (no accessible name)  -- visible, enabled
-                        [Button] More options for Adding git capabilities to agent  -- visible, enabled, focusable
-                        [Hyperlink] Idle Fix TypeScript test failures on merge-phase3-combined  -- visible, enabled, focusable
-                          [Image] Idle  -- visible, enabled
-                          [Group] (no accessible name)  -- visible, enabled
-                        [Button] More options for Fix TypeScript test failures on merge-phase3-combined  -- visible, enabled, focusable
-                        [Hyperlink] Idle JAWS screen reader support for KeePassXC  -- enabled, focusable
-                          [Image] Idle  -- enabled
-                          [Group] (no accessible name)  -- enabled
-                        [Button] More options for JAWS screen reader support for KeePassXC  -- enabled, focusable
-                        [Hyperlink] Idle JAWS keyboard shortcuts in QT applications  -- enabled, focusable
-                          [Image] Idle  -- enabled
-                          [Group] (no accessible name)  -- enabled
-                        [Button] More options for JAWS keyboard shortcuts in QT applications  -- enabled, focusable
-                        [Hyperlink] Idle Accessibility issues for JAWS and braille display  -- enabled, focusable
-                          [Image] Idle  -- enabled
-                          [Group] (no accessible name)  -- enabled
-                        [Button] More options for Accessibility issues for JAWS and braille display  -- enabled, focusable
-                        [Hyperlink] Idle KeePassXC UI accessibility issues for screen readers  -- enabled, focusable
-                          [Image] Idle  -- enabled
-                          [Group] (no accessible name)  -- enabled
-                        [Button] More options for KeePassXC UI accessibility issues for screen readers  -- enabled, focusable
-                        [Hyperlink] Idle KeePassXC import dialog accessibility issues  -- enabled, focusable
-                          [Image] Idle  -- enabled
-                          [Group] (no accessible name)  -- enabled
-                        [Button] More options for KeePassXC import dialog accessibility issues  -- enabled, focusable
-                        [Hyperlink] Idle KeePassXC screen reader accessibility issues  -- enabled, focusable
-                          [Image] Idle  -- enabled
-                          [Group] (no accessible name)  -- enabled
-                        [Button] More options for KeePassXC screen reader accessibility issues  -- enabled, focusable
-                        [Hyperlink] Idle Removing hard-coded paths from KeePassXC build script  -- enabled, focusable
-                          [Image] Idle  -- enabled
-                          [Group] (no accessible name)  -- enabled
-                        [Button] More options for Removing hard-coded paths from KeePassXC build script  -- enabled, focusable
-                        [Hyperlink] Idle Automating Asciidoctor installation in KeePassXC Windows build script  -- enabled, focusable
-                          [Image] Idle  -- enabled
-                          [Group] (no accessible name)  -- enabled
-                        [Button] More options for Automating Asciidoctor installation in KeePassXC Windows build script  -- enabled, focusable
-                        [Hyperlink] Idle KeePassXC accessibility improvements for screen readers and keyboard navigation  -- enabled, focusable
-                          [Image] Idle  -- enabled
-                          [Group] (no accessible name)  -- enabled
-                        [Button] More options for KeePassXC accessibility improvements for screen readers and keyboard navigation  -- enabled, focusable
-                        [Hyperlink] Idle KeePassXC accessibility improvements for screen readers and keyboard navigation  -- enabled, focusable
-                          [Image] Idle  -- enabled
-                          [Group] (no accessible name)  -- enabled
-                        [Button] More options for KeePassXC accessibility improvements for screen readers and keyboard navigation  -- enabled, focusable
-                        [Hyperlink] Idle Testing ProjectExplorer filter feature  -- enabled, focusable
-                          [Image] Idle  -- enabled
-                          [Group] (no accessible name)  -- enabled
-                        [Button] More options for Testing ProjectExplorer filter feature  -- enabled, focusable
-                        [Hyperlink] Idle Add select all files button to project explorer  -- enabled, focusable
-                          [Image] Idle  -- enabled
-                          [Group] (no accessible name)  -- enabled
-                        [Button] More options for Add select all files button to project explorer  -- enabled, focusable
-                        [Hyperlink] Idle Debugging ai-terminal-chat codebase  -- enabled, focusable
-                          [Image] Idle  -- enabled
-                          [Group] (no accessible name)  -- enabled
-                        [Button] More options for Debugging ai-terminal-chat codebase  -- enabled, focusable
-                        [Button] View all conversations  -- enabled, focusable
-                        [Hyperlink] Design  -- visible, enabled, focusable
-                        [Button] M M Free  -- visible, enabled, focusable
-                          [Image] M  -- visible, enabled
-                          [Text] M  -- visible, enabled
-                          [Text] Free  -- visible, enabled
-                        [Group] (no accessible name)  -- visible, enabled
-                          [Hyperlink] Get apps and extensions  -- visible, enabled, focusable
-                        [Button] Search  -- visible, enabled, focusable
-                        [Button] Hide sidebar  -- visible, enabled, focusable
-                      [Group] (no accessible name)  -- visible, enabled
-                        [Group] (no accessible name)  -- enabled, focusable
-                        [Button] Screen reader testing for KeePassXC, rename chat  -- visible, enabled, focusable
-                        [Button] More options for Screen reader testing for KeePassXC  -- visible, enabled, focusable
-                        [Group] (no accessible name)  -- visible, enabled
-                        [Group] (no accessible name)  -- visible, enabled
-                          [StatusBar] (no accessible name)  -- enabled
-                            [Text] Claude finished the response  -- enabled
-                          [Group] Chat messages  -- visible, enabled
-                            [Text] Use the up and down arrow keys to move between messages.  -- enabled
-                            [Button] Load earlier messages  -- enabled, focusable
-                            [Group] Message 16 of 22  -- enabled, focusable
-                              [Text] Claude responded: pip install dogtail on Windows isn't going to work — and it's not a packaging problem, so there's no flag or workaround that fixes it.  -- enabled
-                              [Text] Thought for 24s  -- enabled
-                              [Button] Thought for 24s  -- enabled, focusable
-                              [StatusBar] (no accessible name)  -- enabled
-                                [Text] Thought for 24s  -- enabled
-                              [Text] pip install dogtail  -- enabled
-                              [Text]  on Windows isn't going to work — and it's not a packaging problem, so there's no flag or workaround that fixes it.  -- enabled
-                              [Text] Dogtail talks to AT-SPI (the Linux accessibility bus) through the   -- enabled
-                              [Text] pyatspi  -- enabled
-                              [Text]  bindings. AT-SPI doesn't exist on Windows at all — there's no service for it to connect to. A Windows build of KeePassXC (what   -- enabled
-                              [Text] build-debug.ps1  -- enabled
-                              [Text]  produces) doesn't register with AT-SPI; it registers with   -- enabled
-                              [Text] UI Automation  -- enabled
-                              [Text]  instead, which is a completely different, non-interoperable bridge.   -- enabled
-                              [Text] pip install dogtail  -- enabled
-                              [Text]  might complete without error, but the first   -- enabled
-                              [Text] import pyatspi  -- enabled
-                              [Text]  in the script would fail immediately, because that package itself needs GObject-introspection libraries that only ship on Linux desktops. Running it under WSL wouldn't help either — your   -- enabled
-                              [Text] .exe  -- enabled
-                              [Text]  still only speaks UIA regardless of what OS the test script runs from.  -- enabled
-                              [Text] The actual Windows counterpart to   -- enabled
-                              [Text] dump_tree.py  -- enabled
-                              [Text]  is the   -- enabled
-                              [Text] pywinauto  -- enabled
-                              [Text]  approach from a few messages back — same idea (walk the accessible tree, print names/roles/states, check focus), just reading it through UIA instead of AT-SPI, and it can connect to the app   -- enabled
-                              [Text] build-debug.ps1  -- enabled
-                              [Text]  already launches rather than needing to launch it itself:  -- enabled
-                              [Group] python code  -- enabled, focusable
-                                [Button] Copy to clipboard  -- enabled, focusable
-                                [StatusBar] (no accessible name)  -- enabled
-                                [Text] python  -- enabled
-                                [Group] (no accessible name)  -- enabled, focusable
-                                  [Text] from  -- enabled
-                                  [Text]  pywinauto   -- enabled
-                                  [Text] import  -- enabled
-                                  [Text]  Application  -- enabled
-                                  [Text] 
-  -- enabled
-                                  [Text] app = Application  -- enabled
-                                  [Text] (  -- enabled
-                                  [Text] backend  -- enabled
-                                  [Text] =  -- enabled
-                                  [Text] "uia"  -- enabled
-                                  [Text] ).  -- enabled
-                                  [Text] connect  -- enabled
-                                  [Text] (  -- enabled
-                                  [Text] title_re  -- enabled
-                                  [Text] =  -- enabled
-                                  [Text] ".*KeePassXC.*"  -- enabled
-                                  [Text] )  -- enabled
-                              [Text] Want me to write that as a Windows equivalent of   -- enabled
-                              [Text] dump_tree.py  -- enabled
-                              [Text]  — same diagnostic-dump-first structure, dumping name/role/state for every node before you add focus assertions?  -- enabled
-                              [Button] Show message actions for Claude responded: pip install dogtail on Windows isn't going to work — and it's not a packaging problem, so there's no flag or workaround that fixes it.  -- enabled, focusable
-                            [Group] Message 17 of 22  -- enabled, focusable
-                              [Text] You said: Yes, please.  -- enabled
-                              [Text] Yes, please. I can try.  -- enabled
-                              [Button] Show message actions for You said: Yes, please.  -- enabled, focusable
-                              [StatusBar] (no accessible name)  -- enabled
-                            [Group] Message 18 of 22  -- enabled, focusable
-                              [Text] Claude responded: Good news: this one's much simpler than dogtail's install, since pywinauto is pure Python — no system accessibility service to separately install.  -- enabled
-                              [Text] Thought for 48s  -- enabled
-                              [Button] Thought for 48s  -- enabled, focusable
-                              [StatusBar] (no accessible name)  -- enabled
-                                [Text] Thought for 48s  -- enabled
-                              [Text] Good news: this one's much simpler than dogtail's install, since pywinauto is pure Python — no system accessibility service to separately install.  -- enabled
-                              [Text] Ran a command, created a file, read a file  -- enabled
-                              [Button] Ran a command, created a file, read a file  -- enabled, focusable
-                              [StatusBar] (no accessible name)  -- enabled
-                                [Text] Ran a command, created a file, read a file  -- enabled
-                              [Text] Install and run:  -- enabled
-                              [Group] powershell code  -- enabled, focusable
-                                [Button] Copy to clipboard  -- enabled, focusable
-                                [StatusBar] (no accessible name)  -- enabled
-                                [Text] powershell  -- enabled
-                                [Text] pip install pywinauto  -- enabled
-                              [Text] Then launch KeePassXC via   -- enabled
-                              [Text] build-debug.ps1  -- enabled
-                              [Text]  as usual, and in a separate terminal:  -- enabled
-                              [Group] powershell code  -- enabled, focusable
-                                [Button] Copy to clipboard  -- enabled, focusable
-                                [StatusBar] (no accessible name)  -- enabled
-                                [Text] powershell  -- enabled
-                                [Text] python dump_tree_windows.py  -- enabled
-                              [Text] It doesn't launch the app itself — it connects to whatever KeePassXC window is already running, by title, so   -- enabled
-                              [Text] build-debug.ps1  -- enabled
-                              [Text]  stays exactly as-is. If the window title doesn't match   -- enabled
-                              [Text] .*KeePassXC.*  -- enabled
-                              [Text]  (e.g. it shows a filename), edit   -- enabled
-                              [Text] WINDOW_TITLE_RE  -- enabled
-                              [Text]  at the top.  -- enabled
-                              [Text] One honesty note: a couple of the state-check method names (  -- enabled
-                              [Text] is_keyboard_focusable  -- enabled
-                              [Text]  especially) vary slightly across pywinauto versions — I've wrapped each one individually in a   -- enabled
-                              [Text] try/except  -- enabled
-                              [Text] , so a version mismatch just drops that one flag from the output rather than crashing the whole run. If the tree dump looks suspiciously state-free, that's the first thing to check.  -- enabled
-                              [Button] View Dump tree windows  -- enabled, focusable
-                              [Text] Dump tree windows  -- enabled
-                              [Text] PY  -- enabled
-                              [Text]    -- enabled
-                              [Button] Download Dump tree windows  -- enabled, focusable
-                              [Button] Show message actions for Claude responded: Good news: this one's much simpler than dogtail's install, since pywinauto is pure Python — no system accessibility service to separately install.  -- enabled, focusable
-                            [Group] Message 19 of 22  -- enabled, focusable, focused
-                              [Text] You said: I'm testing keepassxc.  -- enabled
-                              [Text] Message collapsed  -- enabled
-                              [Button] Show more  -- enabled, focusable
-                              [Button] Show message actions for You said: I'm testing keepassxc.  -- enabled, focusable
-                              [StatusBar] (no accessible name)  -- enabled
-                            [Group] Message 20 of 22  -- enabled, focusable
-                              [Text] Used MCP Github integration  -- enabled
-                              [Button] Used MCP Github integration  -- enabled, focusable
-                              [StatusBar] (no accessible name)  -- enabled
-                                [Text] Used MCP Github integration  -- enabled
-                            [Group] Message 21 of 22  -- enabled, focusable
-                              [Text] You said: Continue.  -- enabled
-                              [Text] Continue.  -- enabled
-                              [ToolBar] Message actions  -- enabled, focusable
-                                [Text] (no accessible name)  -- enabled
-                                  [Text] 24 minutes ago  -- enabled
-                                [Button] Retry  -- enabled, focusable
-                                [Button] Edit  -- enabled, focusable
-                                [Button] Copy  -- enabled, focusable
-                                [StatusBar] (no accessible name)  -- enabled
-                              [StatusBar] (no accessible name)  -- enabled
-                            [Group] Message 22 of 22  -- visible, enabled, focusable
-                              [Text] Claude responded: Good — clone succeeded, so I can verify the patch actually applies before handing it over, matching how you've been doing this.  -- enabled
-                              [Text] Ran 5 commands, edited 3 files, read a file  -- enabled
-                              [Button] Ran 5 commands, edited 3 files, read a file  -- enabled, focusable
-                              [StatusBar] (no accessible name)  -- enabled
-                                [Text] Ran 5 commands, edited 3 files, read a file  -- enabled
-                              [Text] Root cause, confirmed in the actual source:   -- enabled
-                              [Text] importTypeList  -- enabled
-                              [Text]  is a   -- enabled
-                              [Text] QListWidget  -- enabled
-                              [Text] , not a combo box — Tab moves between its items because   -- enabled
-                              [Text] tabKeyNavigation  -- enabled
-                              [Text]  is explicitly set true on it. Qt's list views emit   -- enabled
-                              [Text] itemActivated  -- enabled
-                              [Text]  by default when you press Enter on the current item, but nothing in   -- enabled
-                              [Text] ImportWizardPageSelect.cpp  -- enabled
-                              [Text]  was connected to that signal — so the key press was fully swallowed by the list with zero effect, which matches exactly what you saw.  -- enabled
-                              [Text] The fix connects   -- enabled
-                              [Text] itemActivated  -- enabled
-                              [Text]  to move focus to the next field (the import-file path box, or the remote-download command box if that's the visible one). I deliberately didn't wire it to   -- enabled
-                              [Text] wizard()->next()  -- enabled
-                              [Text]  — that call skips   -- enabled
-                              [Text] isComplete()  -- enabled
-                              [Text] 's check, so Enter would've let you skip straight to the review page with no file selected yet.  -- enabled
-                              [Text] On the Escape/"combo dropdown" part — I can't fix or verify that one yet. This page genuinely has no combo box; the "Database format" combo with KDBX4/3/KDB options that description mentioned actually lives in the   -- visible, enabled
-                              [Text] New Database  -- visible, enabled
-                              [Text]  wizard (  -- visible, enabled
-                              [Text] NewDatabaseWizardPageEncryption  -- visible, enabled
-                              [Text] ), a different dialog entirely from Import File. So either you were on a different screen when Escape failed, or that pasted description merged two different wizards together — worth knowing, since a couple of its other details (the button layout, "Other formats…") don't match this dialog's real source either. Where exactly does Escape not work — same Import File screen, or somewhere else?  -- visible, enabled
-                              [Button] View 0001 import wizard enter key  -- visible, enabled, focusable
-                              [Text] 0001 import wizard enter key  -- visible, enabled
-                              [Text] PATCH  -- visible, enabled
-                              [Text]    -- visible, enabled
-                              [Button] Download 0001 import wizard enter key  -- visible, enabled, focusable
-                              [ToolBar] Message actions  -- visible, enabled, focusable
-                                [Button] Copy  -- visible, enabled, focusable
-                                [StatusBar] (no accessible name)  -- visible, enabled
-                                [Button] Read aloud  -- visible, enabled, focusable
-                                [Button] Good response  -- visible, enabled, focusable
-                                [Button] Bad response  -- visible, enabled, focusable
-                                [Button] Retry  -- visible, enabled, focusable
-                                [Text] (no accessible name)  -- visible, enabled
-                                  [Text] 23 minutes ago  -- visible, enabled
-                          [Group] (no accessible name)  -- enabled, focusable
-                            [StatusBar] (no accessible name)  -- visible, enabled
-                          [StatusBar] (no accessible name)  -- visible, enabled
-                          [StatusBar] (no accessible name)  -- visible, enabled
-                          [Group] (no accessible name)  -- visible, enabled
-                            [Edit] Write your prompt to Claude  -- visible, enabled, focusable
-                              [Text] 
-  -- visible, enabled
-                            [StatusBar] (no accessible name)  -- visible, enabled
-                            [Button] Add files, connectors, and more  -- visible, enabled, focusable
-                            [Group] (no accessible name)  -- visible, enabled, focusable
-                              [Group] Dictate  -- visible, enabled
-                                [Button] Dictate  -- visible, enabled, focusable
-                                [Button] Voice input  -- visible, enabled, focusable
-                            [Group] (no accessible name)  -- visible, enabled
-                              [Group] (no accessible name)  -- visible, enabled
-                                [Hyperlink] Claude is AI and can make mistakes.  -- visible, enabled, focusable
-                              [Group] (no accessible name)  -- visible, enabled
-                                [Button] Model: Sonnet 5 High  -- visible, enabled, focusable
-                                  [Text] Sonnet 5  -- visible, enabled
-                                  [Text]    -- visible, enabled
-                                  [Text] High  -- visible, enabled
-                        [Thumb] Resize file viewer  -- visible, enabled, focusable
-                        [Group] (no accessible name)  -- visible, enabled, focusable
-                          [Group] (no accessible name)  -- visible, enabled, focusable
-                            [Text] 0001 import wizard enter key · PATCH  -- visible, enabled
-                            [Group] More options  -- visible, enabled
-                              [Button] Copy  -- visible, enabled, focusable
-                              [Button] More options  -- visible, enabled, focusable
-                            [Button] Expand  -- visible, enabled, focusable
-                            [Button] Go back  -- visible, enabled, focusable
-                            [Group] (no accessible name)  -- visible, enabled, focusable
-                              [Text] 1  -- visible, enabled
-                              [Text] diff --git a/src/gui/wizard/ImportWizardPageSelect.cpp b/src/gui/wizard/ImportWizardPageSelect.cpp  -- visible, enabled
-                              [Text] 2  -- visible, enabled
-                              [Text] index d7cd17b..210e025 100644  -- visible, enabled
-                              [Text] 3  -- visible, enabled
-                              [Text] --- a/src/gui/wizard/ImportWizardPageSelect.cpp  -- visible, enabled
-                              [Text] 4  -- visible, enabled
-                              [Text] +++ b/src/gui/wizard/ImportWizardPageSelect.cpp  -- visible, enabled
-                              [Text] 5  -- visible, enabled
-                              [Text] @@ -74,6 +74,13 @@ ImportWizardPageSelect::ImportWizardPageSelect(QWidget* parent)  -- visible, enabled
-                              [Text] 6  -- visible, enabled
-                              [Text]      m_ui->importTypeList->item(6)->setData(Qt::UserRole, ImportWizard::IMPORT_KEEPASS1);  -- visible, enabled
-                              [Text] 7  -- visible, enabled
-                              [Text]    -- visible, enabled
-                              [Text] 8  -- visible, enabled
-                              [Text]      connect(m_ui->importTypeList, &QListWidget::currentItemChanged, this, &ImportWizardPageSelect::itemSelected);  -- visible, enabled
-                              [Text] 9  -- visible, enabled
-                              [Text] +    // QAbstractItemView emits itemActivated() by default when Enter/Return is  -- visible, enabled
-                              [Text] 10  -- visible, enabled
-                              [Text] +    // pressed on the current item; nothing was connected to it, so the key  -- visible, enabled
-                              [Text] 11  -- visible, enabled
-                              [Text] +    // press was silently swallowed by the list instead of doing anything.  -- visible, enabled
-                              [Text] 12  -- visible, enabled
-                              [Text] +    // Keyboard and screen reader users select a format via Tab/arrow keys  -- visible, enabled
-                              [Text] 13  -- visible, enabled
-                              [Text] +    // (which already applies the selection through itemSelected() above)  -- visible, enabled
-                              [Text] 14  -- visible, enabled
-                              [Text] +    // and then expect Enter to move them forward, not nothing.  -- visible, enabled
-                              [Text] 15  -- visible, enabled
-                              [Text] +    connect(m_ui->importTypeList, &QListWidget::itemActivated, this, &ImportWizardPageSelect::advanceFocusFromTypeList);  -- visible, enabled
-                              [Text] 16  -- enabled
-                              [Text]      m_ui->importTypeList->setCurrentRow(0);  -- enabled
-                              [Text] 17  -- enabled
-                              [Text]    -- enabled
-                              [Text] 18  -- enabled
-                              [Text]      connect(m_ui->importFileButton, &QAbstractButton::clicked, this, &ImportWizardPageSelect::chooseImportFile);  -- enabled
-                              [Text] 19  -- enabled
-                              [Text] @@ -182,6 +189,20 @@ void ImportWizardPageSelect::itemSelected(QListWidgetItem* current, QListWidgetI  -- enabled
-                              [Text] 20  -- enabled
-                              [Text]      }  -- enabled
-                              [Text] 21  -- enabled
-                              [Text]  }  -- enabled
-                              [Text] 22  -- enabled
-                              [Text]    -- enabled
-                              [Text] 23  -- enabled
-                              [Text] +void ImportWizardPageSelect::advanceFocusFromTypeList()  -- enabled
-                              [Text] 24  -- enabled
-                              [Text] +{  -- enabled
-                              [Text] 25  -- enabled
-                              [Text] +    // Deliberately move focus to the next field rather than calling  -- enabled
-                              [Text] 26  -- enabled
-                              [Text] +    // wizard()->next() here: QWizard::next() only calls validatePage(),  -- enabled
-                              [Text] 27  -- enabled
-                              [Text] +    // it does not check isComplete(), so it would let Enter skip straight  -- enabled
-                              [Text] 28  -- enabled
-                              [Text] +    // to the next page even with no import file selected yet. Moving  -- enabled
-                              [Text] 29  -- enabled
-                              [Text] +    // focus keeps Enter useful without bypassing that validation.  -- enabled
-                              [Text] 30  -- enabled
-                              [Text] +    if (m_ui->downloadCommand->isVisible()) {  -- enabled
-                              [Text] 31  -- enabled
-                              [Text] +        m_ui->downloadCommand->setFocus();  -- enabled
-                              [Text] 32  -- enabled
-                              [Text] +    } else {  -- enabled
-                              [Text] 33  -- enabled
-                              [Text] +        m_ui->importFileEdit->setFocus();  -- enabled
-                              [Text] 34  -- enabled
-                              [Text] +    }  -- enabled
-                              [Text] 35  -- enabled
-                              [Text] +}  -- enabled
-                              [Text] 36  -- enabled
-                              [Text] +  -- enabled
-                              [Text] 37  -- enabled
-                              [Text]  void ImportWizardPageSelect::updateDatabaseChoices() const  -- enabled
-                              [Text] 38  -- enabled
-                              [Text]  {  -- enabled
-                              [Text] 39  -- enabled
-                              [Text]      m_ui->existingDatabaseChoice->clear();  -- enabled
-                              [Text] 40  -- enabled
-                              [Text] diff --git a/src/gui/wizard/ImportWizardPageSelect.h b/src/gui/wizard/ImportWizardPageSelect.h  -- enabled
-                              [Text] 41  -- enabled
-                              [Text] index 5c4024e..befc951 100644  -- enabled
-                              [Text] 42  -- enabled
-                              [Text] --- a/src/gui/wizard/ImportWizardPageSelect.h  -- enabled
-                              [Text] 43  -- enabled
-                              [Text] +++ b/src/gui/wizard/ImportWizardPageSelect.h  -- enabled
-                              [Text] 44  -- enabled
-                              [Text] @@ -43,6 +43,7 @@ public:  -- enabled
-                              [Text] 45  -- enabled
-                              [Text]    -- enabled
-                              [Text] 46  -- enabled
-                              [Text]  private slots:  -- enabled
-                              [Text] 47  -- enabled
-                              [Text]      void itemSelected(QListWidgetItem* current, QListWidgetItem* previous);  -- enabled
-                              [Text] 48  -- enabled
-                              [Text] +    void advanceFocusFromTypeList();  -- enabled
-                              [Text] 49  -- enabled
-                              [Text]      void chooseImportFile();  -- enabled
-                              [Text] 50  -- enabled
-                              [Text]      void chooseKeyFile();  -- enabled
-                              [Text] 51  -- enabled
-                              [Text]      void updateDatabaseChoices() const;  -- enabled
-                              [Text] 52  -- enabled
-                              [Text]    -- enabled
-                        [StatusBar] (no accessible name)  -- visible, enabled
-                        [Group] (no accessible name)  -- visible, enabled, focusable
-                    [Group] (no accessible name)  -- visible, enabled
-                      [StatusBar] (no accessible name)  -- visible, enabled
-                      [Group] Notifications  -- visible, enabled, focusable
-              [Pane] (no accessible name)  -- visible, enabled
-          [Pane] (no accessible name)  -- visible, enabled
-            [Pane] (no accessible name)  -- visible, enabled
-              [Button] Tab search  -- visible, enabled, focusable
-            [Pane] (no accessible name)  -- visible, enabled
-              [Tab] (no accessible name)  -- visible, enabled
-                [TabItem] Dashboard ‹ Miriam Lozneanu - Software Engineer — WordPress - Memory usage - 369 MB  -- visible, enabled, focusable
-                  [Button] Close  -- visible, enabled, focusable
-                [TabItem] Needs input — Screen reader testing for KeePassXC - Claude - Memory usage - 263 MB  -- visible, enabled, focusable
-                  [Button] Close  -- visible, enabled, focusable
-              [Pane] (no accessible name)  -- visible, enabled
-            [Button] New Tab  -- visible, enabled, focusable
-            [Pane] (no accessible name)  -- visible, enabled
-            [Pane] (no accessible name)  -- visible, enabled
-              [Button] Open Gemini in Chrome  -- visible, enabled, focusable
-              [Pane] (no accessible name)  -- visible, enabled
-          [Pane] (no accessible name)  -- visible, enabled
+      [Group] (no accessible name)  -- visible, enabled
+        [Group] (no accessible name)  -- visible, enabled
+          [Image] (no accessible name)  -- visible, enabled
+          [Text] Welcome to KeePassXC 2.8.0-snapshot  -- visible, enabled
+          [Button] Create Database  -- visible, enabled, focusable
+          [Button] Open Database  -- visible, enabled, focusable
+          [Button] Import File  -- visible, enabled, focusable
+          [Text] Recent databases  -- visible, enabled
+          [List] Open a recent database  -- visible, enabled, focusable
+            [ListItem] C:\Users\Miriam\Passwords.kdbx  -- visible, enabled, focusable
+  [MenuBar] (no accessible name)  -- visible, enabled
+    [MenuItem] Database  -- visible, enabled
+    [MenuItem] Entries  -- visible, enabled
+    [MenuItem] Groups  -- visible, enabled
+    [MenuItem] Tools  -- visible, enabled
+    [MenuItem] View  -- visible, enabled
+    [MenuItem] Help  -- visible, enabled
+  [ToolBar] Database toolbar  -- visible, enabled
+    [Button] Open Database  -- visible, enabled, focusable
+    [Button] Save Database  -- visible, focusable
+    [Button] Lock Database  -- visible, focusable
+    [Group] (no accessible name)  -- visible, enabled
+    [Button] New Entry  -- visible, focusable
+    [Button] Edit Entry  -- visible, focusable
+    [Button] Delete Entry  -- visible, focusable
+    [Group] (no accessible name)  -- visible, enabled
+    [Button] Copy Username  -- visible, focusable
+    [Button] Copy Password  -- visible, focusable
+    [Button] Copy URL  -- visible, focusable
+    [Button] Perform Auto-Type  -- visible, focusable
+    [Group] (no accessible name)  -- visible, enabled
+    [CheckBox] Show Database Settings  -- visible, focusable
+    [CheckBox] Show Database Reports  -- visible, focusable
+    [Group] (no accessible name)  -- visible, enabled
+    [CheckBox] Show Password Generator  -- visible, enabled, focusable
+    [CheckBox] Show Application Settings  -- visible, enabled, focusable
+    [Group] (no accessible name)  -- visible, enabled
+    [Group] (no accessible name)  -- visible
+      [Edit] Search  -- visible, focusable
+        [Button] (no accessible name)  -- visible
+        [Button] Search  -- visible
+        [Button] Search Help  -- visible
+  [StatusBar] (no accessible name)  -- visible, enabled
+    [Thumb] (no accessible name)  -- visible, enabled
+    [Text] (no accessible name)  -- visible, enabled

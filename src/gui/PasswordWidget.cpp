@@ -27,6 +27,7 @@
 #include "gui/osutils/OSUtils.h"
 #include "gui/styles/StateColorPalette.h"
 
+#include <QAbstractButton>
 #include <QAccessible>
 #include <QEvent>
 #include <QLineEdit>
@@ -83,6 +84,26 @@ PasswordWidget::PasswordWidget(QWidget* parent)
     m_passwordGeneratorAction->setShortcutContext(Qt::WidgetShortcut);
     m_ui->passwordEdit->addAction(m_passwordGeneratorAction, QLineEdit::TrailingPosition);
     m_passwordGeneratorAction->setVisible(false);
+
+    // QLineEdit::addAction() renders each action as an internal
+    // QLineEditIconButton (a QToolButton parented to the line edit), but that
+    // button defaults to Qt::NoFocus -- it responds to a mouse click but is
+    // skipped entirely by Tab and never receives keyboard focus. Confirmed
+    // live via UIA: every other checkbox in a dialog using this widget
+    // reports "focusable"; this action's button doesn't. That leaves the
+    // toggle/generate controls reachable only by already knowing their
+    // Ctrl+H / Ctrl+G shortcuts, which a keyboard-only or screen-reader user
+    // exploring the form by Tab has no way to discover. Qt::TabFocus (not
+    // StrongFocus) is enough here since mouse click-to-activate already
+    // works regardless of focus policy; this only adds Tab reachability.
+    for (QAction* action : {m_toggleVisibleAction.data(), m_passwordGeneratorAction.data()}) {
+        for (QAbstractButton* button : m_ui->passwordEdit->findChildren<QAbstractButton*>()) {
+            if (button->defaultAction() == action) {
+                button->setFocusPolicy(Qt::TabFocus);
+                break;
+            }
+        }
+    }
 
     m_capslockAction =
         new QAction(icons()->icon("dialog-warning", true, StateColorPalette().color(StateColorPalette::Error)),
