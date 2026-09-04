@@ -4,12 +4,15 @@
 # Exercises the same accessible tree that Orca/screen readers read from,
 # without needing real screen-reader hardware.
 #
-# CAVEAT: continue-on-error is deliberate for now. run-tests.sh (in
-# keepassxc-build-scripts) already documents that even Xvfb + fluxbox
-# can fail to deliver real focus events reliably in a throwaway CI
-# session -- this job rides the same display stack, so treat a failure
-# here as "investigate", not "confirmed regression", until it's proven
-# stable over several runs. Flip continue-on-error off once it has.
+# CAVEAT: continue-on-error is deliberate for now, but it's scoped to
+# only the "Run accessibility tree check" step below -- NOT the whole
+# job. run-tests.sh (in keepassxc-build-scripts) already documents that
+# even Xvfb + fluxbox can fail to deliver real focus events reliably in
+# a throwaway CI session, so treat a failure in that one step as
+# "investigate", not "confirmed regression", until it's proven stable
+# over several runs. Flip its continue-on-error off once it has. A
+# failure in any other step (deps, build) should still fail the job
+# normally -- it means something is actually broken, not flaky.
 
 name: Accessibility (AT-SPI)
 
@@ -22,7 +25,6 @@ on:
 jobs:
   atspi-check:
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     steps:
       - name: Checkout code
@@ -51,6 +53,7 @@ jobs:
           ninja -C build-debug
 
       - name: Run accessibility tree check
+        continue-on-error: true
         run: |
           Xvfb :99 -screen 0 1280x1024x24 -nolisten tcp &
           sleep 1

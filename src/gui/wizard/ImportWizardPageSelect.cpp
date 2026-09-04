@@ -74,6 +74,13 @@ ImportWizardPageSelect::ImportWizardPageSelect(QWidget* parent)
     m_ui->importTypeList->item(6)->setData(Qt::UserRole, ImportWizard::IMPORT_KEEPASS1);
 
     connect(m_ui->importTypeList, &QListWidget::currentItemChanged, this, &ImportWizardPageSelect::itemSelected);
+    // QAbstractItemView emits itemActivated() by default when Enter/Return is
+    // pressed on the current item; nothing was connected to it, so the key
+    // press was silently swallowed by the list instead of doing anything.
+    // Keyboard and screen reader users select a format via Tab/arrow keys
+    // (which already applies the selection through itemSelected() above)
+    // and then expect Enter to move them forward, not nothing.
+    connect(m_ui->importTypeList, &QListWidget::itemActivated, this, &ImportWizardPageSelect::advanceFocusFromTypeList);
     m_ui->importTypeList->setCurrentRow(0);
 
     connect(m_ui->importFileButton, &QAbstractButton::clicked, this, &ImportWizardPageSelect::chooseImportFile);
@@ -179,6 +186,20 @@ void ImportWizardPageSelect::itemSelected(QListWidgetItem* current, QListWidgetI
         break;
     default:
         Q_ASSERT(false);
+    }
+}
+
+void ImportWizardPageSelect::advanceFocusFromTypeList()
+{
+    // Deliberately move focus to the next field rather than calling
+    // wizard()->next() here: QWizard::next() only calls validatePage(),
+    // it does not check isComplete(), so it would let Enter skip straight
+    // to the next page even with no import file selected yet. Moving
+    // focus keeps Enter useful without bypassing that validation.
+    if (m_ui->downloadCommand->isVisible()) {
+        m_ui->downloadCommand->setFocus();
+    } else {
+        m_ui->importFileEdit->setFocus();
     }
 }
 

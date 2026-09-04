@@ -1,8 +1,8 @@
 UIA accessible tree for window matching '.*KeePassXC.*'
 ============================================================
-[Window] Done — Screen reader testing for KeePassXC - Claude - Google Chrome  -- visible, enabled
+[Window] Needs input — Screen reader testing for KeePassXC - Claude - Google Chrome  -- visible, enabled
   [Pane] (no accessible name)  -- visible, focusable
-  [Pane] Done — Screen reader testing for KeePassXC - Claude - Google Chrome  -- visible, enabled
+  [Pane] Needs input — Screen reader testing for KeePassXC - Claude - Google Chrome  -- visible, enabled
     [Pane] (no accessible name)  -- visible, enabled
       [Pane] (no accessible name)  -- visible, enabled
         [Pane] (no accessible name)  -- visible, enabled
@@ -34,7 +34,7 @@ UIA accessible tree for window matching '.*KeePassXC.*'
             [Pane] (no accessible name)  -- visible, enabled
               [Pane] (no accessible name)  -- visible, enabled
                 [Pane] (no accessible name)  -- visible, enabled
-                [Document] Screen reader testing for KeePassXC - Claude  -- visible, enabled, focusable
+                [Document] Needs input — Screen reader testing for KeePassXC - Claude  -- visible, enabled, focusable
                   [Group] (no accessible name)  -- visible, enabled
                     [Group] (no accessible name)  -- visible, enabled
                       [Group] Sidebar  -- visible, enabled
@@ -48,8 +48,8 @@ UIA accessible tree for window matching '.*KeePassXC.*'
                         [Button] Chats and tasks  -- visible, enabled, focusable
                         [Button] View all  -- visible, enabled, focusable
                         [Button] Group and sort  -- visible, enabled, focusable
-                        [Hyperlink] Idle Screen reader testing for KeePassXC  -- visible, enabled, focusable
-                          [Image] Idle  -- visible, enabled
+                        [Hyperlink] Awaiting input Screen reader testing for KeePassXC  -- visible, enabled, focusable
+                          [StatusBar] Awaiting input  -- visible, enabled
                           [Group] (no accessible name)  -- visible, enabled
                         [Button] More options for Screen reader testing for KeePassXC  -- visible, enabled, focusable
                         [Hyperlink] Idle Ollama installation and setup workflow  -- visible, enabled, focusable
@@ -73,7 +73,7 @@ UIA accessible tree for window matching '.*KeePassXC.*'
                           [Group] (no accessible name)  -- visible, enabled
                         [Button] More options for Adding git capabilities to agent  -- visible, enabled, focusable
                         [Hyperlink] Idle Fix TypeScript test failures on merge-phase3-combined  -- visible, enabled, focusable
-                          [Image] Idle  -- enabled
+                          [Image] Idle  -- visible, enabled
                           [Group] (no accessible name)  -- visible, enabled
                         [Button] More options for Fix TypeScript test failures on merge-phase3-combined  -- visible, enabled, focusable
                         [Hyperlink] Idle JAWS screen reader support for KeePassXC  -- enabled, focusable
@@ -145,11 +145,11 @@ UIA accessible tree for window matching '.*KeePassXC.*'
                         [Group] (no accessible name)  -- visible, enabled
                         [Group] (no accessible name)  -- visible, enabled
                           [StatusBar] (no accessible name)  -- enabled
-                            [Text] Claude is responding  -- enabled
+                            [Text] Claude finished the response  -- enabled
                           [Group] Chat messages  -- visible, enabled
                             [Text] Use the up and down arrow keys to move between messages.  -- enabled
                             [Button] Load earlier messages  -- enabled, focusable
-                            [Group] Message 16 of 20  -- enabled, focusable
+                            [Group] Message 16 of 22  -- enabled, focusable
                               [Text] Claude responded: pip install dogtail on Windows isn't going to work — and it's not a packaging problem, so there's no flag or workaround that fixes it.  -- enabled
                               [Text] Thought for 24s  -- enabled
                               [Button] Thought for 24s  -- enabled, focusable
@@ -203,27 +203,13 @@ UIA accessible tree for window matching '.*KeePassXC.*'
                               [Text] Want me to write that as a Windows equivalent of   -- enabled
                               [Text] dump_tree.py  -- enabled
                               [Text]  — same diagnostic-dump-first structure, dumping name/role/state for every node before you add focus assertions?  -- enabled
-                              [ToolBar] Message actions  -- enabled, focusable
-                                [Button] Copy  -- enabled, focusable
-                                [StatusBar] (no accessible name)  -- enabled
-                                [Button] Read aloud  -- enabled, focusable
-                                [Button] Good response  -- enabled, focusable
-                                [Button] Bad response  -- enabled, focusable
-                                [Button] Retry  -- enabled, focusable
-                                [Text] (no accessible name)  -- enabled
-                                  [Text] 1 hour ago  -- enabled
-                            [Group] Message 17 of 20  -- enabled, focusable
+                              [Button] Show message actions for Claude responded: pip install dogtail on Windows isn't going to work — and it's not a packaging problem, so there's no flag or workaround that fixes it.  -- enabled, focusable
+                            [Group] Message 17 of 22  -- enabled, focusable
                               [Text] You said: Yes, please.  -- enabled
                               [Text] Yes, please. I can try.  -- enabled
-                              [ToolBar] Message actions  -- enabled, focusable
-                                [Text] (no accessible name)  -- enabled
-                                  [Text] 58 minutes ago  -- enabled
-                                [Button] Retry  -- enabled, focusable
-                                [Button] Edit  -- enabled, focusable
-                                [Button] Copy  -- enabled, focusable
-                                [StatusBar] (no accessible name)  -- enabled
+                              [Button] Show message actions for You said: Yes, please.  -- enabled, focusable
                               [StatusBar] (no accessible name)  -- enabled
-                            [Group] Message 18 of 20  -- enabled, focusable
+                            [Group] Message 18 of 22  -- enabled, focusable
                               [Text] Claude responded: Good news: this one's much simpler than dogtail's install, since pywinauto is pure Python — no system accessibility service to separately install.  -- enabled
                               [Text] Thought for 48s  -- enabled
                               [Button] Thought for 48s  -- enabled, focusable
@@ -265,39 +251,82 @@ UIA accessible tree for window matching '.*KeePassXC.*'
                               [Text] PY  -- enabled
                               [Text]    -- enabled
                               [Button] Download Dump tree windows  -- enabled, focusable
-                              [ToolBar] Message actions  -- enabled, focusable
-                                [Button] Copy  -- enabled, focusable
-                                [StatusBar] (no accessible name)  -- enabled
-                                [Button] Read aloud  -- enabled, focusable
-                                [Button] Good response  -- enabled, focusable
-                                [Button] Bad response  -- enabled, focusable
-                                [Button] Retry  -- enabled, focusable
-                                [Text] (no accessible name)  -- enabled
-                                  [Text] 56 minutes ago  -- enabled
-                            [Group] Message 19 of 20  -- visible, enabled, focusable
+                              [Button] Show message actions for Claude responded: Good news: this one's much simpler than dogtail's install, since pywinauto is pure Python — no system accessibility service to separately install.  -- enabled, focusable
+                            [Group] Message 19 of 22  -- enabled, focusable, focused
                               [Text] You said: I'm testing keepassxc.  -- enabled
                               [Text] Message collapsed  -- enabled
-                              [Button] Show more  -- visible, enabled, focusable
-                              [Button] Show message actions for You said: I'm testing keepassxc.  -- visible, enabled, focusable
+                              [Button] Show more  -- enabled, focusable
+                              [Button] Show message actions for You said: I'm testing keepassxc.  -- enabled, focusable
                               [StatusBar] (no accessible name)  -- enabled
-                            [Group] Currently streaming message  -- visible, enabled, focusable
-                              [Text] Needs your input  -- visible, enabled
-                              [Button] Needs your input  -- visible, enabled, focusable
-                              [StatusBar] (no accessible name)  -- visible, enabled
-                                [Text] Needs your input  -- enabled
-                              [Button] Search code  -- visible, enabled, focusable
+                            [Group] Message 20 of 22  -- enabled, focusable
+                              [Text] Used MCP Github integration  -- enabled
+                              [Button] Used MCP Github integration  -- enabled, focusable
+                              [StatusBar] (no accessible name)  -- enabled
+                                [Text] Used MCP Github integration  -- enabled
+                            [Group] Message 21 of 22  -- enabled, focusable
+                              [Text] You said: Continue.  -- enabled
+                              [Text] Continue.  -- enabled
+                              [ToolBar] Message actions  -- enabled, focusable
+                                [Text] (no accessible name)  -- enabled
+                                  [Text] 24 minutes ago  -- enabled
+                                [Button] Retry  -- enabled, focusable
+                                [Button] Edit  -- enabled, focusable
+                                [Button] Copy  -- enabled, focusable
+                                [StatusBar] (no accessible name)  -- enabled
+                              [StatusBar] (no accessible name)  -- enabled
+                            [Group] Message 22 of 22  -- visible, enabled, focusable
+                              [Text] Claude responded: Good — clone succeeded, so I can verify the patch actually applies before handing it over, matching how you've been doing this.  -- enabled
+                              [Text] Ran 5 commands, edited 3 files, read a file  -- enabled
+                              [Button] Ran 5 commands, edited 3 files, read a file  -- enabled, focusable
+                              [StatusBar] (no accessible name)  -- enabled
+                                [Text] Ran 5 commands, edited 3 files, read a file  -- enabled
+                              [Text] Root cause, confirmed in the actual source:   -- enabled
+                              [Text] importTypeList  -- enabled
+                              [Text]  is a   -- enabled
+                              [Text] QListWidget  -- enabled
+                              [Text] , not a combo box — Tab moves between its items because   -- enabled
+                              [Text] tabKeyNavigation  -- enabled
+                              [Text]  is explicitly set true on it. Qt's list views emit   -- enabled
+                              [Text] itemActivated  -- enabled
+                              [Text]  by default when you press Enter on the current item, but nothing in   -- enabled
+                              [Text] ImportWizardPageSelect.cpp  -- enabled
+                              [Text]  was connected to that signal — so the key press was fully swallowed by the list with zero effect, which matches exactly what you saw.  -- enabled
+                              [Text] The fix connects   -- enabled
+                              [Text] itemActivated  -- enabled
+                              [Text]  to move focus to the next field (the import-file path box, or the remote-download command box if that's the visible one). I deliberately didn't wire it to   -- enabled
+                              [Text] wizard()->next()  -- enabled
+                              [Text]  — that call skips   -- enabled
+                              [Text] isComplete()  -- enabled
+                              [Text] 's check, so Enter would've let you skip straight to the review page with no file selected yet.  -- enabled
+                              [Text] On the Escape/"combo dropdown" part — I can't fix or verify that one yet. This page genuinely has no combo box; the "Database format" combo with KDBX4/3/KDB options that description mentioned actually lives in the   -- visible, enabled
+                              [Text] New Database  -- visible, enabled
+                              [Text]  wizard (  -- visible, enabled
+                              [Text] NewDatabaseWizardPageEncryption  -- visible, enabled
+                              [Text] ), a different dialog entirely from Import File. So either you were on a different screen when Escape failed, or that pasted description merged two different wizards together — worth knowing, since a couple of its other details (the button layout, "Other formats…") don't match this dialog's real source either. Where exactly does Escape not work — same Import File screen, or somewhere else?  -- visible, enabled
+                              [Button] View 0001 import wizard enter key  -- visible, enabled, focusable
+                              [Text] 0001 import wizard enter key  -- visible, enabled
+                              [Text] PATCH  -- visible, enabled
+                              [Text]    -- visible, enabled
+                              [Button] Download 0001 import wizard enter key  -- visible, enabled, focusable
+                              [ToolBar] Message actions  -- visible, enabled, focusable
+                                [Button] Copy  -- visible, enabled, focusable
+                                [StatusBar] (no accessible name)  -- visible, enabled
+                                [Button] Read aloud  -- visible, enabled, focusable
+                                [Button] Good response  -- visible, enabled, focusable
+                                [Button] Bad response  -- visible, enabled, focusable
+                                [Button] Retry  -- visible, enabled, focusable
+                                [Text] (no accessible name)  -- visible, enabled
+                                  [Text] 23 minutes ago  -- visible, enabled
                           [Group] (no accessible name)  -- enabled, focusable
                             [StatusBar] (no accessible name)  -- visible, enabled
                           [StatusBar] (no accessible name)  -- visible, enabled
                           [StatusBar] (no accessible name)  -- visible, enabled
                           [Group] (no accessible name)  -- visible, enabled
-                            [Edit] Write your prompt to Claude  -- visible, enabled, focusable, focused
+                            [Edit] Write your prompt to Claude  -- visible, enabled, focusable
                               [Text] 
   -- visible, enabled
                             [StatusBar] (no accessible name)  -- visible, enabled
                             [Button] Add files, connectors, and more  -- visible, enabled, focusable
-                            [Group] (no accessible name)  -- visible, enabled
-                              [Button] Stop response  -- visible, enabled, focusable
                             [Group] (no accessible name)  -- visible, enabled, focusable
                               [Group] Dictate  -- visible, enabled
                                 [Button] Dictate  -- visible, enabled, focusable
@@ -313,7 +342,7 @@ UIA accessible tree for window matching '.*KeePassXC.*'
                         [Thumb] Resize file viewer  -- visible, enabled, focusable
                         [Group] (no accessible name)  -- visible, enabled, focusable
                           [Group] (no accessible name)  -- visible, enabled, focusable
-                            [Text] Dump tree windows · PY  -- visible, enabled
+                            [Text] 0001 import wizard enter key · PATCH  -- visible, enabled
                             [Group] More options  -- visible, enabled
                               [Button] Copy  -- visible, enabled, focusable
                               [Button] More options  -- visible, enabled, focusable
@@ -321,801 +350,108 @@ UIA accessible tree for window matching '.*KeePassXC.*'
                             [Button] Go back  -- visible, enabled, focusable
                             [Group] (no accessible name)  -- visible, enabled, focusable
                               [Text] 1  -- visible, enabled
-                              [Text] """  -- visible, enabled
+                              [Text] diff --git a/src/gui/wizard/ImportWizardPageSelect.cpp b/src/gui/wizard/ImportWizardPageSelect.cpp  -- visible, enabled
                               [Text] 2  -- visible, enabled
-                              [Text] Target path in the repo: tests/accessibility/dump_tree_windows.py  -- visible, enabled
+                              [Text] index d7cd17b..210e025 100644  -- visible, enabled
                               [Text] 3  -- visible, enabled
-                              [Text] (pairs with tests/accessibility/dump_tree.py, the Linux/AT-SPI version)  -- visible, enabled
+                              [Text] --- a/src/gui/wizard/ImportWizardPageSelect.cpp  -- visible, enabled
                               [Text] 4  -- visible, enabled
-                              [Text]    -- visible, enabled
+                              [Text] +++ b/src/gui/wizard/ImportWizardPageSelect.cpp  -- visible, enabled
                               [Text] 5  -- visible, enabled
-                              [Text] Diagnostic (not yet assertions) script for exercising KeePassXC's  -- visible, enabled
+                              [Text] @@ -74,6 +74,13 @@ ImportWizardPageSelect::ImportWizardPageSelect(QWidget* parent)  -- visible, enabled
                               [Text] 6  -- visible, enabled
-                              [Text] accessible tree on Windows via UI Automation (UIA) -- the same bridge  -- visible, enabled
+                              [Text]      m_ui->importTypeList->item(6)->setData(Qt::UserRole, ImportWizard::IMPORT_KEEPASS1);  -- visible, enabled
                               [Text] 7  -- visible, enabled
-                              [Text] JAWS reads from -- using pywinauto instead of raw COM.  -- visible, enabled
+                              [Text]    -- visible, enabled
                               [Text] 8  -- visible, enabled
-                              [Text]    -- visible, enabled
+                              [Text]      connect(m_ui->importTypeList, &QListWidget::currentItemChanged, this, &ImportWizardPageSelect::itemSelected);  -- visible, enabled
                               [Text] 9  -- visible, enabled
-                              [Text] Unlike dump_tree.py, this script does NOT launch the app itself. Keep  -- visible, enabled
+                              [Text] +    // QAbstractItemView emits itemActivated() by default when Enter/Return is  -- visible, enabled
                               [Text] 10  -- visible, enabled
-                              [Text] using build-debug.ps1 exactly as you do now; this connects to whatever  -- visible, enabled
+                              [Text] +    // pressed on the current item; nothing was connected to it, so the key  -- visible, enabled
                               [Text] 11  -- visible, enabled
-                              [Text] KeePassXC window is already running, by title, regardless of how it  -- visible, enabled
+                              [Text] +    // press was silently swallowed by the list instead of doing anything.  -- visible, enabled
                               [Text] 12  -- visible, enabled
-                              [Text] was launched or whether a debugger is attached.  -- visible, enabled
+                              [Text] +    // Keyboard and screen reader users select a format via Tab/arrow keys  -- visible, enabled
                               [Text] 13  -- visible, enabled
-                              [Text]    -- visible, enabled
+                              [Text] +    // (which already applies the selection through itemSelected() above)  -- visible, enabled
                               [Text] 14  -- visible, enabled
-                              [Text] What this does:  -- visible, enabled
+                              [Text] +    // and then expect Enter to move them forward, not nothing.  -- visible, enabled
                               [Text] 15  -- visible, enabled
-                              [Text]   1. Polls for a KeePassXC window to appear (connect(), retried --  -- visible, enabled
-                              [Text] 16  -- visible, enabled
-                              [Text]      the window can take a moment to render after launch).  -- visible, enabled
-                              [Text] 17  -- visible, enabled
-                              [Text]   2. Walks the full UIA tree and prints, for every element: control  -- visible, enabled
-                              [Text] 18  -- visible, enabled
-                              [Text]      type (role), accessible name, and the state flags most relevant  -- visible, enabled
-                              [Text] 19  -- visible, enabled
-                              [Text]      to screen-reader use (visible / enabled / keyboard-focusable /  -- visible, enabled
-                              [Text] 20  -- visible, enabled
-                              [Text]      has keyboard focus).  -- visible, enabled
-                              [Text] 21  -- visible, enabled
-                              [Text]   3. Writes the same output to uia-tree-dump.txt.  -- visible, enabled
-                              [Text] 22  -- visible, enabled
-                              [Text]    -- visible, enabled
-                              [Text] 23  -- visible, enabled
-                              [Text] This intentionally does NOT assert anything about *specific* widget  -- visible, enabled
-                              [Text] 24  -- visible, enabled
-                              [Text] names yet -- run it once, read uia-tree-dump.txt, then turn the names/  -- visible, enabled
+                              [Text] +    connect(m_ui->importTypeList, &QListWidget::itemActivated, this, &ImportWizardPageSelect::advanceFocusFromTypeList);  -- visible, enabled
+                              [Text] 16  -- enabled
+                              [Text]      m_ui->importTypeList->setCurrentRow(0);  -- enabled
+                              [Text] 17  -- enabled
+                              [Text]    -- enabled
+                              [Text] 18  -- enabled
+                              [Text]      connect(m_ui->importFileButton, &QAbstractButton::clicked, this, &ImportWizardPageSelect::chooseImportFile);  -- enabled
+                              [Text] 19  -- enabled
+                              [Text] @@ -182,6 +189,20 @@ void ImportWizardPageSelect::itemSelected(QListWidgetItem* current, QListWidgetI  -- enabled
+                              [Text] 20  -- enabled
+                              [Text]      }  -- enabled
+                              [Text] 21  -- enabled
+                              [Text]  }  -- enabled
+                              [Text] 22  -- enabled
+                              [Text]    -- enabled
+                              [Text] 23  -- enabled
+                              [Text] +void ImportWizardPageSelect::advanceFocusFromTypeList()  -- enabled
+                              [Text] 24  -- enabled
+                              [Text] +{  -- enabled
                               [Text] 25  -- enabled
-                              [Text] roles you actually care about into real assertions using the template  -- enabled
+                              [Text] +    // Deliberately move focus to the next field rather than calling  -- enabled
                               [Text] 26  -- enabled
-                              [Text] at the bottom.  -- enabled
+                              [Text] +    // wizard()->next() here: QWizard::next() only calls validatePage(),  -- enabled
                               [Text] 27  -- enabled
-                              [Text]    -- enabled
+                              [Text] +    // it does not check isComplete(), so it would let Enter skip straight  -- enabled
                               [Text] 28  -- enabled
-                              [Text] Requirements:  -- enabled
+                              [Text] +    // to the next page even with no import file selected yet. Moving  -- enabled
                               [Text] 29  -- enabled
-                              [Text]     pip install pywinauto  -- enabled
+                              [Text] +    // focus keeps Enter useful without bypassing that validation.  -- enabled
                               [Text] 30  -- enabled
-                              [Text]    -- enabled
+                              [Text] +    if (m_ui->downloadCommand->isVisible()) {  -- enabled
                               [Text] 31  -- enabled
-                              [Text] Usage:  -- enabled
+                              [Text] +        m_ui->downloadCommand->setFocus();  -- enabled
                               [Text] 32  -- enabled
-                              [Text]     1. Launch KeePassXC via build-debug.ps1, as usual.  -- enabled
+                              [Text] +    } else {  -- enabled
                               [Text] 33  -- enabled
-                              [Text]     2. Once the window is up, in a separate PowerShell:  -- enabled
+                              [Text] +        m_ui->importFileEdit->setFocus();  -- enabled
                               [Text] 34  -- enabled
-                              [Text]          python dump_tree_windows.py  -- enabled
+                              [Text] +    }  -- enabled
                               [Text] 35  -- enabled
-                              [Text] """  -- enabled
+                              [Text] +}  -- enabled
                               [Text] 36  -- enabled
-                              [Text]    -- enabled
+                              [Text] +  -- enabled
                               [Text] 37  -- enabled
-                              [Text] import  -- enabled
-                              [Text]    -- enabled
-                              [Text] sys  -- enabled
+                              [Text]  void ImportWizardPageSelect::updateDatabaseChoices() const  -- enabled
                               [Text] 38  -- enabled
-                              [Text] import  -- enabled
-                              [Text]    -- enabled
-                              [Text] time  -- enabled
+                              [Text]  {  -- enabled
                               [Text] 39  -- enabled
-                              [Text]    -- enabled
+                              [Text]      m_ui->existingDatabaseChoice->clear();  -- enabled
                               [Text] 40  -- enabled
-                              [Text] try  -- enabled
-                              [Text] :  -- enabled
+                              [Text] diff --git a/src/gui/wizard/ImportWizardPageSelect.h b/src/gui/wizard/ImportWizardPageSelect.h  -- enabled
                               [Text] 41  -- enabled
-                              [Text]       -- enabled
-                              [Text] from  -- enabled
-                              [Text]    -- enabled
-                              [Text] pywinauto  -- enabled
-                              [Text]    -- enabled
-                              [Text] import  -- enabled
-                              [Text]    -- enabled
-                              [Text] Application  -- enabled
+                              [Text] index 5c4024e..befc951 100644  -- enabled
                               [Text] 42  -- enabled
-                              [Text] except  -- enabled
-                              [Text]    -- enabled
-                              [Text] ImportError  -- enabled
-                              [Text] :  -- enabled
+                              [Text] --- a/src/gui/wizard/ImportWizardPageSelect.h  -- enabled
                               [Text] 43  -- enabled
-                              [Text]       -- enabled
-                              [Text] print  -- enabled
-                              [Text] (  -- enabled
-                              [Text] "ERROR: pywinauto not importable. Run: pip install pywinauto"  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] file  -- enabled
-                              [Text] =  -- enabled
-                              [Text] sys  -- enabled
-                              [Text] .  -- enabled
-                              [Text] stderr  -- enabled
-                              [Text] )  -- enabled
+                              [Text] +++ b/src/gui/wizard/ImportWizardPageSelect.h  -- enabled
                               [Text] 44  -- enabled
-                              [Text]       -- enabled
-                              [Text] sys  -- enabled
-                              [Text] .  -- enabled
-                              [Text] exit  -- enabled
-                              [Text] (  -- enabled
-                              [Text] 2  -- enabled
-                              [Text] )  -- enabled
+                              [Text] @@ -43,6 +43,7 @@ public:  -- enabled
                               [Text] 45  -- enabled
-                              [Text]    -- enabled
+                              [Text]    -- enabled
                               [Text] 46  -- enabled
-                              [Text] # Adjust if your build's window title doesn't match -- it may include  -- enabled
+                              [Text]  private slots:  -- enabled
                               [Text] 47  -- enabled
-                              [Text] # a filename or version string. title_re is a regex, so  -- enabled
+                              [Text]      void itemSelected(QListWidgetItem* current, QListWidgetItem* previous);  -- enabled
                               [Text] 48  -- enabled
-                              [Text] # ".*KeePassXC.*" matches most variants.  -- enabled
+                              [Text] +    void advanceFocusFromTypeList();  -- enabled
                               [Text] 49  -- enabled
-                              [Text] WINDOW_TITLE_RE  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] ".*KeePassXC.*"  -- enabled
+                              [Text]      void chooseImportFile();  -- enabled
                               [Text] 50  -- enabled
-                              [Text] CONNECT_TIMEOUT_S  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] 15  -- enabled
+                              [Text]      void chooseKeyFile();  -- enabled
                               [Text] 51  -- enabled
-                              [Text] CONNECT_RETRY_INTERVAL_S  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] 0.5  -- enabled
+                              [Text]      void updateDatabaseChoices() const;  -- enabled
                               [Text] 52  -- enabled
-                              [Text]    -- enabled
-                              [Text] 53  -- enabled
-                              [Text] # Some of these convenience methods vary slightly by pywinauto version.  -- enabled
-                              [Text] 54  -- enabled
-                              [Text] # Each is wrapped individually in dump_node() below, so a missing one  -- enabled
-                              [Text] 55  -- enabled
-                              [Text] # is silently skipped rather than crashing the whole walk.  -- enabled
-                              [Text] 56  -- enabled
-                              [Text] STATE_METHODS  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]  (  -- enabled
-                              [Text] 57  -- enabled
-                              [Text]     (  -- enabled
-                              [Text] "is_visible"  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] "visible"  -- enabled
-                              [Text] ),  -- enabled
-                              [Text] 58  -- enabled
-                              [Text]     (  -- enabled
-                              [Text] "is_enabled"  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] "enabled"  -- enabled
-                              [Text] ),  -- enabled
-                              [Text] 59  -- enabled
-                              [Text]     (  -- enabled
-                              [Text] "is_keyboard_focusable"  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] "focusable"  -- enabled
-                              [Text] ),  -- enabled
-                              [Text] 60  -- enabled
-                              [Text]     (  -- enabled
-                              [Text] "has_keyboard_focus"  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] "focused"  -- enabled
-                              [Text] ),  -- enabled
-                              [Text] 61  -- enabled
-                              [Text] )  -- enabled
-                              [Text] 62  -- enabled
-                              [Text]    -- enabled
-                              [Text] 63  -- enabled
-                              [Text]    -- enabled
-                              [Text] 64  -- enabled
-                              [Text] def  -- enabled
-                              [Text]    -- enabled
-                              [Text] connect_to_app  -- enabled
-                              [Text] ():  -- enabled
-                              [Text] 65  -- enabled
-                              [Text]       -- enabled
-                              [Text] """Poll for the window rather than a single immediate lookup --  -- enabled
-                              [Text] 66  -- enabled
-                              [Text]     build-debug.ps1 launching the app doesn't mean the window has  -- enabled
-                              [Text] 67  -- enabled
-                              [Text]     finished rendering yet."""  -- enabled
-                              [Text] 68  -- enabled
-                              [Text]       -- enabled
-                              [Text] deadline  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] time  -- enabled
-                              [Text] .  -- enabled
-                              [Text] time  -- enabled
-                              [Text] ()   -- enabled
-                              [Text] +  -- enabled
-                              [Text]    -- enabled
-                              [Text] CONNECT_TIMEOUT_S  -- enabled
-                              [Text] 69  -- enabled
-                              [Text]       -- enabled
-                              [Text] last_err  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] None  -- enabled
-                              [Text] 70  -- enabled
-                              [Text]       -- enabled
-                              [Text] while  -- enabled
-                              [Text]    -- enabled
-                              [Text] time  -- enabled
-                              [Text] .  -- enabled
-                              [Text] time  -- enabled
-                              [Text] ()   -- enabled
-                              [Text] <  -- enabled
-                              [Text]    -- enabled
-                              [Text] deadline  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 71  -- enabled
-                              [Text]           -- enabled
-                              [Text] try  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 72  -- enabled
-                              [Text]               -- enabled
-                              [Text] app  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] Application  -- enabled
-                              [Text] (  -- enabled
-                              [Text] backend  -- enabled
-                              [Text] =  -- enabled
-                              [Text] "uia"  -- enabled
-                              [Text] ).  -- enabled
-                              [Text] connect  -- enabled
-                              [Text] (  -- enabled
-                              [Text] title_re  -- enabled
-                              [Text] =  -- enabled
-                              [Text] WINDOW_TITLE_RE  -- enabled
-                              [Text] )  -- enabled
-                              [Text] 73  -- enabled
-                              [Text]               -- enabled
-                              [Text] return  -- enabled
-                              [Text]    -- enabled
-                              [Text] app  -- enabled
-                              [Text] .  -- enabled
-                              [Text] top_window  -- enabled
-                              [Text] ()  -- enabled
-                              [Text] 74  -- enabled
-                              [Text]           -- enabled
-                              [Text] except  -- enabled
-                              [Text]    -- enabled
-                              [Text] Exception  -- enabled
-                              [Text]    -- enabled
-                              [Text] as  -- enabled
-                              [Text]    -- enabled
-                              [Text] e  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 75  -- enabled
-                              [Text]               -- enabled
-                              [Text] last_err  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] e  -- enabled
-                              [Text] 76  -- enabled
-                              [Text]               -- enabled
-                              [Text] time  -- enabled
-                              [Text] .  -- enabled
-                              [Text] sleep  -- enabled
-                              [Text] (  -- enabled
-                              [Text] CONNECT_RETRY_INTERVAL_S  -- enabled
-                              [Text] )  -- enabled
-                              [Text] 77  -- enabled
-                              [Text]       -- enabled
-                              [Text] raise  -- enabled
-                              [Text]    -- enabled
-                              [Text] SystemExit  -- enabled
-                              [Text] (  -- enabled
-                              [Text] 78  -- enabled
-                              [Text]           -- enabled
-                              [Text] f"FAILED: no window matching '{WINDOW_TITLE_RE}' appeared within "  -- enabled
-                              [Text] 79  -- enabled
-                              [Text]           -- enabled
-                              [Text] f"{CONNECT_TIMEOUT_S}s ({last_err}).\n"  -- enabled
-                              [Text] 80  -- enabled
-                              [Text]           -- enabled
-                              [Text] "Make sure KeePassXC is already running (via build-debug.ps1) "  -- enabled
-                              [Text] 81  -- enabled
-                              [Text]           -- enabled
-                              [Text] "before starting this script, and check the actual window "  -- enabled
-                              [Text] 82  -- enabled
-                              [Text]           -- enabled
-                              [Text] "title if it doesn't match the default regex."  -- enabled
-                              [Text] 83  -- enabled
-                              [Text]     )  -- enabled
-                              [Text] 84  -- enabled
-                              [Text]    -- enabled
-                              [Text] 85  -- enabled
-                              [Text]    -- enabled
-                              [Text] 86  -- enabled
-                              [Text] def  -- enabled
-                              [Text]    -- enabled
-                              [Text] dump_node  -- enabled
-                              [Text] (  -- enabled
-                              [Text] node  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] out  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] depth  -- enabled
-                              [Text] =  -- enabled
-                              [Text] 0  -- enabled
-                              [Text] ):  -- enabled
-                              [Text] 87  -- enabled
-                              [Text]       -- enabled
-                              [Text] try  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 88  -- enabled
-                              [Text]           -- enabled
-                              [Text] name  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] node  -- enabled
-                              [Text] .  -- enabled
-                              [Text] element_info  -- enabled
-                              [Text] .  -- enabled
-                              [Text] name  -- enabled
-                              [Text]    -- enabled
-                              [Text] or  -- enabled
-                              [Text]    -- enabled
-                              [Text] "(no accessible name)"  -- enabled
-                              [Text] 89  -- enabled
-                              [Text]       -- enabled
-                              [Text] except  -- enabled
-                              [Text]    -- enabled
-                              [Text] Exception  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 90  -- enabled
-                              [Text]           -- enabled
-                              [Text] name  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] "(name unavailable)"  -- enabled
-                              [Text] 91  -- enabled
-                              [Text]       -- enabled
-                              [Text] try  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 92  -- enabled
-                              [Text]           -- enabled
-                              [Text] role  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] node  -- enabled
-                              [Text] .  -- enabled
-                              [Text] element_info  -- enabled
-                              [Text] .  -- enabled
-                              [Text] control_type  -- enabled
-                              [Text]    -- enabled
-                              [Text] or  -- enabled
-                              [Text]    -- enabled
-                              [Text] "(no control type)"  -- enabled
-                              [Text] 93  -- enabled
-                              [Text]       -- enabled
-                              [Text] except  -- enabled
-                              [Text]    -- enabled
-                              [Text] Exception  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 94  -- enabled
-                              [Text]           -- enabled
-                              [Text] role  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] "(control type unavailable)"  -- enabled
-                              [Text] 95  -- enabled
-                              [Text]    -- enabled
-                              [Text] 96  -- enabled
-                              [Text]       -- enabled
-                              [Text] flags  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]  []  -- enabled
-                              [Text] 97  -- enabled
-                              [Text]       -- enabled
-                              [Text] for  -- enabled
-                              [Text]    -- enabled
-                              [Text] attr  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] label  -- enabled
-                              [Text]    -- enabled
-                              [Text] in  -- enabled
-                              [Text]    -- enabled
-                              [Text] STATE_METHODS  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 98  -- enabled
-                              [Text]           -- enabled
-                              [Text] try  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 99  -- enabled
-                              [Text]               -- enabled
-                              [Text] if  -- enabled
-                              [Text]    -- enabled
-                              [Text] getattr  -- enabled
-                              [Text] (  -- enabled
-                              [Text] node  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] attr  -- enabled
-                              [Text] )():  -- enabled
-                              [Text] 100  -- enabled
-                              [Text]                   -- enabled
-                              [Text] flags  -- enabled
-                              [Text] .  -- enabled
-                              [Text] append  -- enabled
-                              [Text] (  -- enabled
-                              [Text] label  -- enabled
-                              [Text] )  -- enabled
-                              [Text] 101  -- enabled
-                              [Text]           -- enabled
-                              [Text] except  -- enabled
-                              [Text]    -- enabled
-                              [Text] Exception  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 102  -- enabled
-                              [Text]               -- enabled
-                              [Text] pass  -- enabled
-                              [Text] 103  -- enabled
-                              [Text]       -- enabled
-                              [Text] flag_str  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] ", "  -- enabled
-                              [Text] .  -- enabled
-                              [Text] join  -- enabled
-                              [Text] (  -- enabled
-                              [Text] flags  -- enabled
-                              [Text] )   -- enabled
-                              [Text] if  -- enabled
-                              [Text]    -- enabled
-                              [Text] flags  -- enabled
-                              [Text]    -- enabled
-                              [Text] else  -- enabled
-                              [Text]    -- enabled
-                              [Text] "(no notable state)"  -- enabled
-                              [Text] 104  -- enabled
-                              [Text]    -- enabled
-                              [Text] 105  -- enabled
-                              [Text]       -- enabled
-                              [Text] line  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] f"{'  ' * depth}[{role}] {name}  -- {flag_str}"  -- enabled
-                              [Text] 106  -- enabled
-                              [Text]       -- enabled
-                              [Text] print  -- enabled
-                              [Text] (  -- enabled
-                              [Text] line  -- enabled
-                              [Text] )  -- enabled
-                              [Text] 107  -- enabled
-                              [Text]       -- enabled
-                              [Text] out  -- enabled
-                              [Text] .  -- enabled
-                              [Text] write  -- enabled
-                              [Text] (  -- enabled
-                              [Text] line  -- enabled
-                              [Text]    -- enabled
-                              [Text] +  -- enabled
-                              [Text]    -- enabled
-                              [Text] "\n"  -- enabled
-                              [Text] )  -- enabled
-                              [Text] 108  -- enabled
-                              [Text]    -- enabled
-                              [Text] 109  -- enabled
-                              [Text]       -- enabled
-                              [Text] try  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 110  -- enabled
-                              [Text]           -- enabled
-                              [Text] children  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] node  -- enabled
-                              [Text] .  -- enabled
-                              [Text] children  -- enabled
-                              [Text] ()  -- enabled
-                              [Text] 111  -- enabled
-                              [Text]       -- enabled
-                              [Text] except  -- enabled
-                              [Text]    -- enabled
-                              [Text] Exception  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 112  -- enabled
-                              [Text]           -- enabled
-                              [Text] children  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]  []  -- enabled
-                              [Text] 113  -- enabled
-                              [Text]       -- enabled
-                              [Text] for  -- enabled
-                              [Text]    -- enabled
-                              [Text] child  -- enabled
-                              [Text]    -- enabled
-                              [Text] in  -- enabled
-                              [Text]    -- enabled
-                              [Text] children  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 114  -- enabled
-                              [Text]           -- enabled
-                              [Text] dump_node  -- enabled
-                              [Text] (  -- enabled
-                              [Text] child  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] out  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] depth  -- enabled
-                              [Text]    -- enabled
-                              [Text] +  -- enabled
-                              [Text]    -- enabled
-                              [Text] 1  -- enabled
-                              [Text] )  -- enabled
-                              [Text] 115  -- enabled
-                              [Text]    -- enabled
-                              [Text] 116  -- enabled
-                              [Text]    -- enabled
-                              [Text] 117  -- enabled
-                              [Text] def  -- enabled
-                              [Text]    -- enabled
-                              [Text] main  -- enabled
-                              [Text] ():  -- enabled
-                              [Text] 118  -- enabled
-                              [Text]       -- enabled
-                              [Text] window  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] connect_to_app  -- enabled
-                              [Text] ()  -- enabled
-                              [Text] 119  -- enabled
-                              [Text]       -- enabled
-                              [Text] print  -- enabled
-                              [Text] (  -- enabled
-                              [Text] f"Connected to window matching '{WINDOW_TITLE_RE}'. Walking tree...\n"  -- enabled
-                              [Text] )  -- enabled
-                              [Text] 120  -- enabled
-                              [Text]    -- enabled
-                              [Text] 121  -- enabled
-                              [Text]       -- enabled
-                              [Text] with  -- enabled
-                              [Text]    -- enabled
-                              [Text] open  -- enabled
-                              [Text] (  -- enabled
-                              [Text] "uia-tree-dump.txt"  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] "w"  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] encoding  -- enabled
-                              [Text] =  -- enabled
-                              [Text] "utf-8"  -- enabled
-                              [Text] )   -- enabled
-                              [Text] as  -- enabled
-                              [Text]    -- enabled
-                              [Text] out  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 122  -- enabled
-                              [Text]           -- enabled
-                              [Text] out  -- enabled
-                              [Text] .  -- enabled
-                              [Text] write  -- enabled
-                              [Text] (  -- enabled
-                              [Text] f"UIA accessible tree for window matching '{WINDOW_TITLE_RE}'\n"  -- enabled
-                              [Text] )  -- enabled
-                              [Text] 123  -- enabled
-                              [Text]           -- enabled
-                              [Text] out  -- enabled
-                              [Text] .  -- enabled
-                              [Text] write  -- enabled
-                              [Text] (  -- enabled
-                              [Text] "="  -- enabled
-                              [Text]    -- enabled
-                              [Text] *  -- enabled
-                              [Text]    -- enabled
-                              [Text] 60  -- enabled
-                              [Text]    -- enabled
-                              [Text] +  -- enabled
-                              [Text]    -- enabled
-                              [Text] "\n"  -- enabled
-                              [Text] )  -- enabled
-                              [Text] 124  -- enabled
-                              [Text]           -- enabled
-                              [Text] dump_node  -- enabled
-                              [Text] (  -- enabled
-                              [Text] window  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] out  -- enabled
-                              [Text] )  -- enabled
-                              [Text] 125  -- enabled
-                              [Text]    -- enabled
-                              [Text] 126  -- enabled
-                              [Text]       -- enabled
-                              [Text] print  -- enabled
-                              [Text] (  -- enabled
-                              [Text] "\nTree dump written to uia-tree-dump.txt"  -- enabled
-                              [Text] )  -- enabled
-                              [Text] 127  -- enabled
-                              [Text]    -- enabled
-                              [Text] 128  -- enabled
-                              [Text]    -- enabled
-                              [Text] 129  -- enabled
-                              [Text] # --- Template for a real focus-traversal assertion, once the tree ---  -- enabled
-                              [Text] 130  -- enabled
-                              [Text] # --- dump above confirms the widget names you expect. Not run by  ---  -- enabled
-                              [Text] 131  -- enabled
-                              [Text] # --- default -- copy into its own test once you've validated it.  ---  -- enabled
-                              [Text] 132  -- enabled
-                              [Text] def  -- enabled
-                              [Text]    -- enabled
-                              [Text] _example_focus_check  -- enabled
-                              [Text] (  -- enabled
-                              [Text] window  -- enabled
-                              [Text] ):  -- enabled
-                              [Text] 133  -- enabled
-                              [Text]       -- enabled
-                              [Text] from  -- enabled
-                              [Text]    -- enabled
-                              [Text] pywinauto  -- enabled
-                              [Text] .  -- enabled
-                              [Text] keyboard  -- enabled
-                              [Text]    -- enabled
-                              [Text] import  -- enabled
-                              [Text]    -- enabled
-                              [Text] send_keys  -- enabled
-                              [Text] 134  -- enabled
-                              [Text]    -- enabled
-                              [Text] 135  -- enabled
-                              [Text]       -- enabled
-                              [Text] first_field  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] window  -- enabled
-                              [Text] .  -- enabled
-                              [Text] child_window  -- enabled
-                              [Text] (  -- enabled
-                              [Text] title  -- enabled
-                              [Text] =  -- enabled
-                              [Text] "Database Name"  -- enabled
-                              [Text] ,   -- enabled
-                              [Text] control_type  -- enabled
-                              [Text] =  -- enabled
-                              [Text] "Edit"  -- enabled
-                              [Text] )  -- enabled
-                              [Text] 136  -- enabled
-                              [Text]       -- enabled
-                              [Text] first_field  -- enabled
-                              [Text] .  -- enabled
-                              [Text] set_focus  -- enabled
-                              [Text] ()  -- enabled
-                              [Text] 137  -- enabled
-                              [Text]       -- enabled
-                              [Text] send_keys  -- enabled
-                              [Text] (  -- enabled
-                              [Text] "{TAB}"  -- enabled
-                              [Text] )  -- enabled
-                              [Text] 138  -- enabled
-                              [Text]    -- enabled
-                              [Text] 139  -- enabled
-                              [Text]       -- enabled
-                              [Text] focused  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] None  -- enabled
-                              [Text] 140  -- enabled
-                              [Text]       -- enabled
-                              [Text] for  -- enabled
-                              [Text]    -- enabled
-                              [Text] child  -- enabled
-                              [Text]    -- enabled
-                              [Text] in  -- enabled
-                              [Text]    -- enabled
-                              [Text] window  -- enabled
-                              [Text] .  -- enabled
-                              [Text] descendants  -- enabled
-                              [Text] ():  -- enabled
-                              [Text] 141  -- enabled
-                              [Text]           -- enabled
-                              [Text] try  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 142  -- enabled
-                              [Text]               -- enabled
-                              [Text] if  -- enabled
-                              [Text]    -- enabled
-                              [Text] child  -- enabled
-                              [Text] .  -- enabled
-                              [Text] has_keyboard_focus  -- enabled
-                              [Text] ():  -- enabled
-                              [Text] 143  -- enabled
-                              [Text]                   -- enabled
-                              [Text] focused  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] child  -- enabled
-                              [Text] 144  -- enabled
-                              [Text]                   -- enabled
-                              [Text] break  -- enabled
-                              [Text] 145  -- enabled
-                              [Text]           -- enabled
-                              [Text] except  -- enabled
-                              [Text]    -- enabled
-                              [Text] Exception  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 146  -- enabled
-                              [Text]               -- enabled
-                              [Text] continue  -- enabled
-                              [Text] 147  -- enabled
-                              [Text]    -- enabled
-                              [Text] 148  -- enabled
-                              [Text]       -- enabled
-                              [Text] expected_next  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] "Database Description"  -- enabled
-                              [Text] 149  -- enabled
-                              [Text]       -- enabled
-                              [Text] actual  -- enabled
-                              [Text]    -- enabled
-                              [Text] =  -- enabled
-                              [Text]    -- enabled
-                              [Text] focused  -- enabled
-                              [Text] .  -- enabled
-                              [Text] element_info  -- enabled
-                              [Text] .  -- enabled
-                              [Text] name  -- enabled
-                              [Text]    -- enabled
-                              [Text] if  -- enabled
-                              [Text]    -- enabled
-                              [Text] focused  -- enabled
-                              [Text]    -- enabled
-                              [Text] else  -- enabled
-                              [Text]    -- enabled
-                              [Text] None  -- enabled
-                              [Text] 150  -- enabled
-                              [Text]       -- enabled
-                              [Text] assert  -- enabled
-                              [Text]    -- enabled
-                              [Text] actual  -- enabled
-                              [Text]    -- enabled
-                              [Text] ==  -- enabled
-                              [Text]    -- enabled
-                              [Text] expected_next  -- enabled
-                              [Text] , (  -- enabled
-                              [Text] 151  -- enabled
-                              [Text]           -- enabled
-                              [Text] f"expected focus on '{expected_next}' after Tab, got '{actual}'"  -- enabled
-                              [Text] 152  -- enabled
-                              [Text]     )  -- enabled
-                              [Text] 153  -- enabled
-                              [Text]    -- enabled
-                              [Text] 154  -- enabled
-                              [Text]    -- enabled
-                              [Text] 155  -- enabled
-                              [Text] if  -- enabled
-                              [Text]    -- enabled
-                              [Text] __name__  -- enabled
-                              [Text]    -- enabled
-                              [Text] ==  -- enabled
-                              [Text]    -- enabled
-                              [Text] "__main__"  -- enabled
-                              [Text] :  -- enabled
-                              [Text] 156  -- enabled
-                              [Text]       -- enabled
-                              [Text] main  -- enabled
-                              [Text] ()  -- enabled
-                              [Text] 157  -- enabled
                               [Text]    -- enabled
                         [StatusBar] (no accessible name)  -- visible, enabled
                         [Group] (no accessible name)  -- visible, enabled, focusable
@@ -1128,7 +464,9 @@ UIA accessible tree for window matching '.*KeePassXC.*'
               [Button] Tab search  -- visible, enabled, focusable
             [Pane] (no accessible name)  -- visible, enabled
               [Tab] (no accessible name)  -- visible, enabled
-                [TabItem] Done — Screen reader testing for KeePassXC - Claude - Memory usage - 329 MB  -- visible, enabled, focusable
+                [TabItem] Dashboard ‹ Miriam Lozneanu - Software Engineer — WordPress - Memory usage - 369 MB  -- visible, enabled, focusable
+                  [Button] Close  -- visible, enabled, focusable
+                [TabItem] Needs input — Screen reader testing for KeePassXC - Claude - Memory usage - 263 MB  -- visible, enabled, focusable
                   [Button] Close  -- visible, enabled, focusable
               [Pane] (no accessible name)  -- visible, enabled
             [Button] New Tab  -- visible, enabled, focusable
