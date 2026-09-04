@@ -1,0 +1,78 @@
+# Target path in the repo: .github/workflows/accessibility-atspi.yml
+#
+# Best-effort accessibility regression check via Linux AT-SPI + dogtail.
+# Exercises the same accessible tree that Orca/screen readers read from,
+# without needing real screen-reader hardware.
+#
+# CAVEAT: continue-on-error is deliberate for now. run-tests.sh (in
+# keepassxc-build-scripts) already documents that even Xvfb + fluxbox
+# can fail to deliver real focus events reliably in a throwaway CI
+# session -- this job rides the same display stack, so treat a failure
+# here as "investigate", not "confirmed regression", until it's proven
+# stable over several runs. Flip continue-on-error off once it has.
+
+name: Accessibility (AT-SPI)
+
+on:
+  push:
+    branches: [feature/gui-accessibility]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  atspi-check:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install build + accessibility deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential cmake ninja-build pkg-config git \
+            qt6-base-dev qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools libqt6svg6-dev \
+            libbotan-2-dev zlib1g-dev libminizip-dev libargon2-dev libqrencode-dev libreadline-dev \
+            libpcsclite-dev libusb-1.0-0-dev libkeyutils-dev \
+            libxkbcommon-dev libxkbcommon-x11-dev libxi-dev libxtst-dev libx11-dev \
+            xvfb fluxbox dbus-x11 at-spi2-core python3-dogtail python3-pyatspi
+
+      - name: Configure + build
+        run: |
+          cmake -G Ninja -B build-debug \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DWITH_TESTS=ON \
+            -DWITH_GUI_TESTS=ON \
+            -DKPXC_FEATURE_NETWORK=OFF \
+            -DKPXC_FEATURE_UPDATES=OFF \
+            -DKPXC_FEATURE_DOCS=OFF
+          ninja -C build-debug
+
+      - name: Run accessibility tree check
+        run: |
+          Xvfb :99 -screen 0 1280x1024x24 -nolisten tcp &
+          sleep 1
+          export DISPLAY=:99
+          dbus-run-session -- bash -c '
+            fluxbox >/dev/null 2>&1 &
+            sleep 1
+            export QT_LINUX_ACCESSIBILITY_ALWAYS_ON=1
+            export QT_ACCESSIBILITY=1
+            ./build-debug/src/keepassxc &
+            APP_PID=$!
+            sleep 3
+            python3 tests/accessibility/dump_tree.py
+            STATUS=$?
+            kill "$APP_PID" 2>/dev/null || true
+            exit $STATUS
+          '
+
+      - name: Upload tree dump
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atspi-tree-dump
+          path: atspi-tree-dump.txt
+          if-no-files-found: ignore
