@@ -78,6 +78,17 @@ jobs:
             echo "QT_QPA_PLATFORM=$QT_QPA_PLATFORM"
             echo "QT_LOGGING_RULES=$QT_LOGGING_RULES"
             echo "toolkit-accessibility=$(gsettings get org.gnome.desktop.interface toolkit-accessibility)"
+            echo "=== D-Bus environment ==="
+            echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
+            echo "DBUS_STARTER_BUS_TYPE=$DBUS_STARTER_BUS_TYPE"
+            echo "DBUS_STARTER_ADDRESS=$DBUS_STARTER_ADDRESS"
+            env | grep '^DBUS_' | sort || true
+            echo "=== AT-SPI bus launcher ==="
+            which at-spi-bus-launcher || true
+            ls -l "$(which at-spi-bus-launcher)" 2>/dev/null || true
+            echo "=== AT-SPI registry ==="
+            which at-spi2-registryd || true
+            ls -l "$(which at-spi2-registryd)" 2>/dev/null || true
             echo "=== AT-SPI services before app launch ==="
             busctl --user list | grep -E 'atspi|a11y' || true
             echo "=== Qt version ==="
@@ -88,6 +99,14 @@ jobs:
             qmake6 -query QT_INSTALL_PLUGINS || true
             echo "=== AT-SPI libraries ==="
             ldconfig -p | grep -E 'libatspi|libatk-bridge' || true
+
+            # Explicitly activate org.a11y.Bus and show its exported API.
+            # busctl introspect causes D-Bus activation if the service is
+            # only present as an activatable name.
+            echo "=== Activating AT-SPI bus ==="
+            busctl --user introspect org.a11y.Bus /org/a11y/bus || true
+            echo "=== AT-SPI services after activation ==="
+            busctl --user list | grep -E 'atspi|a11y' || true
 
             ./build-debug/src/keepassxc &
             APP_PID=$!
