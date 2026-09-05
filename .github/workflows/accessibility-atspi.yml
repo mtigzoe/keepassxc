@@ -58,77 +58,91 @@ jobs:
           Xvfb :99 -screen 0 1280x1024x24 -nolisten tcp &
           sleep 1
           export DISPLAY=:99
-          dbus-run-session -- bash -c '
-            fluxbox >/dev/null 2>&1 &
-            sleep 1
 
-            # Dogtail checks GNOME's toolkit-accessibility setting before
-            # connecting to AT-SPI. CI uses Fluxbox rather than GNOME, so
-            # explicitly enable the setting in this temporary D-Bus session.
-            gsettings set org.gnome.desktop.interface toolkit-accessibility true
+          # Run the complete accessibility session as a temporary script
+          # under dbus-run-session. This avoids relying on shell quoting or
+          # GitHub Actions' command wrapper to preserve the D-Bus environment.
+          cat > /tmp/run-atspi-check.sh <<'ATSPISCRIPT'
+          #!/usr/bin/env bash
+          set -e
 
-            export QT_LINUX_ACCESSIBILITY_ALWAYS_ON=1
-            export QT_ACCESSIBILITY=1
-            export QT_QPA_PLATFORM=xcb
-            export QT_LOGGING_RULES="qt.accessibility.*=true"
+          fluxbox >/dev/null 2>&1 &
+          sleep 1
 
-            echo "=== Accessibility environment ==="
-            echo "QT_LINUX_ACCESSIBILITY_ALWAYS_ON=$QT_LINUX_ACCESSIBILITY_ALWAYS_ON"
-            echo "QT_ACCESSIBILITY=$QT_ACCESSIBILITY"
-            echo "QT_QPA_PLATFORM=$QT_QPA_PLATFORM"
-            echo "QT_LOGGING_RULES=$QT_LOGGING_RULES"
-            echo "toolkit-accessibility=$(gsettings get org.gnome.desktop.interface toolkit-accessibility)"
-            echo "=== D-Bus environment ==="
-            echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
-            echo "DBUS_STARTER_BUS_TYPE=$DBUS_STARTER_BUS_TYPE"
-            echo "DBUS_STARTER_ADDRESS=$DBUS_STARTER_ADDRESS"
-            env | grep '^DBUS_' | sort || true
+          # Dogtail checks GNOME's toolkit-accessibility setting before
+          # connecting to AT-SPI. CI uses Fluxbox rather than GNOME, so
+          # explicitly enable the setting in this temporary D-Bus session.
+          gsettings set org.gnome.desktop.interface toolkit-accessibility true
 
-            # dbus-run-session provides the session bus, while AT-SPI uses a
-            # separate accessibility bus. In CI there is no desktop session
-            # to start at-spi-bus-launcher for us, so start it explicitly.
-            # The launcher registers org.a11y.Bus on the session bus and
-            # creates the separate accessibility bus with --launch-immediately.
-            echo "=== Starting AT-SPI bus launcher ==="
+          export QT_LINUX_ACCESSIBILITY_ALWAYS_ON=1
+          export QT_ACCESSIBILITY=1
+          export QT_QPA_PLATFORM=xcb
+          export QT_LOGGING_RULES="qt.accessibility.*=true"
+
+          echo "=== Accessibility environment ==="
+          echo "QT_LINUX_ACCESSIBILITY_ALWAYS_ON=$QT_LINUX_ACCESSIBILITY_ALWAYS_ON"
+          echo "QT_ACCESSIBILITY=$QT_ACCESSIBILITY"
+          echo "QT_QPA_PLATFORM=$QT_QPA_PLATFORM"
+          echo "QT_LOGGING_RULES=$QT_LOGGING_RULES"
+          echo "toolkit-accessibility=$(gsettings get org.gnome.desktop.interface toolkit-accessibility)"
+          echo "=== D-Bus environment ==="
+          echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
+          echo "DBUS_STARTER_BUS_TYPE=$DBUS_STARTER_BUS_TYPE"
+          echo "DBUS_STARTER_ADDRESS=$DBUS_STARTER_ADDRESS"
+          env | grep '^DBUS_' | sort || true
+
+          # Ubuntu installs at-spi-bus-launcher outside the normal PATH on
+          # some runner images. Prefer the standard libexec location and
+          # fall back to PATH lookup for other distributions.
+          echo "=== Starting AT-SPI bus launcher ==="
+          if [ -x /usr/libexec/at-spi-bus-launcher ]; then
+            AT_SPI_LAUNCHER=/usr/libexec/at-spi-bus-launcher
+          elif [ -x /usr/lib/at-spi2-core/at-spi-bus-launcher ]; then
+            AT_SPI_LAUNCHER=/usr/lib/at-spi2-core/at-spi-bus-launcher
+          else
             AT_SPI_LAUNCHER="$(command -v at-spi-bus-launcher)"
-            echo "AT_SPI_LAUNCHER=$AT_SPI_LAUNCHER"
-            "$AT_SPI_LAUNCHER" --launch-immediately >/tmp/at-spi-bus-launcher.log 2>&1 &
-            ATSPI_LAUNCHER_PID=$!
-            sleep 2
-            echo "AT-SPI launcher PID=$ATSPI_LAUNCHER_PID"
-            cat /tmp/at-spi-bus-launcher.log || true
+          fi
+          echo "AT_SPI_LAUNCHER=$AT_SPI_LAUNCHER"
+          "$AT_SPI_LAUNCHER" --launch-immediately >/tmp/at-spi-bus-launcher.log 2>&1 &
+          ATSPI_LAUNCHER_PID=$!
+          sleep 2
+          echo "AT-SPI launcher PID=$ATSPI_LAUNCHER_PID"
+          cat /tmp/at-spi-bus-launcher.log || true
 
-            echo "=== AT-SPI services after launcher ==="
-            busctl --user list | grep -E 'atspi|a11y' || true
-            echo "=== AT-SPI bus address ==="
-            busctl --user call org.a11y.Bus /org/a11y/bus org.a11y.Bus GetAddress || true
+          echo "=== AT-SPI services after launcher ==="
+          busctl --user list | grep -E 'atspi|a11y' || true
+          echo "=== AT-SPI bus address ==="
+          busctl --user call org.a11y.Bus /org/a11y/bus org.a11y.Bus GetAddress || true
 
-            echo "=== Qt version ==="
-            qmake6 -query QT_VERSION || true
-            echo "=== Qt accessibility plugins ==="
-            find /usr/lib /usr/local/lib -type f \( -iname '*accessib*' -o -path '*/accessiblebridge/*' \) 2>/dev/null | sort || true
-            echo "=== Qt plugin directories ==="
-            qmake6 -query QT_INSTALL_PLUGINS || true
-            echo "=== AT-SPI libraries ==="
-            ldconfig -p | grep -E 'libatspi|libatk-bridge' || true
+          echo "=== Qt version ==="
+          qmake6 -query QT_VERSION || true
+          echo "=== Qt accessibility plugins ==="
+          find /usr/lib /usr/local/lib -type f \( -iname '*accessib*' -o -path '*/accessiblebridge/*' \) 2>/dev/null | sort || true
+          echo "=== Qt plugin directories ==="
+          qmake6 -query QT_INSTALL_PLUGINS || true
+          echo "=== AT-SPI libraries ==="
+          ldconfig -p | grep -E 'libatspi|libatk-bridge' || true
 
-            ./build-debug/src/keepassxc &
-            APP_PID=$!
-            sleep 3
+          ./build-debug/src/keepassxc &
+          APP_PID=$!
+          sleep 3
 
-            echo "=== KeePassXC process environment ==="
-            tr '\0' '\n' < "/proc/$APP_PID/environ" | grep -E '^(QT_|DISPLAY|DBUS_)' | sort || true
-            echo "=== AT-SPI services after app launch ==="
-            busctl --user list | grep -E 'atspi|a11y' || true
-            echo "=== KeePassXC process status ==="
-            ps -p "$APP_PID" -o pid=,stat=,cmd=
+          echo "=== KeePassXC process environment ==="
+          tr '\0' '\n' < "/proc/$APP_PID/environ" | grep -E '^(QT_|DISPLAY|DBUS_)' | sort || true
+          echo "=== AT-SPI services after app launch ==="
+          busctl --user list | grep -E 'atspi|a11y' || true
+          echo "=== KeePassXC process status ==="
+          ps -p "$APP_PID" -o pid=,stat=,cmd=
 
-            python3 tests/accessibility/dump_tree.py
-            STATUS=$?
-            kill "$APP_PID" 2>/dev/null || true
-            kill "$ATSPI_LAUNCHER_PID" 2>/dev/null || true
-            exit $STATUS
-          '
+          python3 tests/accessibility/dump_tree.py
+          STATUS=$?
+          kill "$APP_PID" 2>/dev/null || true
+          kill "$ATSPI_LAUNCHER_PID" 2>/dev/null || true
+          exit $STATUS
+          ATSPISCRIPT
+
+          chmod +x /tmp/run-atspi-check.sh
+          dbus-run-session -- /tmp/run-atspi-check.sh
 
       - name: Upload tree dump
         if: always()
