@@ -108,9 +108,6 @@ jobs:
             exit 1
           fi
           export AT_SPI_BUS_ADDRESS
-          # libatspi uses this exact environment variable name for an
-          # explicit accessibility-bus address. Keep AT_SPI_BUS_ADDRESS
-          # too because it is useful for diagnostics and busctl commands.
           export ATSPI_BUS_ADDRESS="$AT_SPI_BUS_ADDRESS"
           echo "AT_SPI_BUS_ADDRESS=$AT_SPI_BUS_ADDRESS"
           echo "ATSPI_BUS_ADDRESS=$ATSPI_BUS_ADDRESS"
@@ -128,7 +125,7 @@ jobs:
             AT_SPI_REGISTRY="$(command -v at-spi2-registryd)"
           fi
           echo "AT_SPI_REGISTRY=$AT_SPI_REGISTRY"
-          "$AT_SPI_REGISTRY" >/tmp/at-spi-registryd.log 2>&1 &
+          "$AT_SPI_REGISTRY" --use-gnome-session >/tmp/at-spi-registryd.log 2>&1 &
           ATSPI_REGISTRY_PID=$!
           sleep 2
           echo "AT-SPI registry PID=$ATSPI_REGISTRY_PID"
