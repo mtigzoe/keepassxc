@@ -136,7 +136,7 @@ jobs:
           echo "=== Qt version ==="
           qmake6 -query QT_VERSION || true
           echo "=== Qt accessibility plugins ==="
-          find /usr/lib /usr/local/lib -type f \( -iname '*accessib*' -o -path '*/accessiblebridge/*' \) 2>/dev/null | sort || true
+          find /usr/lib/qt6 /usr/lib/x86_64-linux-gnu/qt6 -type f \( -iname '*accessib*' -o -path '*/accessiblebridge/*' \) 2>/dev/null | sort || true
           echo "=== Qt plugin directories ==="
           qmake6 -query QT_INSTALL_PLUGINS || true
           echo "=== AT-SPI libraries ==="
@@ -158,8 +158,10 @@ jobs:
           busctl --address="$AT_SPI_BUS_ADDRESS" tree org.a11y.atspi.Registry 2>&1 || true
           echo "=== AT-SPI registry root introspection ==="
           busctl --address="$AT_SPI_BUS_ADDRESS" introspect org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>&1 || true
-          echo "=== AT-SPI registry cache GetItems ==="
-          busctl --address="$AT_SPI_BUS_ADDRESS" call org.a11y.atspi.Registry /org/a11y/atspi/accessible/root org.a11y.atspi.Cache GetItems 2>&1 || true
+          echo "=== AT-SPI cache object introspection ==="
+          busctl --address="$AT_SPI_BUS_ADDRESS" introspect org.a11y.atspi.Registry /org/a11y/atspi/cache 2>&1 || true
+          echo "=== AT-SPI cache GetItems ==="
+          busctl --address="$AT_SPI_BUS_ADDRESS" call org.a11y.atspi.Registry /org/a11y/atspi/cache org.a11y.atspi.Cache GetItems 2>&1 || true
           echo "=== AT-SPI registry object introspection ==="
           busctl --address="$AT_SPI_BUS_ADDRESS" introspect org.a11y.atspi.Registry /org/a11y/atspi/registry 2>&1 || true
           echo "=== Python AT-SPI environment ==="
