@@ -80,6 +80,10 @@ jobs:
             busctl --user list | grep -E 'atspi|a11y' || true
             echo "=== Qt version ==="
             qmake6 -query QT_VERSION || true
+            echo "=== Qt accessibility plugins ==="
+            find /usr/lib /usr/local/lib -type f \( -iname '*accessib*' -o -path '*/accessiblebridge/*' \) 2>/dev/null | sort || true
+            echo "=== Qt plugin directories ==="
+            qmake6 -query QT_INSTALL_PLUGINS || true
             echo "=== AT-SPI libraries ==="
             ldconfig -p | grep -E 'libatspi|libatk-bridge' || true
 
