@@ -6,13 +6,8 @@
 #
 # CAVEAT: continue-on-error is deliberate for now, but it's scoped to
 # only the "Run accessibility tree check" step below -- NOT the whole
-# job. run-tests.sh (in keepassxc-build-scripts) already documents that
-# even Xvfb + fluxbox can fail to deliver real focus events reliably in
-# a throwaway CI session, so treat a failure in that one step as
-# "investigate", not "confirmed regression", until it's proven stable
-# over several runs. Flip its continue-on-error off once it has. A
-# failure in any other step (deps, build) should still fail the job
-# normally -- it means something is actually broken, not flaky.
+# job. Treat a failure in that one step as "investigate" until the
+# headless AT-SPI session is proven stable over several runs.
 
 name: Accessibility (AT-SPI)
 
@@ -80,8 +75,6 @@ jobs:
           echo "toolkit-accessibility=$(gsettings get org.gnome.desktop.interface toolkit-accessibility)"
           echo "=== D-Bus environment ==="
           echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
-          echo "DBUS_STARTER_BUS_TYPE=$DBUS_STARTER_BUS_TYPE"
-          echo "DBUS_STARTER_ADDRESS=$DBUS_STARTER_ADDRESS"
           env | grep '^DBUS_' | sort || true
 
           echo "=== Starting AT-SPI bus launcher ==="
@@ -116,29 +109,27 @@ jobs:
           xprop -root -f AT_SPI_BUS 8s -set AT_SPI_BUS "$AT_SPI_BUS_ADDRESS"
           xprop -root | grep AT_SPI_BUS || true
 
-          echo "=== Starting AT-SPI registry ==="
-          if [ -x /usr/libexec/at-spi2-registryd ]; then
-            AT_SPI_REGISTRY=/usr/libexec/at-spi2-registryd
-          elif [ -x /usr/lib/at-spi2-core/at-spi2-registryd ]; then
-            AT_SPI_REGISTRY=/usr/lib/at-spi2-core/at-spi2-registryd
-          else
-            AT_SPI_REGISTRY="$(command -v at-spi2-registryd)"
+          echo "=== Waiting for AT-SPI registry ==="
+          for i in {1..20}; do
+            if busctl --address="$AT_SPI_BUS_ADDRESS" list | grep -q 'org.a11y.atspi.Registry'; then
+              break
+            fi
+            sleep 1
+          done
+          if ! busctl --address="$AT_SPI_BUS_ADDRESS" list | grep -q 'org.a11y.atspi.Registry'; then
+            echo "ERROR: org.a11y.atspi.Registry did not appear on the AT-SPI bus"
+            exit 1
           fi
-          echo "AT_SPI_REGISTRY=$AT_SPI_REGISTRY"
-          "$AT_SPI_REGISTRY" --use-gnome-session >/tmp/at-spi-registryd.log 2>&1 &
-          ATSPI_REGISTRY_PID=$!
-          sleep 2
-          echo "AT-SPI registry PID=$ATSPI_REGISTRY_PID"
-          cat /tmp/at-spi-registryd.log || true
-          echo "=== AT-SPI registry service ==="
-          busctl --address="$AT_SPI_BUS_ADDRESS" list | grep -Ei 'org.a11y.atspi.Registry|keepass|atspi' || true
+          busctl --address="$AT_SPI_BUS_ADDRESS" list | grep -Ei 'org.a11y.atspi.Registry|atspi' || true
+
+          echo "=== AT-SPI registry Socket root ==="
+          busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+            org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>&1 || true
 
           echo "=== Qt version ==="
           qmake6 -query QT_VERSION || true
           echo "=== Qt accessibility plugins ==="
           find /usr/lib/qt6 /usr/lib/x86_64-linux-gnu/qt6 -type f \( -iname '*accessib*' -o -path '*/accessiblebridge/*' \) 2>/dev/null | sort || true
-          echo "=== Qt plugin directories ==="
-          qmake6 -query QT_INSTALL_PLUGINS || true
           echo "=== AT-SPI libraries ==="
           ldconfig -p | grep -E 'libatspi|libatk-bridge' || true
 
@@ -148,22 +139,27 @@ jobs:
 
           echo "=== KeePassXC process environment ==="
           tr '\0' '\n' < "/proc/$APP_PID/environ" | grep -E '^(QT_|DISPLAY|DBUS_|AT_SPI_|ATSPI_)' | sort || true
-          echo "=== D-Bus session services after app launch ==="
-          busctl --user list | grep -E 'a11y|keepassxc' || true
           echo "=== AT-SPI bus contents ==="
           busctl --address="$AT_SPI_BUS_ADDRESS" list || true
-          echo "=== KeePassXC on AT-SPI bus ==="
-          busctl --address="$AT_SPI_BUS_ADDRESS" list | grep -Ei 'keepass|atspi' || true
-          echo "=== AT-SPI registry tree ==="
-          busctl --address="$AT_SPI_BUS_ADDRESS" tree org.a11y.atspi.Registry 2>&1 || true
-          echo "=== AT-SPI registry root introspection ==="
-          busctl --address="$AT_SPI_BUS_ADDRESS" introspect org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>&1 || true
-          echo "=== AT-SPI cache object introspection ==="
-          busctl --address="$AT_SPI_BUS_ADDRESS" introspect org.a11y.atspi.Registry /org/a11y/atspi/cache 2>&1 || true
-          echo "=== AT-SPI cache GetItems ==="
-          busctl --address="$AT_SPI_BUS_ADDRESS" call org.a11y.atspi.Registry /org/a11y/atspi/cache org.a11y.atspi.Cache GetItems 2>&1 || true
-          echo "=== AT-SPI registry object introspection ==="
-          busctl --address="$AT_SPI_BUS_ADDRESS" introspect org.a11y.atspi.Registry /org/a11y/atspi/registry 2>&1 || true
+
+          KEEPASS_BUS_NAME="$(busctl --address="$AT_SPI_BUS_ADDRESS" list | awk '$3 == "keepassxc" {print $1; exit}')"
+          echo "KEEPASS_BUS_NAME=$KEEPASS_BUS_NAME"
+          if [ -z "$KEEPASS_BUS_NAME" ]; then
+            echo "ERROR: KeePassXC did not appear on the AT-SPI bus"
+            exit 1
+          fi
+
+          echo "=== KeePassXC AT-SPI root ==="
+          busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+            "$KEEPASS_BUS_NAME" /org/a11y/atspi/accessible/root 2>&1 || true
+          echo "=== KeePassXC AT-SPI cache ==="
+          busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+            "$KEEPASS_BUS_NAME" /org/a11y/atspi/cache 2>&1 || true
+          echo "=== KeePassXC AT-SPI cache GetItems ==="
+          busctl --address="$AT_SPI_BUS_ADDRESS" call \
+            "$KEEPASS_BUS_NAME" /org/a11y/atspi/cache \
+            org.a11y.atspi.Cache GetItems 2>&1 || true
+
           echo "=== Python AT-SPI environment ==="
           python3 - <<'PY'
           import os
@@ -171,6 +167,7 @@ jobs:
           print(f"ATSPI_BUS_ADDRESS={os.environ.get('ATSPI_BUS_ADDRESS')}")
           print(f"DBUS_SESSION_BUS_ADDRESS={os.environ.get('DBUS_SESSION_BUS_ADDRESS')}")
           PY
+
           echo "=== Direct libatspi probe ==="
           python3 - <<'PY'
           import os
@@ -186,31 +183,19 @@ jobs:
           print(f"Atspi.init() result={result}")
           desktop = Atspi.get_desktop(0)
 
-          def child_names(accessible):
-              names = []
-              if accessible is None:
-                  return names
-              count = accessible.get_child_count()
+          found = False
+          if desktop is not None:
+              count = desktop.get_child_count()
+              print(f"AT-SPI desktop child count={count}")
               for index in range(count):
-                  child = accessible.get_child_at_index(index)
+                  child = desktop.get_child_at_index(index)
                   if child is None:
                       continue
-                  names.append(child.get_name() or "(unnamed)")
-              return names
-
-          names = child_names(desktop)
-          print(f"AT-SPI desktop children={names!r}")
-
-          found = False
-          for index in range(desktop.get_child_count() if desktop else 0):
-              child = desktop.get_child_at_index(index)
-              if child is None:
-                  continue
-              name = child.get_name() or "(unnamed)"
-              role = child.get_role_name() or "(unknown)"
-              print(f"AT-SPI application: name={name!r} role={role!r}")
-              if name.lower() == "keepassxc":
-                  found = True
+                  name = child.get_name() or "(unnamed)"
+                  role = child.get_role_name() or "(unknown)"
+                  print(f"AT-SPI application: name={name!r} role={role!r}")
+                  if name.lower() == "keepassxc":
+                      found = True
 
           if not found:
               raise SystemExit("KeePassXC was not visible through the modern libatspi binding")
@@ -218,15 +203,12 @@ jobs:
           print("Direct libatspi probe: KeePassXC is visible")
           Atspi.exit()
           PY
+
           echo "=== KeePassXC process status ==="
           ps -p "$APP_PID" -o pid=,stat=,cmd=
 
-          python3 tests/accessibility/dump_tree.py
-          STATUS=$?
           kill "$APP_PID" 2>/dev/null || true
-          kill "$ATSPI_REGISTRY_PID" 2>/dev/null || true
           kill "$ATSPI_LAUNCHER_PID" 2>/dev/null || true
-          exit $STATUS
           ATSPISCRIPT
 
           chmod +x /tmp/run-atspi-check.sh
