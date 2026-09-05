@@ -112,7 +112,13 @@ jobs:
           echo "=== AT-SPI services after launcher ==="
           busctl --user list | grep -E 'atspi|a11y' || true
           echo "=== AT-SPI bus address ==="
-          busctl --user call org.a11y.Bus /org/a11y/bus org.a11y.Bus GetAddress || true
+          AT_SPI_BUS_ADDRESS="$(busctl --user call org.a11y.Bus /org/a11y/bus org.a11y.Bus GetAddress | sed -n 's/^s "\(.*\)"$/\1/p')"
+          if [ -z "$AT_SPI_BUS_ADDRESS" ]; then
+            echo "ERROR: org.a11y.Bus did not return an AT-SPI bus address"
+            exit 1
+          fi
+          export AT_SPI_BUS_ADDRESS
+          echo "AT_SPI_BUS_ADDRESS=$AT_SPI_BUS_ADDRESS"
 
           echo "=== Qt version ==="
           qmake6 -query QT_VERSION || true
@@ -128,9 +134,9 @@ jobs:
           sleep 3
 
           echo "=== KeePassXC process environment ==="
-          tr '\0' '\n' < "/proc/$APP_PID/environ" | grep -E '^(QT_|DISPLAY|DBUS_)' | sort || true
+          tr '\0' '\n' < "/proc/$APP_PID/environ" | grep -E '^(QT_|DISPLAY|DBUS_|AT_SPI_)' | sort || true
           echo "=== AT-SPI services after app launch ==="
-          busctl --user list | grep -E 'atspi|a11y' || true
+          busctl --user list | grep -E 'atspi|a11y|keepassxc' || true
           echo "=== KeePassXC process status ==="
           ps -p "$APP_PID" -o pid=,stat=,cmd=
 
