@@ -59,18 +59,12 @@ jobs:
           sleep 1
           export DISPLAY=:99
 
-          # Run the complete accessibility session as a temporary script
-          # under dbus-run-session. This avoids relying on shell quoting or
-          # GitHub Actions' command wrapper to preserve the D-Bus environment.
           cat > /tmp/run-atspi-check.sh <<'ATSPISCRIPT'
           #!/usr/bin/env bash
           set -e
 
           fluxbox >/dev/null 2>&1 &
           sleep 1
-
-          # CI uses Fluxbox rather than GNOME, so explicitly enable the
-          # toolkit accessibility setting in this temporary D-Bus session.
           gsettings set org.gnome.desktop.interface toolkit-accessibility true
 
           export QT_LINUX_ACCESSIBILITY_ALWAYS_ON=1
@@ -90,9 +84,6 @@ jobs:
           echo "DBUS_STARTER_ADDRESS=$DBUS_STARTER_ADDRESS"
           env | grep '^DBUS_' | sort || true
 
-          # Ubuntu installs at-spi-bus-launcher outside the normal PATH on
-          # some runner images. Prefer the standard libexec location and
-          # fall back to PATH lookup for other distributions.
           echo "=== Starting AT-SPI bus launcher ==="
           if [ -x /usr/libexec/at-spi-bus-launcher ]; then
             AT_SPI_LAUNCHER=/usr/libexec/at-spi-bus-launcher
@@ -117,20 +108,17 @@ jobs:
             exit 1
           fi
           export AT_SPI_BUS_ADDRESS
+          # libatspi uses this exact environment variable name for an
+          # explicit accessibility-bus address. Keep AT_SPI_BUS_ADDRESS
+          # too because it is useful for diagnostics and busctl commands.
+          export ATSPI_BUS_ADDRESS="$AT_SPI_BUS_ADDRESS"
           echo "AT_SPI_BUS_ADDRESS=$AT_SPI_BUS_ADDRESS"
+          echo "ATSPI_BUS_ADDRESS=$ATSPI_BUS_ADDRESS"
 
-          # libatspi and registryd traditionally discover the accessibility
-          # bus from the AT_SPI_BUS X11 root-window property. The launcher
-          # does not reliably populate that property in a minimal Xvfb
-          # session, so set it explicitly to the bus address we just obtained.
           echo "=== Setting AT-SPI X11 root property ==="
           xprop -root -f AT_SPI_BUS 8s -set AT_SPI_BUS "$AT_SPI_BUS_ADDRESS"
           xprop -root | grep AT_SPI_BUS || true
 
-          # The registry is normally D-Bus-activated by the accessibility
-          # bus. In this minimal CI session it can remain merely activatable,
-          # leaving libatspi's desktop empty. Start it explicitly after the
-          # accessibility bus exists and point it at the same bus.
           echo "=== Starting AT-SPI registry ==="
           if [ -x /usr/libexec/at-spi2-registryd ]; then
             AT_SPI_REGISTRY=/usr/libexec/at-spi2-registryd
@@ -162,7 +150,7 @@ jobs:
           sleep 3
 
           echo "=== KeePassXC process environment ==="
-          tr '\0' '\n' < "/proc/$APP_PID/environ" | grep -E '^(QT_|DISPLAY|DBUS_|AT_SPI_)' | sort || true
+          tr '\0' '\n' < "/proc/$APP_PID/environ" | grep -E '^(QT_|DISPLAY|DBUS_|AT_SPI_|ATSPI_)' | sort || true
           echo "=== D-Bus session services after app launch ==="
           busctl --user list | grep -E 'a11y|keepassxc' || true
           echo "=== AT-SPI bus contents ==="
@@ -175,6 +163,7 @@ jobs:
           python3 - <<'PY'
           import os
           print(f"AT_SPI_BUS_ADDRESS={os.environ.get('AT_SPI_BUS_ADDRESS')}")
+          print(f"ATSPI_BUS_ADDRESS={os.environ.get('ATSPI_BUS_ADDRESS')}")
           print(f"DBUS_SESSION_BUS_ADDRESS={os.environ.get('DBUS_SESSION_BUS_ADDRESS')}")
           PY
           echo "=== Direct libatspi probe ==="
@@ -185,6 +174,7 @@ jobs:
           from gi.repository import Atspi
 
           print(f"AT_SPI_BUS_ADDRESS={os.environ.get('AT_SPI_BUS_ADDRESS')}")
+          print(f"ATSPI_BUS_ADDRESS={os.environ.get('ATSPI_BUS_ADDRESS')}")
           print(f"DISPLAY={os.environ.get('DISPLAY')}")
           print(f"Atspi version={Atspi.get_version()}")
           result = Atspi.init()
