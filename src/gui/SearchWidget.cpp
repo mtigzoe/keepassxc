@@ -94,7 +94,22 @@ SearchWidget::SearchWidget(QWidget* parent)
 
     // Fix initial visibility of actions (bug in Qt)
     for (QToolButton* toolButton : m_ui->searchEdit->findChildren<QToolButton*>()) {
-        toolButton->setVisible(toolButton->defaultAction()->isVisible());
+        QAction* action = toolButton->defaultAction();
+        toolButton->setVisible(action->isVisible());
+
+        // Qt's own built-in "clear text" button (from clearButtonEnabled
+        // above) has a real internal QAction, but that action's text is
+        // always empty -- confirmed live via UIA, this button reaches
+        // JAWS with no accessible name at all ("(no accessible name)"),
+        // unlike searchIcon/helpIcon/saveIcon, which we gave real text.
+        // It isn't exposed as a named member we can compare against
+        // directly, so identify it by elimination: anything here whose
+        // action isn't one of our own three known actions is Qt's clear
+        // button (or, if Qt ever adds another internal control of its
+        // own, something equally nameless that needs a name either way).
+        if (action != m_ui->searchIcon && action != m_ui->helpIcon && action != m_ui->saveIcon) {
+            toolButton->setAccessibleName(tr("Clear Search"));
+        }
     }
 }
 

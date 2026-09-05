@@ -1,42 +1,6 @@
 UIA accessible tree for window matching '.*KeePassXC.*'
 ============================================================
 [Window] KeePassXC  -- visible, enabled, focusable
-  [Window] Import Wizard  -- visible, enabled, focusable
-    [TitleBar] (no accessible name)  -- visible, enabled, focusable
-      [MenuBar] System  -- visible, enabled, focusable
-        [MenuItem] System  -- visible, enabled, focusable
-      [Button] Close  -- visible, enabled
-    [Group] (no accessible name)  -- visible, enabled
-      [Button] Go Back  -- visible, focusable
-      [Button] Continue  -- visible, focusable
-      [Custom] (no accessible name)  -- visible, enabled
-        [Group] (no accessible name)  -- visible, enabled
-          [List] Import type. Choose a file to import and where to import it.  -- visible, enabled, focusable
-            [ListItem] Comma Separated Values (.csv)  -- visible, enabled, focusable
-            [ListItem] 1Password Export (.1pux)  -- visible, enabled, focusable
-            [ListItem] 1Password Vault (.opvault)  -- visible, enabled, focusable
-            [ListItem] Bitwarden (.json)  -- visible, enabled, focusable
-            [ListItem] Proton Pass (.json)  -- visible, enabled, focusable
-            [ListItem] Remote Database (.kdbx)  -- visible, enabled, focusable
-          [Group] (no accessible name)  -- visible, enabled
-            [Text] Import File:  -- visible, enabled
-            [Edit] Import File:  -- visible, enabled, focusable
-            [Button] Browse for import file  -- visible, enabled, focusable
-            [Text] Password:  -- visible, enabled
-            [Group] Password to unlock import file  -- visible, enabled
-              [Edit] Password to unlock import file  -- visible, enabled, focusable
-                [CheckBox] Toggle Password (Ctrl+H)  -- visible, enabled
-            [Text] Key File:  -- visible, enabled
-            [Edit] Key File:  -- visible, enabled, focusable
-            [Button] Browse for key file  -- visible, enabled, focusable
-            [Text] Import Into:  -- visible, enabled
-            [Group] (no accessible name)  -- visible, enabled
-              [RadioButton] New Database  -- visible, enabled, focusable
-              [RadioButton] Existing Database:  -- visible, focusable
-              [ComboBox] Existing database to import into  -- visible, focusable
-        [Text] Choose a file to import and where to import it.  -- visible, enabled
-      [Button] Cancel  -- visible, enabled, focusable
-      [Text] Import File Selection  -- visible, enabled
   [TitleBar] (no accessible name)  -- visible, enabled, focusable
     [MenuBar] System  -- visible, enabled, focusable
       [MenuItem] System  -- visible, enabled, focusable
