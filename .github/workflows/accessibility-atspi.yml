@@ -39,7 +39,7 @@ jobs:
             libbotan-2-dev zlib1g-dev libminizip-dev libargon2-dev libqrencode-dev libreadline-dev \
             libpcsclite-dev libusb-1.0-0-dev libkeyutils-dev \
             libxkbcommon-dev libxkbcommon-x11-dev libxi-dev libxtst-dev libx11-dev \
-            xvfb fluxbox dbus-x11 at-spi2-core gir1.2-atspi-2.0 python3-gi
+            xvfb fluxbox dbus-x11 at-spi2-core gir1.2-atspi-2.0 python3-gi x11-utils
 
       - name: Configure + build
         run: |
@@ -119,6 +119,35 @@ jobs:
           export AT_SPI_BUS_ADDRESS
           echo "AT_SPI_BUS_ADDRESS=$AT_SPI_BUS_ADDRESS"
 
+          # libatspi and registryd traditionally discover the accessibility
+          # bus from the AT_SPI_BUS X11 root-window property. The launcher
+          # does not reliably populate that property in a minimal Xvfb
+          # session, so set it explicitly to the bus address we just obtained.
+          echo "=== Setting AT-SPI X11 root property ==="
+          xprop -root -f AT_SPI_BUS 8s -set AT_SPI_BUS "$AT_SPI_BUS_ADDRESS"
+          xprop -root | grep AT_SPI_BUS || true
+
+          # The registry is normally D-Bus-activated by the accessibility
+          # bus. In this minimal CI session it can remain merely activatable,
+          # leaving libatspi's desktop empty. Start it explicitly after the
+          # accessibility bus exists and point it at the same bus.
+          echo "=== Starting AT-SPI registry ==="
+          if [ -x /usr/libexec/at-spi2-registryd ]; then
+            AT_SPI_REGISTRY=/usr/libexec/at-spi2-registryd
+          elif [ -x /usr/lib/at-spi2-core/at-spi2-registryd ]; then
+            AT_SPI_REGISTRY=/usr/lib/at-spi2-core/at-spi2-registryd
+          else
+            AT_SPI_REGISTRY="$(command -v at-spi2-registryd)"
+          fi
+          echo "AT_SPI_REGISTRY=$AT_SPI_REGISTRY"
+          "$AT_SPI_REGISTRY" >/tmp/at-spi-registryd.log 2>&1 &
+          ATSPI_REGISTRY_PID=$!
+          sleep 2
+          echo "AT-SPI registry PID=$ATSPI_REGISTRY_PID"
+          cat /tmp/at-spi-registryd.log || true
+          echo "=== AT-SPI registry service ==="
+          busctl --address="$AT_SPI_BUS_ADDRESS" list | grep -Ei 'org.a11y.atspi.Registry|keepass|atspi' || true
+
           echo "=== Qt version ==="
           qmake6 -query QT_VERSION || true
           echo "=== Qt accessibility plugins ==="
@@ -156,7 +185,10 @@ jobs:
           from gi.repository import Atspi
 
           print(f"AT_SPI_BUS_ADDRESS={os.environ.get('AT_SPI_BUS_ADDRESS')}")
-          Atspi.init()
+          print(f"DISPLAY={os.environ.get('DISPLAY')}")
+          print(f"Atspi version={Atspi.get_version()}")
+          result = Atspi.init()
+          print(f"Atspi.init() result={result}")
           desktop = Atspi.get_desktop(0)
 
           def child_names(accessible):
@@ -197,6 +229,7 @@ jobs:
           python3 tests/accessibility/dump_tree.py
           STATUS=$?
           kill "$APP_PID" 2>/dev/null || true
+          kill "$ATSPI_REGISTRY_PID" 2>/dev/null || true
           kill "$ATSPI_LAUNCHER_PID" 2>/dev/null || true
           exit $STATUS
           ATSPISCRIPT
