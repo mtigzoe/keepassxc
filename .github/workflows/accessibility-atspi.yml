@@ -135,8 +135,20 @@ jobs:
 
           echo "=== KeePassXC process environment ==="
           tr '\0' '\n' < "/proc/$APP_PID/environ" | grep -E '^(QT_|DISPLAY|DBUS_|AT_SPI_)' | sort || true
-          echo "=== AT-SPI services after app launch ==="
-          busctl --user list | grep -E 'atspi|a11y|keepassxc' || true
+          echo "=== D-Bus session services after app launch ==="
+          busctl --user list | grep -E 'a11y|keepassxc' || true
+          echo "=== AT-SPI bus contents ==="
+          busctl --address="$AT_SPI_BUS_ADDRESS" list || true
+          echo "=== KeePassXC on AT-SPI bus ==="
+          busctl --address="$AT_SPI_BUS_ADDRESS" list | grep -Ei 'keepass|atspi' || true
+          echo "=== AT-SPI registry tree ==="
+          busctl --address="$AT_SPI_BUS_ADDRESS" tree org.a11y.atspi.Registry 2>&1 || true
+          echo "=== Python AT-SPI environment ==="
+          python3 - <<'PY'
+          import os
+          print(f"AT_SPI_BUS_ADDRESS={os.environ.get('AT_SPI_BUS_ADDRESS')}")
+          print(f"DBUS_SESSION_BUS_ADDRESS={os.environ.get('DBUS_SESSION_BUS_ADDRESS')}")
+          PY
           echo "=== KeePassXC process status ==="
           ps -p "$APP_PID" -o pid=,stat=,cmd=
 
