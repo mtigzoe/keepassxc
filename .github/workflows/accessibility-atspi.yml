@@ -61,6 +61,12 @@ jobs:
           dbus-run-session -- bash -c '
             fluxbox >/dev/null 2>&1 &
             sleep 1
+
+            # Dogtail checks GNOME's toolkit-accessibility setting before
+            # connecting to AT-SPI. CI uses Fluxbox rather than GNOME, so
+            # explicitly enable the setting in this temporary D-Bus session.
+            gsettings set org.gnome.desktop.interface toolkit-accessibility true
+
             export QT_LINUX_ACCESSIBILITY_ALWAYS_ON=1
             export QT_ACCESSIBILITY=1
             ./build-debug/src/keepassxc &
