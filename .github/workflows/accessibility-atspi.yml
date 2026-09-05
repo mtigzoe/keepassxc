@@ -1,13 +1,9 @@
-# Target path in the repo: .github/workflows/accessibility-atspi.yml
-#
 # Best-effort accessibility regression check via Linux AT-SPI.
-# Exercises the same accessible tree that Orca/screen readers read from,
-# without needing real screen-reader hardware.
+# Exercises the same accessibility tree used by Orca and other screen readers.
 #
-# CAVEAT: continue-on-error is deliberate for now, but it's scoped to
-# only the "Run accessibility tree check" step below -- NOT the whole
-# job. Treat a failure in that one step as "investigate" until the
-# headless AT-SPI session is proven stable over several runs.
+# The AT-SPI setup is deliberately explicit because GitHub's headless runner does
+# not provide a normal desktop session. Keep the accessibility check best-effort
+# until the headless session proves stable over several runs.
 
 name: Accessibility (AT-SPI)
 
@@ -50,13 +46,13 @@ jobs:
       - name: Run accessibility tree check
         continue-on-error: true
         run: |
-          Xvfb :99 -screen 0 1280x1024x24 -nolisten tcp &
+          Xvfb :99 -screen 0 1280x1024x24 -nolisten tcp >/tmp/xvfb.log 2>&1 &
           sleep 1
           export DISPLAY=:99
 
           cat > /tmp/run-atspi-check.sh <<'ATSPISCRIPT'
           #!/usr/bin/env bash
-          set -e
+          set -euo pipefail
 
           fluxbox >/dev/null 2>&1 &
           sleep 1
@@ -68,14 +64,10 @@ jobs:
           export QT_LOGGING_RULES="qt.accessibility.*=true"
 
           echo "=== Accessibility environment ==="
-          echo "QT_LINUX_ACCESSIBILITY_ALWAYS_ON=$QT_LINUX_ACCESSIBILITY_ALWAYS_ON"
+          echo "DISPLAY=$DISPLAY"
           echo "QT_ACCESSIBILITY=$QT_ACCESSIBILITY"
-          echo "QT_QPA_PLATFORM=$QT_QPA_PLATFORM"
-          echo "QT_LOGGING_RULES=$QT_LOGGING_RULES"
+          echo "QT_LINUX_ACCESSIBILITY_ALWAYS_ON=$QT_LINUX_ACCESSIBILITY_ALWAYS_ON"
           echo "toolkit-accessibility=$(gsettings get org.gnome.desktop.interface toolkit-accessibility)"
-          echo "=== D-Bus environment ==="
-          echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
-          env | grep '^DBUS_' | sort || true
 
           echo "=== Starting AT-SPI bus launcher ==="
           if [ -x /usr/libexec/at-spi-bus-launcher ]; then
@@ -89,12 +81,9 @@ jobs:
           "$AT_SPI_LAUNCHER" --launch-immediately >/tmp/at-spi-bus-launcher.log 2>&1 &
           ATSPI_LAUNCHER_PID=$!
           sleep 2
-          echo "AT-SPI launcher PID=$ATSPI_LAUNCHER_PID"
           cat /tmp/at-spi-bus-launcher.log || true
 
-          echo "=== AT-SPI services after launcher ==="
-          busctl --user list | grep -E 'atspi|a11y' || true
-          echo "=== AT-SPI bus address ==="
+          echo "=== Discovering AT-SPI bus ==="
           AT_SPI_BUS_ADDRESS="$(busctl --user call org.a11y.Bus /org/a11y/bus org.a11y.Bus GetAddress | sed -n 's/^s "\(.*\)"$/\1/p')"
           if [ -z "$AT_SPI_BUS_ADDRESS" ]; then
             echo "ERROR: org.a11y.Bus did not return an AT-SPI bus address"
@@ -105,68 +94,79 @@ jobs:
           echo "AT_SPI_BUS_ADDRESS=$AT_SPI_BUS_ADDRESS"
           echo "ATSPI_BUS_ADDRESS=$ATSPI_BUS_ADDRESS"
 
-          echo "=== Setting AT-SPI X11 root property ==="
+          echo "=== Publishing AT-SPI X11 root property ==="
           xprop -root -f AT_SPI_BUS 8s -set AT_SPI_BUS "$AT_SPI_BUS_ADDRESS"
-          xprop -root | grep AT_SPI_BUS || true
+          xprop -root | grep AT_SPI_BUS
 
-          echo "=== Waiting for AT-SPI registry ==="
-          for i in {1..20}; do
-            if busctl --address="$AT_SPI_BUS_ADDRESS" list | grep -q 'org.a11y.atspi.Registry'; then
+          echo "=== Waiting for AT-SPI registry Socket ==="
+          # The registry name can appear before registryd has exported its Socket
+          # interface. Qt registers only once during startup, so launching Qt too
+          # early can permanently miss the registry even though the bus is alive.
+          for i in {1..30}; do
+            if busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+                org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>/dev/null \
+                | grep -q 'org.a11y.atspi.Socket'; then
               break
             fi
             sleep 1
           done
-          if ! busctl --address="$AT_SPI_BUS_ADDRESS" list | grep -q 'org.a11y.atspi.Registry'; then
-            echo "ERROR: org.a11y.atspi.Registry did not appear on the AT-SPI bus"
+
+          if ! busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+              org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>/dev/null \
+              | grep -q 'org.a11y.atspi.Socket'; then
+            echo "ERROR: AT-SPI registry Socket was not ready"
+            echo "=== Registry introspection ==="
+            busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+              org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>&1 || true
             exit 1
           fi
-          busctl --address="$AT_SPI_BUS_ADDRESS" list | grep -Ei 'org.a11y.atspi.Registry|atspi' || true
 
-          echo "=== AT-SPI registry Socket root ==="
+          echo "AT-SPI registry Socket is ready"
           busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-            org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>&1 || true
+            org.a11y.atspi.Registry /org/a11y/atspi/accessible/root
 
-          echo "=== Qt version ==="
-          qmake6 -query QT_VERSION || true
-          echo "=== Qt accessibility plugins ==="
-          find /usr/lib/qt6 /usr/lib/x86_64-linux-gnu/qt6 -type f \( -iname '*accessib*' -o -path '*/accessiblebridge/*' \) 2>/dev/null | sort || true
-          echo "=== AT-SPI libraries ==="
-          ldconfig -p | grep -E 'libatspi|libatk-bridge' || true
-
-          ./build-debug/src/keepassxc &
+          echo "=== Launching KeePassXC ==="
+          ./build-debug/src/keepassxc >/tmp/keepassxc.log 2>&1 &
           APP_PID=$!
-          sleep 3
 
-          echo "=== KeePassXC process environment ==="
-          tr '\0' '\n' < "/proc/$APP_PID/environ" | grep -E '^(QT_|DISPLAY|DBUS_|AT_SPI_|ATSPI_)' | sort || true
-          echo "=== AT-SPI bus contents ==="
-          busctl --address="$AT_SPI_BUS_ADDRESS" list || true
+          echo "=== Waiting for KeePassXC registration ==="
+          KEEPASS_BUS_NAME=""
+          for i in {1..20}; do
+            KEEPASS_BUS_NAME="$(busctl --address="$AT_SPI_BUS_ADDRESS" list | awk '$3 == "keepassxc" {print $1; exit}')"
+            if [ -n "$KEEPASS_BUS_NAME" ]; then
+              break
+            fi
+            sleep 1
+          done
 
-          KEEPASS_BUS_NAME="$(busctl --address="$AT_SPI_BUS_ADDRESS" list | awk '$3 == "keepassxc" {print $1; exit}')"
-          echo "KEEPASS_BUS_NAME=$KEEPASS_BUS_NAME"
           if [ -z "$KEEPASS_BUS_NAME" ]; then
             echo "ERROR: KeePassXC did not appear on the AT-SPI bus"
+            cat /tmp/keepassxc.log || true
             exit 1
           fi
+          echo "KEEPASS_BUS_NAME=$KEEPASS_BUS_NAME"
+
+          echo "=== Waiting for KeePassXC accessibility root ==="
+          for i in {1..20}; do
+            if busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+                "$KEEPASS_BUS_NAME" /org/a11y/atspi/accessible/root 2>/dev/null \
+                | grep -q 'org.a11y.atspi.Accessible'; then
+              break
+            fi
+            sleep 1
+          done
 
           echo "=== KeePassXC AT-SPI root ==="
           busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-            "$KEEPASS_BUS_NAME" /org/a11y/atspi/accessible/root 2>&1 || true
+            "$KEEPASS_BUS_NAME" /org/a11y/atspi/accessible/root
+
           echo "=== KeePassXC AT-SPI cache ==="
           busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-            "$KEEPASS_BUS_NAME" /org/a11y/atspi/cache 2>&1 || true
-          echo "=== KeePassXC AT-SPI cache GetItems ==="
-          busctl --address="$AT_SPI_BUS_ADDRESS" call \
-            "$KEEPASS_BUS_NAME" /org/a11y/atspi/cache \
-            org.a11y.atspi.Cache GetItems 2>&1 || true
+            "$KEEPASS_BUS_NAME" /org/a11y/atspi/cache || true
 
-          echo "=== Python AT-SPI environment ==="
-          python3 - <<'PY'
-          import os
-          print(f"AT_SPI_BUS_ADDRESS={os.environ.get('AT_SPI_BUS_ADDRESS')}")
-          print(f"ATSPI_BUS_ADDRESS={os.environ.get('ATSPI_BUS_ADDRESS')}")
-          print(f"DBUS_SESSION_BUS_ADDRESS={os.environ.get('DBUS_SESSION_BUS_ADDRESS')}")
-          PY
+          echo "=== Qt accessibility evidence ==="
+          grep -E 'name="(KeePassXC|Database toolbar|Search|Create Database|Open Database|Toggle Password|Generate Password|New Entry|Edit Entry|Delete Entry|Copy Username|Copy Password|Perform Auto-Type|Copy URL|Lock Database)"' \
+            /tmp/keepassxc.log | head -50 || true
 
           echo "=== Direct libatspi probe ==="
           python3 - <<'PY'
@@ -177,13 +177,13 @@ jobs:
 
           print(f"AT_SPI_BUS_ADDRESS={os.environ.get('AT_SPI_BUS_ADDRESS')}")
           print(f"ATSPI_BUS_ADDRESS={os.environ.get('ATSPI_BUS_ADDRESS')}")
-          print(f"DISPLAY={os.environ.get('DISPLAY')}")
           print(f"Atspi version={Atspi.get_version()}")
+
           result = Atspi.init()
           print(f"Atspi.init() result={result}")
           desktop = Atspi.get_desktop(0)
-
           found = False
+
           if desktop is not None:
               count = desktop.get_child_count()
               print(f"AT-SPI desktop child count={count}")
@@ -214,10 +214,13 @@ jobs:
           chmod +x /tmp/run-atspi-check.sh
           dbus-run-session -- /tmp/run-atspi-check.sh
 
-      - name: Upload tree dump
+      - name: Upload AT-SPI diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: atspi-tree-dump
-          path: atspi-tree-dump.txt
+          name: atspi-diagnostics
+          path: |
+            /tmp/keepassxc.log
+            /tmp/at-spi-bus-launcher.log
+            /tmp/xvfb.log
           if-no-files-found: ignore
