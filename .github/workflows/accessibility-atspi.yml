@@ -1,5 +1,5 @@
-# Best-effort accessibility regression check via Linux AT-SPI.
-# Exercises the same accessibility tree used by Orca and other screen readers.
+# AT-SPI accessibility regression check on Linux.
+# Exercises the accessibility tree used by Orca and other screen readers.
 
 name: Accessibility (AT-SPI)
 
@@ -87,30 +87,19 @@ jobs:
           export AT_SPI_BUS_ADDRESS
           export ATSPI_BUS_ADDRESS="$AT_SPI_BUS_ADDRESS"
           echo "AT_SPI_BUS_ADDRESS=$AT_SPI_BUS_ADDRESS"
-          echo "ATSPI_BUS_ADDRESS=$ATSPI_BUS_ADDRESS"
 
           echo "=== Publishing AT-SPI X11 root property ==="
           xprop -root -f AT_SPI_BUS 8s -set AT_SPI_BUS "$AT_SPI_BUS_ADDRESS"
           xprop -root | grep AT_SPI_BUS
 
-          echo "=== Starting AT-SPI registry ==="
-          if [ -x /usr/libexec/at-spi2-registryd ]; then
-            AT_SPI_REGISTRY=/usr/libexec/at-spi2-registryd
-          elif [ -x /usr/lib/at-spi2-core/at-spi2-registryd ]; then
-            AT_SPI_REGISTRY=/usr/lib/at-spi2-core/at-spi2-registryd
-          else
-            AT_SPI_REGISTRY="$(command -v at-spi2-registryd)"
-          fi
-          echo "AT_SPI_REGISTRY=$AT_SPI_REGISTRY"
-          "$AT_SPI_REGISTRY" --use-gnome-session >/tmp/at-spi-registryd.log 2>&1 &
-          ATSPI_REGISTRY_PID=$!
-          sleep 2
-          cat /tmp/at-spi-registryd.log || true
+          echo "=== Launching KeePassXC ==="
+          # Do not start at-spi2-registryd ourselves. The AT-SPI bus launcher
+          # owns registry startup; starting a second registry races with it
+          # and can leave the Socket interface unavailable.
+          ./build-debug/src/keepassxc >/tmp/keepassxc.log 2>&1 &
+          APP_PID=$!
 
           echo "=== Waiting for AT-SPI registry Socket ==="
-          # The registry service name can exist before registryd has exported
-          # its Socket interface. Qt registers only once during startup, so
-          # wait for the actual Socket endpoint before launching KeePassXC.
           for i in {1..30}; do
             if busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
                 org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>/dev/null \
@@ -124,13 +113,15 @@ jobs:
               org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>/dev/null \
               | grep -q 'org.a11y.atspi.Socket'; then
             echo "ERROR: AT-SPI registry Socket was not ready"
-            echo "=== Registry process ==="
-            ps -p "$ATSPI_REGISTRY_PID" -o pid=,stat=,cmd= || true
-            echo "=== Registry log ==="
-            cat /tmp/at-spi-registryd.log || true
+            echo "=== Bus launcher log ==="
+            cat /tmp/at-spi-bus-launcher.log || true
+            echo "=== Registry service ==="
+            busctl --address="$AT_SPI_BUS_ADDRESS" list 2>&1 | grep -E 'org\.a11y\.atspi\.Registry|keepassxc' || true
             echo "=== Registry introspection ==="
             busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
               org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>&1 || true
+            echo "=== KeePassXC log ==="
+            cat /tmp/keepassxc.log || true
             exit 1
           fi
 
@@ -138,13 +129,9 @@ jobs:
           busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
             org.a11y.atspi.Registry /org/a11y/atspi/accessible/root
 
-          echo "=== Launching KeePassXC ==="
-          ./build-debug/src/keepassxc >/tmp/keepassxc.log 2>&1 &
-          APP_PID=$!
-
           echo "=== Waiting for KeePassXC registration ==="
           KEEPASS_BUS_NAME=""
-          for i in {1..20}; do
+          for i in {1..30}; do
             KEEPASS_BUS_NAME="$(busctl --address="$AT_SPI_BUS_ADDRESS" list | awk '$3 == "keepassxc" {print $1; exit}')"
             if [ -n "$KEEPASS_BUS_NAME" ]; then
               break
@@ -221,7 +208,6 @@ jobs:
           ps -p "$APP_PID" -o pid=,stat=,cmd=
 
           kill "$APP_PID" 2>/dev/null || true
-          kill "$ATSPI_REGISTRY_PID" 2>/dev/null || true
           kill "$ATSPI_LAUNCHER_PID" 2>/dev/null || true
           ATSPISCRIPT
 
