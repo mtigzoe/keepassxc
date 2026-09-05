@@ -69,9 +69,31 @@ jobs:
 
             export QT_LINUX_ACCESSIBILITY_ALWAYS_ON=1
             export QT_ACCESSIBILITY=1
+            export QT_QPA_PLATFORM=xcb
+
+            echo "=== Accessibility environment ==="
+            echo "QT_LINUX_ACCESSIBILITY_ALWAYS_ON=$QT_LINUX_ACCESSIBILITY_ALWAYS_ON"
+            echo "QT_ACCESSIBILITY=$QT_ACCESSIBILITY"
+            echo "QT_QPA_PLATFORM=$QT_QPA_PLATFORM"
+            echo "toolkit-accessibility=$(gsettings get org.gnome.desktop.interface toolkit-accessibility)"
+            echo "=== AT-SPI services before app launch ==="
+            busctl --user list | grep -E 'atspi|a11y' || true
+            echo "=== Qt version ==="
+            qmake6 -query QT_VERSION || true
+            echo "=== AT-SPI libraries ==="
+            ldconfig -p | grep -E 'libatspi|libatk-bridge' || true
+
             ./build-debug/src/keepassxc &
             APP_PID=$!
             sleep 3
+
+            echo "=== KeePassXC process environment ==="
+            tr '\0' '\n' < "/proc/$APP_PID/environ" | grep -E '^(QT_|DISPLAY|DBUS_)' | sort || true
+            echo "=== AT-SPI services after app launch ==="
+            busctl --user list | grep -E 'atspi|a11y' || true
+            echo "=== KeePassXC process status ==="
+            ps -p "$APP_PID" -o pid=,stat=,cmd=
+
             python3 tests/accessibility/dump_tree.py
             STATUS=$?
             kill "$APP_PID" 2>/dev/null || true
