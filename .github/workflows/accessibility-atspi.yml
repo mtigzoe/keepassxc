@@ -83,14 +83,26 @@ jobs:
             echo "DBUS_STARTER_BUS_TYPE=$DBUS_STARTER_BUS_TYPE"
             echo "DBUS_STARTER_ADDRESS=$DBUS_STARTER_ADDRESS"
             env | grep '^DBUS_' | sort || true
-            echo "=== AT-SPI bus launcher ==="
-            which at-spi-bus-launcher || true
-            ls -l "$(which at-spi-bus-launcher)" 2>/dev/null || true
-            echo "=== AT-SPI registry ==="
-            which at-spi2-registryd || true
-            ls -l "$(which at-spi2-registryd)" 2>/dev/null || true
-            echo "=== AT-SPI services before app launch ==="
+
+            # dbus-run-session provides the session bus, while AT-SPI uses a
+            # separate accessibility bus. In CI there is no desktop session
+            # to start at-spi-bus-launcher for us, so start it explicitly.
+            # The launcher registers org.a11y.Bus on the session bus and
+            # creates the separate accessibility bus with --launch-immediately.
+            echo "=== Starting AT-SPI bus launcher ==="
+            AT_SPI_LAUNCHER="$(command -v at-spi-bus-launcher)"
+            echo "AT_SPI_LAUNCHER=$AT_SPI_LAUNCHER"
+            "$AT_SPI_LAUNCHER" --launch-immediately >/tmp/at-spi-bus-launcher.log 2>&1 &
+            ATSPI_LAUNCHER_PID=$!
+            sleep 2
+            echo "AT-SPI launcher PID=$ATSPI_LAUNCHER_PID"
+            cat /tmp/at-spi-bus-launcher.log || true
+
+            echo "=== AT-SPI services after launcher ==="
             busctl --user list | grep -E 'atspi|a11y' || true
+            echo "=== AT-SPI bus address ==="
+            busctl --user call org.a11y.Bus /org/a11y/bus org.a11y.Bus GetAddress || true
+
             echo "=== Qt version ==="
             qmake6 -query QT_VERSION || true
             echo "=== Qt accessibility plugins ==="
@@ -99,14 +111,6 @@ jobs:
             qmake6 -query QT_INSTALL_PLUGINS || true
             echo "=== AT-SPI libraries ==="
             ldconfig -p | grep -E 'libatspi|libatk-bridge' || true
-
-            # Explicitly activate org.a11y.Bus and show its exported API.
-            # busctl introspect causes D-Bus activation if the service is
-            # only present as an activatable name.
-            echo "=== Activating AT-SPI bus ==="
-            busctl --user introspect org.a11y.Bus /org/a11y/bus || true
-            echo "=== AT-SPI services after activation ==="
-            busctl --user list | grep -E 'atspi|a11y' || true
 
             ./build-debug/src/keepassxc &
             APP_PID=$!
@@ -122,6 +126,7 @@ jobs:
             python3 tests/accessibility/dump_tree.py
             STATUS=$?
             kill "$APP_PID" 2>/dev/null || true
+            kill "$ATSPI_LAUNCHER_PID" 2>/dev/null || true
             exit $STATUS
           '
 
