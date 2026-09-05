@@ -27,11 +27,11 @@
 #include "gui/osutils/OSUtils.h"
 #include "gui/styles/StateColorPalette.h"
 
-#include <QAbstractButton>
 #include <QAccessible>
 #include <QEvent>
 #include <QLineEdit>
 #include <QTimer>
+#include <QToolButton>
 #include <QToolTip>
 
 PasswordWidget::PasswordWidget(QWidget* parent)
@@ -97,7 +97,7 @@ PasswordWidget::PasswordWidget(QWidget* parent)
     // StrongFocus) is enough here since mouse click-to-activate already
     // works regardless of focus policy; this only adds Tab reachability.
     for (QAction* action : {m_toggleVisibleAction.data(), m_passwordGeneratorAction.data()}) {
-        for (QAbstractButton* button : m_ui->passwordEdit->findChildren<QAbstractButton*>()) {
+        for (QToolButton* button : m_ui->passwordEdit->findChildren<QToolButton*>()) {
             if (button->defaultAction() == action) {
                 button->setFocusPolicy(Qt::TabFocus);
                 break;
