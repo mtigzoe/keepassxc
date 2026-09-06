@@ -26,7 +26,7 @@ jobs:
             libbotan-2-dev zlib1g-dev libminizip-dev libargon2-dev libqrencode-dev libreadline-dev \
             libpcsclite-dev libusb-1.0-0-dev libkeyutils-dev \
             libxkbcommon-dev libxkbcommon-x11-dev libxi-dev libxtst-dev libx11-dev \
-            xvfb fluxbox dbus-x11 at-spi2-core gir1.2-atspi-2.0 python3-gi x11-utils
+            xvfb fluxbox dbus-x11 at-spi2-core gir1.2-atspi-2.0 python3-gi x11-utils libglib2.0-bin
 
       - name: Configure + build
         run: |
@@ -166,8 +166,17 @@ jobs:
               # Qt's AtSpiAdaptor calls Embed() on the Socket interface at
               # /org/a11y/atspi/accessible/root. Do not accept the Registry
               # interface at /org/a11y/atspi/registry as a substitute.
-              if busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-                  org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>/dev/null \
+              #
+              # NOTE: busctl introspect cannot parse this object's XML. AT-SPI2's
+              # interface specs embed org.qtproject.QtDBus.QtTypeName annotations
+              # (used cross-toolkit, not Qt-only) that busctl's sd-bus-based parser
+              # fails on ("Failed to parse bus message: No such device or address"),
+              # even when the Socket interface is genuinely present and functional.
+              # gdbus (libglib2.0-bin) parses the same XML correctly, so use it for
+              # this check instead of busctl.
+              if gdbus introspect --address="$AT_SPI_BUS_ADDRESS" \
+                  --dest org.a11y.atspi.Registry \
+                  --object-path /org/a11y/atspi/accessible/root 2>/dev/null \
                   | grep -q 'org.a11y.atspi.Socket'; then
                 REGISTRY_READY=1
                 break
@@ -185,8 +194,9 @@ jobs:
             echo "=== Bus services ==="
             busctl --address="$AT_SPI_BUS_ADDRESS" list 2>&1 || true
             echo "=== Registry introspection (root) ==="
-            busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-              org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>&1 || true
+            gdbus introspect --address="$AT_SPI_BUS_ADDRESS" \
+              --dest org.a11y.atspi.Registry \
+              --object-path /org/a11y/atspi/accessible/root 2>&1 || true
             echo "=== Registry introspection (/registry) ==="
             busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
               org.a11y.atspi.Registry /org/a11y/atspi/registry 2>&1 || true
@@ -195,8 +205,9 @@ jobs:
             exit 1
           fi
           echo "AT-SPI registry Socket is ready"
-          busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-            org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>&1 || true
+          gdbus introspect --address="$AT_SPI_BUS_ADDRESS" \
+            --dest org.a11y.atspi.Registry \
+            --object-path /org/a11y/atspi/accessible/root 2>&1 || true
 
           echo "=== Launching KeePassXC ==="
           ./build-debug/src/keepassxc >/tmp/keepassxc.log 2>&1 &
@@ -227,24 +238,30 @@ jobs:
           echo "KEEPASS_BUS_NAME=$KEEPASS_BUS_NAME"
 
           echo "=== Waiting for KeePassXC accessibility root ==="
+          # Uses gdbus, not busctl introspect: see the note above the registry
+          # Socket check for why busctl fails to parse AT-SPI accessible objects.
+          KEEPASS_ROOT_READY=0
           for i in {1..30}; do
-            if busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-                "$KEEPASS_BUS_NAME" /org/a11y/atspi/accessible/root 2>/dev/null \
+            if gdbus introspect --address="$AT_SPI_BUS_ADDRESS" \
+                --dest "$KEEPASS_BUS_NAME" \
+                --object-path /org/a11y/atspi/accessible/root 2>/dev/null \
                 | grep -q 'org.a11y.atspi.Accessible'; then
+              KEEPASS_ROOT_READY=1
               break
             fi
             sleep 1
           done
 
           echo "=== KeePassXC AT-SPI root ==="
-          if ! busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-              "$KEEPASS_BUS_NAME" /org/a11y/atspi/accessible/root; then
+          if [ "$KEEPASS_ROOT_READY" -ne 1 ] || ! gdbus introspect --address="$AT_SPI_BUS_ADDRESS" \
+              --dest "$KEEPASS_BUS_NAME" --object-path /org/a11y/atspi/accessible/root; then
             echo "ERROR: KeePassXC accessibility root was not available"
             echo "=== AT-SPI bus services ==="
             busctl --address="$AT_SPI_BUS_ADDRESS" list 2>&1 || true
             echo "=== Registry introspection ==="
-            busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-              org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>&1 || true
+            gdbus introspect --address="$AT_SPI_BUS_ADDRESS" \
+              --dest org.a11y.atspi.Registry \
+              --object-path /org/a11y/atspi/accessible/root 2>&1 || true
             echo "=== Registry log ==="
             cat /tmp/at-spi-registryd.log || true
             echo "=== KeePassXC log ==="
@@ -253,8 +270,8 @@ jobs:
           fi
 
           echo "=== KeePassXC AT-SPI cache ==="
-          busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-            "$KEEPASS_BUS_NAME" /org/a11y/atspi/cache || true
+          gdbus introspect --address="$AT_SPI_BUS_ADDRESS" \
+            --dest "$KEEPASS_BUS_NAME" --object-path /org/a11y/atspi/cache || true
 
           echo "=== Qt accessibility evidence ==="
           grep -E 'name="(KeePassXC|Database toolbar|Search|Create Database|Open Database|Toggle Password|Generate Password|New Entry|Edit Entry|Delete Entry|Copy Username|Copy Password|Perform Auto-Type|Copy URL|Lock Database)"' \
