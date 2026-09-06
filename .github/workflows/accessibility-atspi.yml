@@ -109,7 +109,32 @@ jobs:
           fi
 
           echo "=== Publishing AT-SPI X11 root property ==="
-          xprop -root -f AT_SPI_BUS 8s -set AT_SPI_BUS "$AT_SPI_BUS_ADDRESS"
+          # Wait for X server to accept connections, then set the property with retries.
+          for i in {1..10}; do
+            if xdpyinfo >/dev/null 2>&1; then
+              break
+            fi
+            sleep 0.5
+          done
+          if ! xdpyinfo >/dev/null 2>&1; then
+            echo "ERROR: X display $DISPLAY is not reachable"
+            cat /tmp/xvfb.log || true
+            exit 1
+          fi
+          XPROP_OK=0
+          for i in {1..5}; do
+            if xprop -root -f AT_SPI_BUS 8s -set AT_SPI_BUS "$AT_SPI_BUS_ADDRESS" 2>/tmp/xprop.err; then
+              XPROP_OK=1
+              break
+            fi
+            echo "xprop attempt $i failed: $(cat /tmp/xprop.err 2>/dev/null || true)"
+            sleep 1
+          done
+          if [ "$XPROP_OK" -ne 1 ]; then
+            echo "ERROR: failed to set AT_SPI_BUS X11 root property"
+            cat /tmp/xprop.err || true
+            exit 1
+          fi
           xprop -root | grep AT_SPI_BUS
 
           echo "=== Starting AT-SPI registry daemon ==="
