@@ -93,46 +93,13 @@ jobs:
           xprop -root | grep AT_SPI_BUS
 
           echo "=== Launching KeePassXC ==="
-          # Do not start at-spi2-registryd ourselves. The AT-SPI bus launcher
-          # owns registry startup; starting a second registry races with it
-          # and can leave the Socket interface unavailable.
           ./build-debug/src/keepassxc >/tmp/keepassxc.log 2>&1 &
           APP_PID=$!
 
-          echo "=== Waiting for AT-SPI registry Socket ==="
-          for i in {1..30}; do
-            if busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-                org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>/dev/null \
-                | grep -q 'org.a11y.atspi.Socket'; then
-              break
-            fi
-            sleep 1
-          done
-
-          if ! busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-              org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>/dev/null \
-              | grep -q 'org.a11y.atspi.Socket'; then
-            echo "ERROR: AT-SPI registry Socket was not ready"
-            echo "=== Bus launcher log ==="
-            cat /tmp/at-spi-bus-launcher.log || true
-            echo "=== Registry service ==="
-            busctl --address="$AT_SPI_BUS_ADDRESS" list 2>&1 | grep -E 'org\.a11y\.atspi\.Registry|keepassxc' || true
-            echo "=== Registry introspection ==="
-            busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-              org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>&1 || true
-            echo "=== KeePassXC log ==="
-            cat /tmp/keepassxc.log || true
-            exit 1
-          fi
-
-          echo "AT-SPI registry Socket is ready"
-          busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-            org.a11y.atspi.Registry /org/a11y/atspi/accessible/root
-
-          echo "=== Waiting for KeePassXC registration ==="
+          echo "=== Waiting for KeePassXC on the AT-SPI bus ==="
           KEEPASS_BUS_NAME=""
           for i in {1..30}; do
-            KEEPASS_BUS_NAME="$(busctl --address="$AT_SPI_BUS_ADDRESS" list | awk '$3 == "keepassxc" {print $1; exit}')"
+            KEEPASS_BUS_NAME="$(busctl --address="$AT_SPI_BUS_ADDRESS" list 2>/dev/null | awk '$3 == "keepassxc" {print $1; exit}')"
             if [ -n "$KEEPASS_BUS_NAME" ]; then
               break
             fi
@@ -141,13 +108,18 @@ jobs:
 
           if [ -z "$KEEPASS_BUS_NAME" ]; then
             echo "ERROR: KeePassXC did not appear on the AT-SPI bus"
+            echo "=== Bus launcher log ==="
+            cat /tmp/at-spi-bus-launcher.log || true
+            echo "=== AT-SPI bus services ==="
+            busctl --address="$AT_SPI_BUS_ADDRESS" list 2>&1 || true
+            echo "=== KeePassXC log ==="
             cat /tmp/keepassxc.log || true
             exit 1
           fi
           echo "KEEPASS_BUS_NAME=$KEEPASS_BUS_NAME"
 
           echo "=== Waiting for KeePassXC accessibility root ==="
-          for i in {1..20}; do
+          for i in {1..30}; do
             if busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
                 "$KEEPASS_BUS_NAME" /org/a11y/atspi/accessible/root 2>/dev/null \
                 | grep -q 'org.a11y.atspi.Accessible'; then
@@ -157,8 +129,18 @@ jobs:
           done
 
           echo "=== KeePassXC AT-SPI root ==="
-          busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-            "$KEEPASS_BUS_NAME" /org/a11y/atspi/accessible/root
+          if ! busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+              "$KEEPASS_BUS_NAME" /org/a11y/atspi/accessible/root; then
+            echo "ERROR: KeePassXC accessibility root was not available"
+            echo "=== AT-SPI bus services ==="
+            busctl --address="$AT_SPI_BUS_ADDRESS" list 2>&1 || true
+            echo "=== Registry introspection ==="
+            busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+              org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>&1 || true
+            echo "=== KeePassXC log ==="
+            cat /tmp/keepassxc.log || true
+            exit 1
+          fi
 
           echo "=== KeePassXC AT-SPI cache ==="
           busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
@@ -171,6 +153,7 @@ jobs:
           echo "=== Direct libatspi probe ==="
           python3 - <<'PY'
           import os
+          import time
           import gi
           gi.require_version("Atspi", "2.0")
           from gi.repository import Atspi
@@ -181,21 +164,26 @@ jobs:
 
           result = Atspi.init()
           print(f"Atspi.init() result={result}")
-          desktop = Atspi.get_desktop(0)
           found = False
 
-          if desktop is not None:
-              count = desktop.get_child_count()
-              print(f"AT-SPI desktop child count={count}")
-              for index in range(count):
-                  child = desktop.get_child_at_index(index)
-                  if child is None:
-                      continue
-                  name = child.get_name() or "(unnamed)"
-                  role = child.get_role_name() or "(unknown)"
-                  print(f"AT-SPI application: name={name!r} role={role!r}")
-                  if name.lower() == "keepassxc":
-                      found = True
+          for attempt in range(30):
+              desktop = Atspi.get_desktop(0)
+              if desktop is not None:
+                  count = desktop.get_child_count()
+                  print(f"AT-SPI desktop child count={count} (attempt {attempt + 1})")
+                  for index in range(count):
+                      child = desktop.get_child_at_index(index)
+                      if child is None:
+                          continue
+                      name = child.get_name() or "(unnamed)"
+                      role = child.get_role_name() or "(unknown)"
+                      print(f"AT-SPI application: name={name!r} role={role!r}")
+                      if name.lower() == "keepassxc":
+                          found = True
+                          break
+              if found:
+                  break
+              time.sleep(1)
 
           if not found:
               raise SystemExit("KeePassXC was not visible through the modern libatspi binding")
