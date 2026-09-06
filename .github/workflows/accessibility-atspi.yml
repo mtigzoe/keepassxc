@@ -92,6 +92,27 @@ jobs:
           xprop -root -f AT_SPI_BUS 8s -set AT_SPI_BUS "$AT_SPI_BUS_ADDRESS"
           xprop -root | grep AT_SPI_BUS
 
+          echo "=== Activating AT-SPI registry ==="
+          # The bus launcher exposes the registry as an activatable service. Qt
+          # can register its accessibility root only after the registry has
+          # actually been activated on this bus.
+          busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+            org.a11y.atspi.Registry /org/a11y/atspi/accessible/root
+          for i in {1..10}; do
+            if busctl --address="$AT_SPI_BUS_ADDRESS" list 2>/dev/null \
+                | awk '$1 == "org.a11y.atspi.Registry" {found=1} END {exit !found}'; then
+              break
+            fi
+            sleep 1
+          done
+          if ! busctl --address="$AT_SPI_BUS_ADDRESS" list 2>/dev/null \
+              | awk '$1 == "org.a11y.atspi.Registry" {found=1} END {exit !found}'; then
+            echo "ERROR: AT-SPI registry did not activate"
+            busctl --address="$AT_SPI_BUS_ADDRESS" list 2>&1 || true
+            cat /tmp/at-spi-bus-launcher.log || true
+            exit 1
+          fi
+
           echo "=== Launching KeePassXC ==="
           ./build-debug/src/keepassxc >/tmp/keepassxc.log 2>&1 &
           APP_PID=$!
