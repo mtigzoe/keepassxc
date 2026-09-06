@@ -158,22 +158,17 @@ jobs:
             ATSPIS_REGISTRY_PID=""
           fi
 
-          echo "=== Waiting for AT-SPI registry + Socket ==="
+          echo "=== Waiting for AT-SPI registry Socket ==="
           REGISTRY_READY=0
           for i in {1..20}; do
             if busctl --address="$AT_SPI_BUS_ADDRESS" list 2>/dev/null \
                 | awk '$1 == "org.a11y.atspi.Registry" {found=1} END {exit !found}'; then
-              # Verify Socket interface (needed for Qt Embed)
+              # Qt's AtSpiAdaptor calls Embed() on the Socket interface at
+              # /org/a11y/atspi/accessible/root. Do not accept the Registry
+              # interface at /org/a11y/atspi/registry as a substitute.
               if busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
                   org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>/dev/null \
                   | grep -q 'org.a11y.atspi.Socket'; then
-                REGISTRY_READY=1
-                break
-              fi
-              # Also accept Socket on the registry object itself
-              if busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
-                  org.a11y.atspi.Registry /org/a11y/atspi/registry 2>/dev/null \
-                  | grep -q 'org.a11y.atspi.Socket\|org.a11y.atspi.Registry'; then
                 REGISTRY_READY=1
                 break
               fi
