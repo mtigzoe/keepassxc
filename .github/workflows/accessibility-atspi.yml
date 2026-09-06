@@ -73,6 +73,7 @@ jobs:
             AT_SPI_LAUNCHER="$(command -v at-spi-bus-launcher)"
           fi
           echo "AT_SPI_LAUNCHER=$AT_SPI_LAUNCHER"
+          # Let the bus launcher manage the session + registry (session-aware mode).
           "$AT_SPI_LAUNCHER" --launch-immediately >/tmp/at-spi-bus-launcher.log 2>&1 &
           ATSPI_LAUNCHER_PID=$!
           sleep 2
@@ -109,7 +110,6 @@ jobs:
           fi
 
           echo "=== Publishing AT-SPI X11 root property ==="
-          # Wait for X server to accept connections, then set the property with retries.
           for i in {1..10}; do
             if xdpyinfo >/dev/null 2>&1; then
               break
@@ -137,24 +137,48 @@ jobs:
           fi
           xprop -root | grep AT_SPI_BUS
 
-          echo "=== Starting AT-SPI registry daemon ==="
+          echo "=== Ensuring AT-SPI registry (session-aware) ==="
+          # Prefer registry already started by the bus launcher.
+          # If missing, start it on the accessibility bus explicitly.
           AT_SPI_REGISTRY=/usr/libexec/at-spi2-registryd
           if [ ! -x "$AT_SPI_REGISTRY" ]; then
             AT_SPI_REGISTRY="$(command -v at-spi2-registryd)"
           fi
           echo "AT_SPI_REGISTRY=$AT_SPI_REGISTRY"
-          "$AT_SPI_REGISTRY" >/tmp/at-spi-registryd.log 2>&1 &
-          ATSPIS_REGISTRY_PID=$!
 
-          echo "=== Waiting for AT-SPI registry ==="
+          if ! busctl --address="$AT_SPI_BUS_ADDRESS" list 2>/dev/null \
+              | awk '$1 == "org.a11y.atspi.Registry" {found=1} END {exit !found}'; then
+            echo "Registry not present yet; starting it"
+            # Start on the a11y bus so Embed()/Socket work.
+            DBUS_SESSION_BUS_ADDRESS="$AT_SPI_BUS_ADDRESS" \
+              "$AT_SPI_REGISTRY" >/tmp/at-spi-registryd.log 2>&1 &
+            ATSPIS_REGISTRY_PID=$!
+          else
+            echo "Registry already present on accessibility bus"
+            ATSPIS_REGISTRY_PID=""
+          fi
+
+          echo "=== Waiting for AT-SPI registry + Socket ==="
           REGISTRY_READY=0
-          for i in {1..15}; do
+          for i in {1..20}; do
             if busctl --address="$AT_SPI_BUS_ADDRESS" list 2>/dev/null \
                 | awk '$1 == "org.a11y.atspi.Registry" {found=1} END {exit !found}'; then
-              REGISTRY_READY=1
-              break
+              # Verify Socket interface (needed for Qt Embed)
+              if busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+                  org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>/dev/null \
+                  | grep -q 'org.a11y.atspi.Socket'; then
+                REGISTRY_READY=1
+                break
+              fi
+              # Also accept Socket on the registry object itself
+              if busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+                  org.a11y.atspi.Registry /org/a11y/atspi/registry 2>/dev/null \
+                  | grep -q 'org.a11y.atspi.Socket\|org.a11y.atspi.Registry'; then
+                REGISTRY_READY=1
+                break
+              fi
             fi
-            if ! kill -0 "$ATSPIS_REGISTRY_PID" 2>/dev/null; then
+            if [ -n "${ATSPIS_REGISTRY_PID:-}" ] && ! kill -0 "$ATSPIS_REGISTRY_PID" 2>/dev/null; then
               echo "ERROR: AT-SPI registry daemon exited"
               cat /tmp/at-spi-registryd.log || true
               exit 1
@@ -162,12 +186,22 @@ jobs:
             sleep 1
           done
           if [ "$REGISTRY_READY" -ne 1 ]; then
-            echo "ERROR: AT-SPI registry did not register on the accessibility bus"
+            echo "ERROR: AT-SPI registry Socket not ready"
+            echo "=== Bus services ==="
             busctl --address="$AT_SPI_BUS_ADDRESS" list 2>&1 || true
+            echo "=== Registry introspection (root) ==="
+            busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+              org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>&1 || true
+            echo "=== Registry introspection (/registry) ==="
+            busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+              org.a11y.atspi.Registry /org/a11y/atspi/registry 2>&1 || true
             cat /tmp/at-spi-registryd.log || true
+            cat /tmp/at-spi-bus-launcher.log || true
             exit 1
           fi
-          echo "AT-SPI registry is active"
+          echo "AT-SPI registry Socket is ready"
+          busctl --address="$AT_SPI_BUS_ADDRESS" introspect \
+            org.a11y.atspi.Registry /org/a11y/atspi/accessible/root 2>&1 || true
 
           echo "=== Launching KeePassXC ==="
           ./build-debug/src/keepassxc >/tmp/keepassxc.log 2>&1 &
@@ -277,7 +311,7 @@ jobs:
           ps -p "$APP_PID" -o pid=,stat=,cmd=
 
           kill "$APP_PID" 2>/dev/null || true
-          kill "$ATSPIS_REGISTRY_PID" 2>/dev/null || true
+          [ -n "${ATSPIS_REGISTRY_PID:-}" ] && kill "$ATSPIS_REGISTRY_PID" 2>/dev/null || true
           kill "$ATSPI_LAUNCHER_PID" 2>/dev/null || true
           ATSPISCRIPT
 
