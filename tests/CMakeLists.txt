@@ -186,4 +186,5 @@ endif()
 
 if(WITH_GUI_TESTS)
     add_subdirectory(gui)
+    add_subdirectory(accessibility)
 endif()
