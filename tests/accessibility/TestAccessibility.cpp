@@ -313,18 +313,45 @@ void TestAccessibility::testToolbarButtonsAccessible()
         VERIFY_ACCESSIBLE(buttonIface, button, QString(control.actionName));
 
         QCOMPARE(buttonIface->text(QAccessible::Name), QString(control.expectedName));
+        QVERIFY2(!buttonIface->state().invisible,
+                 qPrintable(QString("%1 should be visible").arg(control.actionName)));
         QVERIFY2(isAccessibleDescendantOf(buttonIface, toolBarIface),
                  qPrintable(QString("%1 should be exposed as a descendant of the toolbar in the accessibility tree")
                                 .arg(control.actionName)));
 
-        // Toolbar buttons must be reachable via Tab, not just mouse click or
-        // the underlying action's shortcut -- regression coverage in the
-        // same spirit as the PasswordWidget toggle/generator focus fix.
+        // Toolbar buttons must be reachable via Tab while enabled, not just
+        // mouse click or the underlying action's shortcut -- regression
+        // coverage in the same spirit as the PasswordWidget toggle/generator
+        // focus fix. A disabled control should NOT be a Tab stop, and the
+        // accessible tree must say so too -- a screen reader user landing on
+        // a "focusable but disabled" control gets an inconsistent
+        // experience. actionEntryEdit starts disabled here (no entry is
+        // selected yet), which lets this loop check both states for free.
+        QCOMPARE(buttonIface->state().disabled, !button->isEnabled());
         if (button->isEnabled()) {
             QVERIFY2(buttonIface->state().focusable,
                      qPrintable(QString("%1 should be keyboard-focusable while enabled").arg(control.actionName)));
+        } else {
+            QVERIFY2(!buttonIface->state().focusable,
+                     qPrintable(QString("%1 should not be a Tab stop while disabled").arg(control.actionName)));
         }
     }
+
+    // Round-trip actionEntryEdit specifically: selecting an entry should
+    // flip it from disabled to enabled, and the accessible tree needs to
+    // reflect that live, not just whatever state it was constructed with.
+    auto* entryView = m_dbWidget->findChild<EntryView*>("entryView");
+    QVERIFY(entryView->model()->rowCount() > 0);
+    entryView->setCurrentIndex(entryView->model()->index(0, 0));
+
+    auto* editEntryAction = m_mainWindow->findChild<QAction*>("actionEntryEdit");
+    auto* editEntryButton = toolBar->widgetForAction(editEntryAction);
+    QTRY_VERIFY2(editEntryButton->isEnabled(), "actionEntryEdit should become enabled once an entry is selected");
+    VERIFY_ACCESSIBLE(editEntryButtonIface, editEntryButton, QStringLiteral("actionEntryEdit (after selection)"));
+    QVERIFY2(!editEntryButtonIface->state().disabled,
+             "actionEntryEdit should report enabled once an entry is selected");
+    QVERIFY2(editEntryButtonIface->state().focusable,
+             "actionEntryEdit should become keyboard-focusable once enabled");
 }
 
 void TestAccessibility::testSearchWidgetAccessible()
@@ -350,6 +377,17 @@ void TestAccessibility::testSearchWidgetAccessible()
     auto* clearButtonIface = findAccessibleChildByNamePrefix(searchEditIface, QStringLiteral("Clear Search"));
     QVERIFY2(clearButtonIface, "The search field should expose a child control named \"Clear Search\"");
     QCOMPARE(clearButtonIface->role(), QAccessible::PushButton);
+
+    // This is NOT a Tab stop -- Qt's internal QLineEditIconButton sets
+    // Qt::NoFocus by design (confirmed in qtbase's qlineedit_p.cpp), same as
+    // every other Qt application's line-edit clear button. A keyboard-only
+    // user is expected to select-all/backspace the field directly rather
+    // than Tab to the icon. This documents that as an intentional, known
+    // limitation rather than an oversight -- if this ever starts passing as
+    // true, something changed in how the button is built and deserves a
+    // second look.
+    QVERIFY2(!clearButtonIface->state().focusable,
+             "The Clear Search button is expected to be excluded from the Tab order (stock Qt behavior)");
 }
 
 void TestAccessibility::testEntryAndGroupViewsAccessible()
@@ -385,7 +423,14 @@ void TestAccessibility::testEntryAndGroupViewsAccessible()
     auto* titleEdit = editEntryWidget->findChild<QLineEdit*>("titleEdit");
     QTest::keyClicks(titleEdit, "Accessibility Test Entry");
     auto* buttonBox = editEntryWidget->findChild<QDialogButtonBox*>("buttonBox");
-    QTest::mouseClick(buttonBox->button(QDialogButtonBox::Ok), Qt::LeftButton);
+    auto* okButton = buttonBox->button(QDialogButtonBox::Ok);
+    // Activate OK via the keyboard (Tab-then-Space, as a keyboard/screen
+    // reader user would) rather than a synthetic mouse click -- this is an
+    // accessibility test suite, so its interactions should match how the
+    // users it cares about actually operate the UI.
+    okButton->setFocus();
+    QTRY_VERIFY(okButton->hasFocus());
+    QTest::keyClick(okButton, Qt::Key_Space);
     QCOMPARE(m_dbWidget->currentMode(), DatabaseWidget::Mode::ViewMode);
 
     QTRY_COMPARE(entryView->model()->rowCount(), initialRowCount + 1);
@@ -450,9 +495,16 @@ void TestAccessibility::testEditEntryDialogAccessible()
     QVERIFY2(!okIface->text(QAccessible::Name).isEmpty(), "The OK button should have an accessible name");
     QVERIFY2(!cancelIface->text(QAccessible::Name).isEmpty(), "The Cancel button should have an accessible name");
 
-    // Leave the dialog without saving so later tests start from a clean state.
+    // Leave the dialog without saving so later tests start from a clean
+    // state. Cancel is activated via the keyboard (Tab-then-Space), not a
+    // synthetic mouse click. Note this form is a plain QWidget, not a
+    // QDialog -- Escape is NOT wired to Cancel here (EditWidget never
+    // overrides keyPressEvent for it), which is exactly the kind of gap
+    // this suite exists to surface rather than assume away.
     MessageBox::setNextAnswer(MessageBox::Discard);
-    QTest::mouseClick(cancelButton, Qt::LeftButton);
+    cancelButton->setFocus();
+    QTRY_VERIFY(cancelButton->hasFocus());
+    QTest::keyClick(cancelButton, Qt::Key_Space);
     QApplication::processEvents();
     MessageBox::setNextAnswer(MessageBox::NoButton);
     QCOMPARE(m_dbWidget->currentMode(), DatabaseWidget::Mode::ViewMode);
