@@ -402,18 +402,13 @@ void TestAccessibility::testEditEntryDialogAccessible()
     auto* editEntryWidget = m_dbWidget->findChild<EditEntryWidget*>("editEntryWidget");
     QVERIFY(editEntryWidget);
 
-    // The title field currently derives its accessible name from its
-    // Designer buddy label ("Title:"), including the trailing colon --
-    // Qt's buddy-label fallback returns the label text verbatim and only
-    // strips '&' mnemonics, not punctuation. Some screen readers read that
-    // colon aloud. This assertion documents the current, real behavior as a
-    // regression guard; giving titleEdit an explicit accessible name (e.g.
-    // "Title") is a reasonable follow-up fix, at which point this
-    // expectation should be updated to match.
+    // The title field has an explicit accessible name in EditEntryWidgetMain.ui.
+    // Keep this assertion aligned with the UI so a future change does not
+    // accidentally remove the field's programmatic label.
     auto* titleEdit = editEntryWidget->findChild<QLineEdit*>("titleEdit");
     VERIFY_ACCESSIBLE(titleEditIface, titleEdit, QStringLiteral("titleEdit"));
     QCOMPARE(titleEditIface->role(), QAccessible::EditableText);
-    QCOMPARE(titleEditIface->text(QAccessible::Name), QString("Title:"));
+    QCOMPARE(titleEditIface->text(QAccessible::Name), QString("Title field"));
 
     // New Entry should place keyboard focus directly into the title field so
     // a keyboard or screen reader user can start typing immediately.
