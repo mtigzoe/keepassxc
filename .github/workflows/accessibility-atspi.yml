@@ -107,8 +107,20 @@ jobs:
             cat /tmp/xvfb.log || true
             exit 1
           fi
-          xprop -root -f AT_SPI_BUS 8s -set AT_SPI_BUS "$AT_SPI_BUS_ADDRESS"
-          xprop -root | grep AT_SPI_BUS
+          # Publish the AT-SPI bus address to the X11 root window for toolkit discovery.
+          # xprop expects the property type/format definition before setting the value.
+          if ! xprop -root -f AT_SPI_BUS 8s -set AT_SPI_BUS "$AT_SPI_BUS_ADDRESS"; then
+            echo "ERROR: Failed to publish AT_SPI_BUS on X11 root window"
+            xprop -root 2>&1 || true
+            cat /tmp/xvfb.log || true
+            exit 1
+          fi
+          if ! xprop -root | grep -Fq 'AT_SPI_BUS'; then
+            echo "ERROR: AT_SPI_BUS X11 root property was not published"
+            xprop -root 2>&1 || true
+            exit 1
+          fi
+          xprop -root | grep -F 'AT_SPI_BUS'
 
           echo "=== Ensuring AT-SPI registry ==="
           AT_SPI_REGISTRY=/usr/libexec/at-spi2-registryd
