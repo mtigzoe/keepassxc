@@ -196,11 +196,11 @@ jobs:
             echo "WARNING: Ubuntu 24.04's Qt 6.4.2 + Xvfb environment is known to expose Qt's accessibility cache without completing the D-Bus application export."
             echo "Falling back to Qt accessibility cache evidence."
 
-            REQUIRED_ROOT_PATTERN='qt\\.accessibility\\.cache: insert.*name="KeePassXC".*role=Window'
+            REQUIRED_ROOT_PATTERN='qt\.accessibility\.cache: insert.*name="KeePassXC".*role=Window'
             REQUIRED_CONTROL_PATTERNS=(
-              'qt\\.accessibility\\.cache: insert.*name="Create Database"'
-              'qt\\.accessibility\\.cache: insert.*name="Open Database"'
-              'qt\\.accessibility\\.cache: insert.*name="Import File"'
+              'qt\.accessibility\.cache: insert.*name="Create Database"'
+              'qt\.accessibility\.cache: insert.*name="Open Database"'
+              'qt\.accessibility\.cache: insert.*name="Import File"'
             )
             CACHE_FALLBACK_OK=1
             grep -qE "$REQUIRED_ROOT_PATTERN" /tmp/keepassxc.log || CACHE_FALLBACK_OK=0
