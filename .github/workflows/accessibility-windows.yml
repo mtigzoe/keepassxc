@@ -1,0 +1,70 @@
+# Windows accessibility regression check.
+# Builds KeePassXC and runs the cross-platform Qt accessibility tests on a
+# native Windows runner. A native UI Automation (UIA) test executable can be
+# added to this workflow when the Windows-specific tests are introduced.
+
+name: Accessibility (Windows)
+
+on:
+  push:
+    branches: [feature/gui-accessibility]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows-accessibility:
+    runs-on: windows-2025
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.3'
+          arch: 'win64_msvc2022_64'
+          modules: 'qtsvg qttools'
+          cache: true
+
+      - name: Set up vcpkg
+        shell: pwsh
+        run: |
+          git clone --depth 1 https://github.com/microsoft/vcpkg.git "$env:RUNNER_TEMP\vcpkg"
+          & "$env:RUNNER_TEMP\vcpkg\bootstrap-vcpkg.bat" -disableMetrics
+          "VCPKG_ROOT=$env:RUNNER_TEMP\vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Install C++ dependencies
+        shell: pwsh
+        run: |
+          & "$env:VCPKG_ROOT\vcpkg.exe" install --triplet x64-windows
+
+      - name: Configure + build
+        shell: pwsh
+        run: |
+          cmake -S . -B build-debug -G Ninja `
+            -DCMAKE_BUILD_TYPE=Debug `
+            -DWITH_TESTS=ON `
+            -DWITH_GUI_TESTS=ON `
+            -DKPXC_FEATURE_NETWORK=OFF `
+            -DKPXC_FEATURE_UPDATES=OFF `
+            -DKPXC_FEATURE_DOCS=OFF `
+            -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake"
+          cmake --build build-debug --parallel
+
+      - name: Run Qt accessibility tests
+        shell: pwsh
+        env:
+          QT_QPA_PLATFORM: windows
+          QT_ACCESSIBILITY: '1'
+        run: |
+          ctest --test-dir build-debug -R '^testaccessibility$' --output-on-failure
+
+      - name: Verify Windows UI Automation API is available
+        shell: pwsh
+        run: |
+          $type = [System.Type]::GetType('System.Windows.Automation.AutomationElement, UIAutomationClient')
+          if ($null -eq $type) {
+            throw 'Windows UI Automation client API is not available on the runner.'
+          }
+          Write-Host "Windows UI Automation API is available: $($type.FullName)"
