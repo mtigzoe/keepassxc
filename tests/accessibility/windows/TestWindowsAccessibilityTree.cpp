@@ -13,12 +13,15 @@
 #include <QProcess>
 #include <QProcessEnvironment>
 #include <QSettings>
+#include <QStringList>
 #include <QTest>
 #include <QTemporaryFile>
 
 #include <UIAutomation.h>
 #include <oleauto.h>
 #include <wrl/client.h>
+
+#include <functional>
 
 #ifndef KEEPASSXC_EXECUTABLE_PATH
 #error "KEEPASSXC_EXECUTABLE_PATH must be defined by CMake"
@@ -340,9 +343,6 @@ void WindowsUiAutomationTreeTest::testCoreControlPatterns()
         PATTERNID pattern;
     };
 
-    // These controls are present on KeePassXC's initial welcome screen.
-    // Checking the pattern is important: a correct UIA name alone does not
-    // prove that assistive technology can invoke or manipulate the control.
     const ExpectedControl controls[] = {
         {"Create Database", UIA_ButtonControlTypeId, UIA_InvokePatternId},
         {"Open Database", UIA_ButtonControlTypeId, UIA_InvokePatternId},
@@ -352,8 +352,7 @@ void WindowsUiAutomationTreeTest::testCoreControlPatterns()
     for (const auto& expected : controls) {
         auto element = findByTypeAndName(QString::fromLatin1(expected.name), expected.type);
         QVERIFY2(element,
-                 qPrintable(QString("Could not find UI Automation %1 \"%2\"")
-                                .arg(expected.type == UIA_ButtonControlTypeId ? QStringLiteral("button") : QStringLiteral("control"))
+                 qPrintable(QString("Could not find UI Automation control \"%1\"")
                                 .arg(QString::fromLatin1(expected.name))));
         QVERIFY2(hasPattern(element.Get(), expected.pattern),
                  qPrintable(QString("UI Automation element \"%1\" does not expose the expected control pattern")
