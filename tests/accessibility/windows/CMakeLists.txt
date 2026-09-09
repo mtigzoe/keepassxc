@@ -9,35 +9,37 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 if(NOT WIN32)
     return()
 endif()
 
-# Unlike ../TestAccessibility.cpp, which queries QAccessible directly
-# in-process, this suite launches the real KeePassXC.exe as a separate
-# process and inspects it exactly as a screen reader or any other UI
-# Automation client would: through the Windows UI Automation (UIA) COM API.
-# It proves the whole chain -- Qt accessibility implementation -> Windows
-# accessibility layer -> native client -- rather than re-testing Qt's
-# QAccessible interfaces, which the cross-platform suite already covers.
-#
-# It only needs the already-built KeePassXC executable and the Windows SDK's
-# UI Automation/COM libraries, both of which are always present alongside
-# the MSVC toolchain, so it adds no new third-party or vcpkg dependency.
-#
-# "util/TemporaryFile.h" resolves via the include directory tests/CMakeLists.txt
-# already adds for the whole tests/ tree, so no include_directories() is needed here.
+# These tests launch the real KeePassXC.exe as a separate process and inspect
+# it through Microsoft's Windows UI Automation (UIA) COM API, rather than
+# querying QAccessible in-process. This exercises the native Windows
+# accessibility boundary consumed by assistive technology clients.
+
+set(WINDOWS_UIA_LIBRARIES
+    Qt6::Core
+    Qt6::Test
+    Uiautomationcore.lib
+    Ole32.lib
+    Oleaut32.lib)
+
 add_unit_test(NAME testwindowsaccessibility
     SOURCES TestWindowsAccessibility.cpp ../../util/TemporaryFile.cpp
-    LIBS Qt6::Core Qt6::Test Uiautomationcore.lib Ole32.lib Oleaut32.lib)
+    LIBS ${WINDOWS_UIA_LIBRARIES})
 
-# testwindowsaccessibility does not link against ${PROGNAME} -- it starts it
-# as an external process -- so this only hands it the executable's path.
-# Building it still requires the ${PROGNAME} target to be part of the same
-# build (as it already is for testcli/keepassxc-cli, above in ../../CMakeLists.txt).
 target_compile_definitions(testwindowsaccessibility PRIVATE
+    KEEPASSXC_EXECUTABLE_PATH="$<TARGET_FILE:${PROGNAME}>")
+
+# Regression suite for the complete UI Automation control tree. In addition
+# to checking named controls, this verifies that interactive controls expose
+# actionable UIA control patterns and that the control view is structurally
+# usable by assistive technology.
+add_unit_test(NAME testwindowsaccessibilitytree
+    SOURCES TestWindowsAccessibilityTree.cpp
+    LIBS ${WINDOWS_UIA_LIBRARIES})
+
+target_compile_definitions(testwindowsaccessibilitytree PRIVATE
     KEEPASSXC_EXECUTABLE_PATH="$<TARGET_FILE:${PROGNAME}>")
