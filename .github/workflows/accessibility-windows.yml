@@ -1,7 +1,12 @@
 # Windows accessibility regression check.
-# Builds KeePassXC and runs the cross-platform Qt accessibility tests on a
-# native Windows runner. A native UI Automation (UIA) test executable can be
-# added to this workflow when the Windows-specific tests are introduced.
+# Builds KeePassXC and runs two layers of accessibility tests on a native
+# Windows runner:
+#   1. testaccessibility -- the cross-platform Qt-level suite, which queries
+#      QAccessible in-process (also runs on Linux/macOS).
+#   2. testwindowsaccessibility -- Windows-native tests that launch the
+#      built KeePassXC.exe and inspect it through Microsoft's Windows UI
+#      Automation (UIA) client API, the same API screen readers use, to
+#      confirm the native accessibility layer itself is working end to end.
 
 name: Accessibility (Windows)
 
@@ -52,14 +57,6 @@ jobs:
             -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake"
           cmake --build build-debug --parallel
 
-      - name: Run Qt accessibility tests
-        shell: pwsh
-        env:
-          QT_QPA_PLATFORM: windows
-          QT_ACCESSIBILITY: '1'
-        run: |
-          ctest --test-dir build-debug -R '^testaccessibility$' --output-on-failure
-
       - name: Verify Windows UI Automation API is available
         shell: pwsh
         run: |
@@ -68,3 +65,19 @@ jobs:
             throw 'Windows UI Automation client API is not available on the runner.'
           }
           Write-Host "Windows UI Automation API is available: $($type.FullName)"
+
+      - name: Run Qt accessibility tests
+        shell: pwsh
+        env:
+          QT_QPA_PLATFORM: windows
+          QT_ACCESSIBILITY: '1'
+        run: |
+          ctest --test-dir build-debug -R '^testaccessibility$' --output-on-failure
+
+      - name: Run Windows UI Automation accessibility tests
+        shell: pwsh
+        env:
+          QT_QPA_PLATFORM: windows
+          QT_ACCESSIBILITY: '1'
+        run: |
+          ctest --test-dir build-debug -R '^testwindowsaccessibility$' --output-on-failure

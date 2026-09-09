@@ -31,3 +31,10 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 # from, so regressions are caught immediately without needing a full native
 # AT round trip for every change.
 add_unit_test(NAME testaccessibility SOURCES TestAccessibility.cpp ../util/TemporaryFile.cpp LIBS ${TEST_LIBRARIES})
+
+# Windows-native UI Automation tests, covering the native accessibility
+# layer this suite's in-process QAccessible tests above do not exercise.
+# See tests/accessibility/windows/CMakeLists.txt.
+if(WIN32)
+    add_subdirectory(windows)
+endif()
