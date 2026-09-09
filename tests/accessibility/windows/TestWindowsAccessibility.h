@@ -20,7 +20,18 @@
 
 #undef NOMINMAX
 #define NOMINMAX
-#define WIN32_LEAN_AND_MEAN
+// Deliberately NOT defining WIN32_LEAN_AND_MEAN here: it strips <ole2.h>
+// (and therefore <objbase.h>/<unknwn.h>) out of <windows.h>, which is
+// where the `interface`/MIDL_INTERFACE macros that <UIAutomationCore.h>
+// (pulled in below via <UIAutomation.h>) needs to parse its
+// `interface IRawElementProviderSimple : public IUnknown { ... }` style
+// declarations come from. Without them, `interface` is just a plain
+// identifier and the header fails with "C2146: missing ';' before
+// identifier" followed by a cascade of "C2371: redefinition" errors --
+// exactly the failure this comment is here to prevent regressing.
+// ../TestWindowsAccessibilityTree.cpp never sets this macro either
+// (it lets Qt's own qt_windows.h include a full <windows.h>), which is
+// why that target already builds cleanly.
 #include <windows.h>
 
 #include <UIAutomation.h>
