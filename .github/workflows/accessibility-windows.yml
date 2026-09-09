@@ -48,15 +48,14 @@ jobs:
       - name: Configure + build
         shell: pwsh
         run: |
-          cmake -S . -B build-debug -G Ninja `
-            -DCMAKE_BUILD_TYPE=Debug `
+          cmake -S . -B build-debug -G "Visual Studio 18 2026" -A x64 `
             -DWITH_TESTS=ON `
             -DWITH_GUI_TESTS=ON `
             -DKPXC_FEATURE_NETWORK=OFF `
             -DKPXC_FEATURE_UPDATES=OFF `
             -DKPXC_FEATURE_DOCS=OFF `
             -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_ROOT\scripts\buildsystems\vcpkg.cmake"
-          cmake --build build-debug --parallel
+          cmake --build build-debug --config Debug --parallel
 
       - name: Verify Windows UI Automation API is available
         shell: pwsh
@@ -73,7 +72,7 @@ jobs:
           QT_QPA_PLATFORM: windows
           QT_ACCESSIBILITY: '1'
         run: |
-          ctest --test-dir build-debug -R '^testaccessibility$' --output-on-failure
+          ctest --test-dir build-debug -C Debug -R '^testaccessibility$' --output-on-failure
 
       - name: Run Windows UI Automation accessibility tests
         shell: pwsh
@@ -81,4 +80,4 @@ jobs:
           QT_QPA_PLATFORM: windows
           QT_ACCESSIBILITY: '1'
         run: |
-          ctest --test-dir build-debug -R '^testwindowsaccessibility$' --output-on-failure
+          ctest --test-dir build-debug -C Debug -R '^testwindowsaccessibility$' --output-on-failure
