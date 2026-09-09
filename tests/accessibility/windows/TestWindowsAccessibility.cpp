@@ -76,8 +76,12 @@ namespace
 // within one scope needs a distinct name. Only usable directly inside a
 // void-returning test slot, since QVERIFY2's early "return;" does not
 // compile in a function with a non-void return type.
+// name is passed through as a runtime const char* (see call sites below,
+// which loop over an array), not a compile-time literal, so this must use
+// QString::fromLatin1() rather than QStringLiteral() -- the same choice
+// ../TestWindowsAccessibilityTree.cpp makes for the identical situation.
 #define VERIFY_UIA_ELEMENT(element, name)                                                                            \
-    auto element = findDescendantByName(QStringLiteral(name), ElementTimeoutMs);                                     \
+    auto element = findDescendantByName(QString::fromLatin1(name), ElementTimeoutMs);                                \
     QVERIFY2(element,                                                                                                \
              qPrintable(QString("UI Automation did not find a \"%1\" element in KeePassXC's accessible tree "       \
                                  "within %2 ms")                                                                     \
@@ -250,7 +254,7 @@ HWND TestWindowsAccessibility::waitForTopLevelWindow(DWORD processId, int timeou
     return nullptr;
 }
 
-QString TestWindowsAccessibility::processDiagnostics(const QString& context) const
+QString TestWindowsAccessibility::processDiagnostics(const QString& context)
 {
     return QString("%1 (process state: %2, exit code: %3, stderr: %4)")
         .arg(context)

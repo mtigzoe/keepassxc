@@ -81,7 +81,9 @@ private slots:
 private:
     bool launchKeePassXC();
     HWND waitForTopLevelWindow(DWORD processId, int timeoutMs) const;
-    QString processDiagnostics(const QString& context) const;
+    // Not const: readAllStandardError() drains QProcess's internal stderr
+    // buffer as a side effect, so this genuinely mutates m_process.
+    QString processDiagnostics(const QString& context);
 
     // UIA helpers. These centralize retry/timeout handling and property
     // access so each test slot above reads as a short list of assertions,
