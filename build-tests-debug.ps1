@@ -12,13 +12,20 @@ param(
     # application-only (WITH_TESTS=OFF).
     [string]$BuildDir = "",
 
-    # Build only, unless -RunAccessibilityTest is specified.
+    # Build only, unless one of the -Run* switches below is specified.
+    # testaccessibility queries Qt's in-process QAccessible bridge; the two
+    # Windows switches drive the real KeePassXC.exe through Windows UI
+    # Automation, the same layer JAWS consumes.
     [switch]$RunAccessibilityTest,
+    [switch]$RunWindowsAccessibilityTest,
+    [switch]$RunWindowsAccessibilityTreeTest,
 
-    # Pass -v2 to QTest when running testaccessibility.
+    # Pass -v2 to QTest for any test run above.
     [switch]$VerboseTest,
 
-    # Remove the test build directory before configuring.
+    # Remove the test build directory before configuring. Recommended after
+    # a vcpkg reclone/reinstall, since a stale build-tests\CMakeCache.txt
+    # can still reference the old, now-deleted vcpkg paths.
     [switch]$Clean
 )
 
@@ -195,6 +202,9 @@ $QtDir = Join-Path $QtRoot "share\Qt6"
 $QtConfig = Join-Path $QtDir "Qt6Config.cmake"
 $QtToolsBin = Join-Path $QtRoot "tools\Qt6\bin"
 $QtDebugBin = Join-Path $QtRoot "debug\bin"
+$QtSvgConfig = Join-Path $QtRoot "share\Qt6Svg\Qt6SvgConfig.cmake"
+$QtSvgWidgetsConfig = Join-Path $QtRoot "share\Qt6SvgWidgets\Qt6SvgWidgetsConfig.cmake"
+$WinDeployQtDebug = Join-Path $QtToolsBin "windeployqt.debug.bat"
 
 if (-not (Test-Path $QtConfig)) {
     throw "Qt6Config.cmake was not found: $QtConfig`nRun your normal build-debug.ps1 first so vcpkg can install Qt."
@@ -210,6 +220,23 @@ if (-not (Test-Path $QtCoreDll)) {
     throw "Qt6Cored.dll was not found: $QtCoreDll"
 }
 
+# keepassxc_gui (linked by every accessibility test target, including
+# testaccessibility) requires the Qt6 Svg and SvgWidgets components. vcpkg
+# ships these via a separate "qtsvg" port, not as part of qtbase.
+if (-not (Test-Path $QtSvgConfig) -or -not (Test-Path $QtSvgWidgetsConfig)) {
+    throw "Qt6SvgConfig.cmake / Qt6SvgWidgetsConfig.cmake was not found under: $QtRoot\share`nRun your normal build-debug.ps1 first so vcpkg can install the qtsvg port."
+}
+
+# testwindowsaccessibility and testwindowsaccessibilitytree embed
+# $<TARGET_FILE:${PROGNAME}> (the KeePassXC.exe path), so building either
+# one also builds the full KeePassXC.exe app, which runs a POST_BUILD
+# windeployqt step on Windows. Plain windeployqt.exe does not correctly
+# resolve Qt's debug DLLs out of vcpkg's separate debug\bin tree, so this
+# must be the debug wrapper -- the same one build-debug.ps1 uses.
+if (-not (Test-Path $WinDeployQtDebug)) {
+    throw "Debug windeployqt wrapper was not found: $WinDeployQtDebug`nRun your normal build-debug.ps1 first so vcpkg can install qtbase[windeployqt]."
+}
+
 Write-Host ""
 Write-Host "Qt:"
 Write-Host $QtConfig
@@ -217,6 +244,10 @@ Write-Host $QtConfig
 Write-Host ""
 Write-Host "Qt debug binaries:"
 Write-Host $QtDebugBin
+
+Write-Host ""
+Write-Host "Debug windeployqt wrapper:"
+Write-Host $WinDeployQtDebug
 
 # Make Qt tools and debug DLLs available.
 $env:PATH = "$QtDebugBin;$QtToolsBin;$env:PATH"
@@ -264,6 +295,7 @@ cmake -S $Repo -B $BuildDir `
     -DCMAKE_BUILD_TYPE=Debug `
     -DCMAKE_TOOLCHAIN_FILE="$VcpkgToolchain" `
     -DQt6_DIR="$QtDir" `
+    -DWINDEPLOYQT_EXE="$WinDeployQtDebug" `
     -DWITH_TESTS=ON `
     -DWITH_GUI_TESTS=ON `
     -DKPXC_FEATURE_NETWORK=OFF `
@@ -294,6 +326,12 @@ foreach ($Target in $Targets) {
     Write-Host "------------------------------------------------------------"
     Write-Host "Building target: $Target"
     Write-Host "------------------------------------------------------------"
+
+    if ($Target -in @("testwindowsaccessibility", "testwindowsaccessibilitytree")) {
+        Write-Host "(This target embeds the KeePassXC.exe path, so it also"
+        Write-Host " builds the full GUI app first -- expect this step to"
+        Write-Host " take noticeably longer than testaccessibility did.)"
+    }
 
     cmake --build $BuildDir --target $Target --parallel
 
@@ -339,36 +377,50 @@ foreach ($Executable in $TestExecutables) {
 }
 
 # ============================================================
-# Optionally run testaccessibility
+# Optionally run the requested test(s)
 # ============================================================
 
-if ($RunAccessibilityTest) {
-    $TestExecutable = $FoundExecutables["testaccessibility.exe"]
+$TestsToRun = @(
+    @{ Exe = "testaccessibility.exe"; Requested = $RunAccessibilityTest; Label = "Qt accessibility (testaccessibility)" },
+    @{ Exe = "testwindowsaccessibility.exe"; Requested = $RunWindowsAccessibilityTest; Label = "Windows UIA accessibility (testwindowsaccessibility)" },
+    @{ Exe = "testwindowsaccessibilitytree.exe"; Requested = $RunWindowsAccessibilityTreeTest; Label = "Windows UIA accessibility tree (testwindowsaccessibilitytree)" }
+)
 
-    Write-Host ""
-    Write-Host "============================================================"
-    Write-Host "Running Qt accessibility tests..."
-    Write-Host "============================================================"
+$AnyTestRequested = $RunAccessibilityTest -or $RunWindowsAccessibilityTest -or $RunWindowsAccessibilityTreeTest
 
+if ($AnyTestRequested) {
     # Match the environment used by the Windows accessibility CI job.
     $env:QT_QPA_PLATFORM = "windows"
     $env:QT_ACCESSIBILITY = "1"
 
-    if ($VerboseTest) {
+    foreach ($Test in $TestsToRun) {
+        if (-not $Test.Requested) {
+            continue
+        }
+
+        $TestExecutable = $FoundExecutables[$Test.Exe]
+
         Write-Host ""
-        Write-Host "Running testaccessibility with QTest -v2..."
-        & $TestExecutable -v2
-    }
-    else {
-        & $TestExecutable
-    }
+        Write-Host "============================================================"
+        Write-Host "Running $($Test.Label)..."
+        Write-Host "============================================================"
 
-    if ($LASTEXITCODE -ne 0) {
-        throw "testaccessibility failed with exit code $LASTEXITCODE."
-    }
+        if ($VerboseTest) {
+            Write-Host ""
+            Write-Host "Running $($Test.Exe) with QTest -v2..."
+            & $TestExecutable -v2
+        }
+        else {
+            & $TestExecutable
+        }
 
-    Write-Host ""
-    Write-Host "testaccessibility passed."
+        if ($LASTEXITCODE -ne 0) {
+            throw "$($Test.Exe) failed with exit code $LASTEXITCODE."
+        }
+
+        Write-Host ""
+        Write-Host "$($Test.Exe) passed."
+    }
 }
 
 # ============================================================
@@ -391,9 +443,11 @@ foreach ($Executable in $FoundExecutables.Keys) {
     Write-Host $FoundExecutables[$Executable]
 }
 
-if (-not $RunAccessibilityTest) {
+if (-not $AnyTestRequested) {
     Write-Host ""
-    Write-Host "To run the Qt accessibility test with detailed QTest output:"
+    Write-Host "To build and run a test with detailed QTest output, e.g.:"
     Write-Host ""
     Write-Host ".\build-tests-debug.ps1 -RunAccessibilityTest -VerboseTest"
+    Write-Host ".\build-tests-debug.ps1 -RunWindowsAccessibilityTest -VerboseTest"
+    Write-Host ".\build-tests-debug.ps1 -RunWindowsAccessibilityTreeTest -VerboseTest"
 }

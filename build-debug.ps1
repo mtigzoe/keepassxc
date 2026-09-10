@@ -370,8 +370,36 @@ if (-not (Test-Path $QtTranslationsCatalog)) {
     }
 }
 
+# KeePassXC's root CMakeLists.txt requires the Qt6 "Svg" component, and
+# src/CMakeLists.txt separately requires "SvgWidgets" (used for the app's
+# vector icons). vcpkg ships both as part of a separate "qtsvg" port rather
+# than as a qtbase feature, so it is not covered by the qtbase install above.
+$QtSvgConfig = "$QtRoot\share\Qt6Svg\Qt6SvgConfig.cmake"
+$QtSvgWidgetsConfig = "$QtRoot\share\Qt6SvgWidgets\Qt6SvgWidgetsConfig.cmake"
+
+if (-not (Test-Path $QtSvgConfig) -or -not (Test-Path $QtSvgWidgetsConfig)) {
+    Write-Host ""
+    Write-Host "Qt SVG module (Svg / SvgWidgets) was not found."
+    Write-Host "Installing qtsvg through vcpkg..."
+    Write-Host ""
+
+    & $VcpkgExe install qtsvg:x64-windows
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "vcpkg failed to install qtsvg."
+    }
+}
+
 if (-not (Test-Path $QtConfig)) {
     throw "Qt6Config.cmake still cannot be found: $QtConfig"
+}
+
+if (-not (Test-Path $QtSvgConfig)) {
+    throw "Qt6SvgConfig.cmake still cannot be found: $QtSvgConfig`nRun: $VcpkgExe install qtsvg:x64-windows"
+}
+
+if (-not (Test-Path $QtSvgWidgetsConfig)) {
+    throw "Qt6SvgWidgetsConfig.cmake still cannot be found: $QtSvgWidgetsConfig`nRun: $VcpkgExe install qtsvg:x64-windows"
 }
 
 if (-not (Test-Path $WinDeployQt)) {
@@ -393,6 +421,11 @@ if (-not (Test-Path $QtTranslationsCatalog)) {
 Write-Host ""
 Write-Host "Qt6 found:"
 Write-Host $QtConfig
+
+Write-Host ""
+Write-Host "Qt6 Svg / SvgWidgets found:"
+Write-Host $QtSvgConfig
+Write-Host $QtSvgWidgetsConfig
 
 Write-Host ""
 Write-Host "Qt debug binaries found:"
