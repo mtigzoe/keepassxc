@@ -300,8 +300,8 @@ void TestAccessibility::testToolbarButtonsAccessible()
         const char* actionName;
         const char* expectedName;
     } controls[] = {
-        {"actionDatabaseNew", "Create Database"},
         {"actionDatabaseOpen", "Open Database"},
+        {"actionDatabaseSave", "Save Database"},
         {"actionEntryNew", "New Entry"},
         {"actionEntryEdit", "Edit Entry"},
     };

@@ -32,6 +32,14 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 # AT round trip for every change.
 add_unit_test(NAME testaccessibility SOURCES TestAccessibility.cpp ../util/TemporaryFile.cpp LIBS ${TEST_LIBRARIES})
 
+# Set environment for Qt accessibility tests to match CI.
+# Use windows platform for Windows CI parity; suppress debug dialogs from
+# Qt assertions in debug builds. Point QT_PLUGIN_PATH to the debug Qt plugins
+# so the windows platform plugin (qwindowsd.dll) can be found.
+set_tests_properties(testaccessibility PROPERTIES
+    ENVIRONMENT "LANG=en_US.UTF-8;QT_QPA_PLATFORM=windows;QT_ACCESSIBILITY=1;QT_FATAL_WARNINGS=0;QT_DEBUG_PLUGINS=0;QT_LOGGING_RULES=*.debug=false;QT_PLUGIN_PATH=C:/Users/Miriam/Personal_Coding/keepassxc-repo/vcpkg/installed/x64-windows/debug/Qt6/plugins"
+)
+
 # Windows-native UI Automation tests, covering the native accessibility
 # layer this suite's in-process QAccessible tests above do not exercise.
 # See tests/accessibility/windows/CMakeLists.txt.
