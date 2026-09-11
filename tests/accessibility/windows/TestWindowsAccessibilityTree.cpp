@@ -7,6 +7,8 @@
  *  version 3 of the License.
  */
 
+#include "util/TemporaryFile.h"
+
 #include <QCoreApplication>
 #include <QElapsedTimer>
 #include <QFileInfo>
@@ -15,7 +17,6 @@
 #include <QSettings>
 #include <QStringList>
 #include <QTest>
-#include <QTemporaryFile>
 
 #include <UIAutomation.h>
 #include <oleauto.h>
@@ -132,7 +133,7 @@ private:
                               QStringList* unnamedElements) const;
 
     QProcess m_process;
-    QTemporaryFile m_config;
+    QString m_tempConfigPath;
     Microsoft::WRL::ComPtr<IUIAutomation> m_automation;
     Microsoft::WRL::ComPtr<IUIAutomationElement> m_mainWindow;
 };
@@ -148,11 +149,23 @@ void WindowsUiAutomationTreeTest::initTestCase()
                                   IID_PPV_ARGS(&m_automation));
     QVERIFY2(SUCCEEDED(hr) && m_automation, "Could not create the Windows UI Automation client");
 
-    QVERIFY2(m_config.open(), "Could not create the temporary KeePassXC configuration");
-    const QString configPath = m_config.fileName();
-    m_config.close();
+    // TemporaryFile (tests/util/TemporaryFile.h) reserves a unique path via
+    // a short-lived, function-local QTemporaryFile and returns a plain
+    // QFile-backed path -- unlike a QTemporaryFile kept open for the
+    // duration of the test (as this file previously did with an `m_config`
+    // member), it does not hold the file open internally afterward. A
+    // QTemporaryFile's close() does not release that internal handle -- the
+    // file "will exist and be kept open internally by QTemporaryFile" for as
+    // long as the QTemporaryFile object itself is alive (Qt docs) -- so
+    // QSettings could never get exclusive write access to it and
+    // settings.sync() reliably failed with AccessError on Windows. This is
+    // the same isolated-config approach already used successfully by
+    // ../TestWindowsAccessibility.cpp and (in-process, via
+    // Config::createConfigFromFile()) by ../TestAccessibility.cpp.
+    m_tempConfigPath = TemporaryFile::createTempConfigFile();
+    QVERIFY2(!m_tempConfigPath.isEmpty(), "Could not create the temporary KeePassXC configuration");
 
-    QSettings settings(configPath, QSettings::IniFormat);
+    QSettings settings(m_tempConfigPath, QSettings::IniFormat);
     settings.setValue("UpdateCheckMessageShown", true);
     settings.setValue("SingleInstance", false);
     settings.setValue("GUI/MinimizeOnStartup", false);
@@ -169,7 +182,7 @@ void WindowsUiAutomationTreeTest::initTestCase()
     m_process.setProcessEnvironment(environment);
     m_process.setWorkingDirectory(QFileInfo(executable).absolutePath());
     m_process.setProgram(executable);
-    m_process.setArguments({QStringLiteral("--config"), configPath});
+    m_process.setArguments({QStringLiteral("--config"), m_tempConfigPath});
     m_process.start();
     QVERIFY2(m_process.waitForStarted(StartTimeoutMs), "KeePassXC.exe did not start");
 
