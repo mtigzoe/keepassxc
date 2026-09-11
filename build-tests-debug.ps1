@@ -463,6 +463,29 @@ if ($AnyTestRequested) {
     $env:QT_QPA_PLATFORM = "windows"
     $env:QT_ACCESSIBILITY = "1"
 
+    # testwindowsaccessibility and testwindowsaccessibilitytree embed
+    # KeePassXC.exe's path via a target_compile_definitions(...
+    # "$<TARGET_FILE:${PROGNAME}>") generator expression in CMakeLists.txt.
+    # That only embeds the path string -- it does not add KeePassXC as a
+    # CMake build-order dependency of the test target, so the loop above
+    # can build testwindowsaccessibility / testwindowsaccessibilitytree
+    # without ever building KeePassXC.exe itself. Build it explicitly here
+    # so either -RunWindowsAccessibilityTest or
+    # -RunWindowsAccessibilityTreeTest works from a clean build-tests
+    # directory, without needing a separate manual build step first.
+    if ($RunWindowsAccessibilityTest -or $RunWindowsAccessibilityTreeTest) {
+        Write-Host ""
+        Write-Host "------------------------------------------------------------"
+        Write-Host "Building target: KeePassXC (required by the Windows UIA tests)"
+        Write-Host "------------------------------------------------------------"
+
+        cmake --build $BuildDir --config Debug --target KeePassXC
+
+        if ($LASTEXITCODE -ne 0) {
+            throw "Build failed for target: KeePassXC"
+        }
+    }
+
     # Build the CTest regex filter from requested tests.
     # Each -Run* switch maps to the exact CTest test name.
     $TestFilters = @()
