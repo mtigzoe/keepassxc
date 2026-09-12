@@ -169,11 +169,16 @@ QString elementFrameworkId(IUIAutomationElement* element)
 // name set for QAccessible to surface here in the first place.
 QString elementDiagnostics(IUIAutomationElement* element, const QString& parentDescription)
 {
-    UIA_HWND rawHandle = 0;
+    UIA_HWND rawHandle = nullptr;
     if (element) {
         element->get_CurrentNativeWindowHandle(&rawHandle);
     }
-    const HWND hwnd = reinterpret_cast<HWND>(static_cast<quintptr>(rawHandle));
+    // UIA_HWND is an opaque handle/pointer type (like HWND itself), not an
+    // integral type -- static_cast can't convert a pointer to an integer
+    // (that's what reinterpret_cast is for), so a direct pointer-to-pointer
+    // reinterpret_cast is both the correct and the simplest conversion here,
+    // matching Microsoft's own sample usage (HWND hwnd = (HWND)windowHandle;).
+    const HWND hwnd = reinterpret_cast<HWND>(rawHandle);
 
     return QStringLiteral("ControlType=%1 AutomationId=\"%2\" ClassName=\"%3\" FrameworkId=\"%4\" "
                            "NativeWindowHandle=%5 Parent=[%6]")
