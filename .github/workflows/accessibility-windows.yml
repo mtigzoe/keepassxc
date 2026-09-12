@@ -3,11 +3,10 @@
 # Builds KeePassXC and runs two layers of accessibility tests on a native
 # Windows runner:
 #   1. testaccessibility -- the cross-platform Qt-level suite, which queries
-#      QAccessible in-process (also runs on Linux/macOS).
-#   2. testwindowsaccessibility -- Windows-native tests that launch the
-#      built KeePassXC.exe and inspect it through Microsoft's Windows UI
-#      Automation (UIA) client API, the same API screen readers use, to
-#      confirm the native accessibility layer itself is working end to end.
+#      QAccessible in-process.
+#   2. testwindowsaccessibility and testwindowsaccessibilitytree --
+#      Windows-native tests that launch the built KeePassXC.exe and inspect
+#      it through Microsoft's Windows UI Automation (UIA) client API.
 
 name: Accessibility (Windows)
 
@@ -80,4 +79,4 @@ jobs:
           QT_QPA_PLATFORM: windows
           QT_ACCESSIBILITY: '1'
         run: |
-          ctest --test-dir build-debug -C Debug -R '^testwindowsaccessibility$' --output-on-failure
+          ctest --test-dir build-debug -C Debug -R '^(testwindowsaccessibility|testwindowsaccessibilitytree)$' --output-on-failure

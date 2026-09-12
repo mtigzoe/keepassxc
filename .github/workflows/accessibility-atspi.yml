@@ -39,9 +39,10 @@ jobs:
             -DKPXC_FEATURE_DOCS=OFF
           ninja -C build-debug
 
-      - name: Run accessibility tree check
+      - name: Run AT-SPI accessibility tree check
         run: |
           Xvfb :99 -screen 0 1280x1024x24 -nolisten tcp >/tmp/xvfb.log 2>&1 &
+          XVFB_PID=$!
           sleep 1
           export DISPLAY=:99
 
@@ -50,6 +51,7 @@ jobs:
           set -euo pipefail
 
           fluxbox >/dev/null 2>&1 &
+          FLUXBOX_PID=$!
           sleep 1
           gsettings set org.gnome.desktop.interface toolkit-accessibility true
 
@@ -100,27 +102,6 @@ jobs:
             cat /tmp/at-spi-bus-launcher.log || true
             exit 1
           fi
-
-          echo "=== Publishing AT-SPI X11 root property ==="
-          if ! xdpyinfo >/dev/null 2>&1; then
-            echo "ERROR: X display $DISPLAY is not reachable"
-            cat /tmp/xvfb.log || true
-            exit 1
-          fi
-          # Publish the AT-SPI bus address to the X11 root window for toolkit discovery.
-          # xprop expects the property type/format definition before setting the value.
-          if ! xprop -root -f AT_SPI_BUS 8s -set AT_SPI_BUS "$AT_SPI_BUS_ADDRESS"; then
-            echo "ERROR: Failed to publish AT_SPI_BUS on X11 root window"
-            xprop -root 2>&1 || true
-            cat /tmp/xvfb.log || true
-            exit 1
-          fi
-          if ! xprop -root | grep -Fq 'AT_SPI_BUS'; then
-            echo "ERROR: AT_SPI_BUS X11 root property was not published"
-            xprop -root 2>&1 || true
-            exit 1
-          fi
-          xprop -root | grep -F 'AT_SPI_BUS'
 
           echo "=== Ensuring AT-SPI registry ==="
           AT_SPI_REGISTRY=/usr/libexec/at-spi2-registryd
@@ -180,111 +161,129 @@ jobs:
           fi
           echo "KEEPASS_BUS_NAME=$KEEPASS_BUS_NAME"
 
-          echo "=== Checking KeePassXC accessibility root ==="
-          KEEPASS_ROOT_READY=0
-          for i in {1..30}; do
-            if gdbus introspect --address="$AT_SPI_BUS_ADDRESS" \
-                --dest "$KEEPASS_BUS_NAME" \
-                --object-path /org/a11y/atspi/accessible/root 2>/dev/null \
-                | grep -q 'org.a11y.atspi.Accessible'; then
-              KEEPASS_ROOT_READY=1
-              break
-            fi
-            sleep 1
-          done
-
-          ATSPI_DBUS_AVAILABLE=0
-          if [ "$KEEPASS_ROOT_READY" -eq 1 ]; then
-            if gdbus introspect --address="$AT_SPI_BUS_ADDRESS" \
-                --dest "$KEEPASS_BUS_NAME" \
-                --object-path /org/a11y/atspi/accessible/root >/tmp/keepassxc-atspi-root.txt; then
-              ATSPI_DBUS_AVAILABLE=1
-              echo "KeePassXC accessibility root confirmed over AT-SPI D-Bus."
-            fi
-          fi
-
-          if [ "$ATSPI_DBUS_AVAILABLE" -eq 0 ]; then
-            echo "WARNING: KeePassXC's AT-SPI D-Bus root was not available."
-            echo "WARNING: Ubuntu 24.04's Qt 6.4.2 + Xvfb environment is known to expose Qt's accessibility cache without completing the D-Bus application export."
-            echo "Falling back to Qt accessibility cache evidence."
-
-            REQUIRED_ROOT_PATTERN='qt\.accessibility\.cache: insert.*name="KeePassXC".*role=Window'
-            REQUIRED_CONTROL_PATTERNS=(
-              'qt\.accessibility\.cache: insert.*name="Create Database"'
-              'qt\.accessibility\.cache: insert.*name="Open Database"'
-              'qt\.accessibility\.cache: insert.*name="Import File"'
-            )
-            CACHE_FALLBACK_OK=1
-            grep -qE "$REQUIRED_ROOT_PATTERN" /tmp/keepassxc.log || CACHE_FALLBACK_OK=0
-            MATCHED_CONTROLS=0
-            for pattern in "${REQUIRED_CONTROL_PATTERNS[@]}"; do
-              if grep -qE "$pattern" /tmp/keepassxc.log; then
-                MATCHED_CONTROLS=$((MATCHED_CONTROLS + 1))
-              fi
-            done
-            echo "Matched $MATCHED_CONTROLS/${#REQUIRED_CONTROL_PATTERNS[@]} required named controls in the accessibility cache trace."
-            [ "$MATCHED_CONTROLS" -ge 2 ] || CACHE_FALLBACK_OK=0
-            if [ "$CACHE_FALLBACK_OK" -ne 1 ]; then
-              echo "ERROR: accessibility cache fallback also failed"
-              cat /tmp/keepassxc.log || true
-              exit 1
-            fi
-            echo "KeePassXC accessibility tree confirmed through Qt cache evidence."
-          fi
-
-          echo "=== Qt accessibility evidence ==="
-          grep -E 'name="(KeePassXC|Database toolbar|Search|Create Database|Open Database|Toggle Password|Generate Password|New Entry|Edit Entry|Delete Entry|Copy Username|Copy Password|Perform Auto-Type|Copy URL|Lock Database)"' \
-            /tmp/keepassxc.log | head -50 || true
-
-          echo "=== Direct libatspi probe ==="
-          set +e
-          python3 - <<'PY'
+          echo "=== Direct AT-SPI application-root accessibility probe ==="
+          # AT-SPI applications expose a root Accessible object at the standard
+          # /org/a11y/atspi/accessible/root path. The registry also exposes a
+          # root path, so the application bus name must be used here.
+          DBUS_SESSION_BUS_ADDRESS="$AT_SPI_BUS_ADDRESS" python3 - "$KEEPASS_BUS_NAME" <<'PY'
           import os
+          import sys
           import time
           import gi
-          gi.require_version("Atspi", "2.0")
-          from gi.repository import Atspi
+          gi.require_version("Gio", "2.0")
+          from gi.repository import Gio
 
+          bus_name = sys.argv[1]
+          address = os.environ["DBUS_SESSION_BUS_ADDRESS"]
+          root_path = "/org/a11y/atspi/accessible/root"
+          accessible_iface = "org.a11y.atspi.Accessible"
+
+          print(f"DBUS_SESSION_BUS_ADDRESS={address}")
           print(f"AT_SPI_BUS_ADDRESS={os.environ.get('AT_SPI_BUS_ADDRESS')}")
-          print(f"Atspi version={Atspi.get_version()}")
-          print(f"Atspi.init() result={Atspi.init()}")
-          found = False
-          for attempt in range(10):
-              desktop = Atspi.get_desktop(0)
-              count = desktop.get_child_count() if desktop is not None else -1
-              print(f"AT-SPI desktop child count={count} (attempt {attempt + 1})")
-              if desktop is not None:
-                  for index in range(count):
-                      child = desktop.get_child_at_index(index)
-                      if child is not None:
-                          name = child.get_name() or "(unnamed)"
-                          role = child.get_role_name() or "(unknown)"
-                          print(f"AT-SPI application: name={name!r} role={role!r}")
-                          if name.lower() == "keepassxc":
-                              found = True
-                              break
-              if found:
-                  break
+          print(f"KeePassXC AT-SPI bus name={bus_name}")
+
+          connection = Gio.DBusConnection.new_for_address_sync(
+              address,
+              Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT
+              | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION,
+              None,
+              None,
+          )
+
+          def call(path, method):
+              return connection.call_sync(
+                  bus_name,
+                  path,
+                  accessible_iface,
+                  method,
+                  None,
+                  None,
+                  Gio.DBusCallFlags.NONE,
+                  5000,
+                  None,
+              )
+
+          def get_name(path):
+              return call(path, "GetName").unpack()[0]
+
+          def get_children(path):
+              return list(call(path, "GetChildren").unpack()[0])
+
+          found_names = set()
+          queue = [(root_path, 0)]
+          visited = set()
+          max_nodes = 2000
+
+          for attempt in range(15):
+              found_names.clear()
+              queue = [(root_path, 0)]
+              visited.clear()
+              nodes = 0
+              try:
+                  while queue and nodes < max_nodes:
+                      path, depth = queue.pop(0)
+                      if path in visited:
+                          continue
+                      visited.add(path)
+                      nodes += 1
+                      try:
+                          name = get_name(path)
+                      except Exception as exc:
+                          print(f"GetName failed for {path}: {exc}")
+                          continue
+                      if name:
+                          found_names.add(name)
+                      if depth < 12:
+                          try:
+                              for child in get_children(path):
+                                  child_bus, child_path = child
+                                  if child_bus in ("", bus_name) and child_path not in visited:
+                                      queue.append((child_path, depth + 1))
+                          except Exception as exc:
+                              print(f"GetChildren failed for {path}: {exc}")
+                  print(f"AT-SPI application tree nodes visited={nodes}")
+                  print(f"Observed required names: {sorted(found_names.intersection({'KeePassXC', 'Create Database', 'Open Database', 'Import File'}))}")
+                  if "KeePassXC" in found_names and {"Create Database", "Open Database", "Import File"}.intersection(found_names):
+                      print("KeePassXC accessibility objects are present in the AT-SPI application tree.")
+                      raise SystemExit(0)
+              except Exception as exc:
+                  print(f"AT-SPI root probe attempt {attempt + 1} failed: {exc}")
               time.sleep(1)
-          Atspi.exit()
-          raise SystemExit(0 if found else 1)
+
+          print("ERROR: KeePassXC accessibility objects were not found in the AT-SPI application tree")
+          print(f"Observed names: {sorted(found_names)[:100]}")
+          raise SystemExit(1)
           PY
-          LIBATSPI_STATUS=$?
-          set -e
 
-          if [ "$LIBATSPI_STATUS" -eq 0 ]; then
-            echo "Direct libatspi probe: KeePassXC is visible."
-          elif [ "$ATSPI_DBUS_AVAILABLE" -eq 1 ]; then
-            echo "ERROR: direct libatspi probe failed even though KeePassXC exported an AT-SPI D-Bus root"
+          echo "KeePassXC is visible through the AT-SPI application tree."
+
+          echo "=== Qt accessibility evidence ==="
+          REQUIRED_ROOT_PATTERN='qt\.accessibility\.cache: insert.*name="KeePassXC".*role=Window'
+          REQUIRED_CONTROL_PATTERNS=(
+            'qt\.accessibility\.cache: insert.*name="Create Database"'
+            'qt\.accessibility\.cache: insert.*name="Open Database"'
+            'qt\.accessibility\.cache: insert.*name="Import File"'
+          )
+          CACHE_FALLBACK_OK=1
+          grep -qE "$REQUIRED_ROOT_PATTERN" /tmp/keepassxc.log || CACHE_FALLBACK_OK=0
+          MATCHED_CONTROLS=0
+          for pattern in "${REQUIRED_CONTROL_PATTERNS[@]}"; do
+            if grep -qE "$pattern" /tmp/keepassxc.log; then
+              MATCHED_CONTROLS=$((MATCHED_CONTROLS + 1))
+            fi
+          done
+          echo "Matched $MATCHED_CONTROLS/${#REQUIRED_CONTROL_PATTERNS[@]} required named controls in the accessibility cache trace."
+          if [ "$CACHE_FALLBACK_OK" -ne 1 ] || [ "$MATCHED_CONTROLS" -lt 2 ]; then
+            echo "ERROR: Qt accessibility cache evidence failed"
+            cat /tmp/keepassxc.log || true
             exit 1
-          else
-            echo "WARNING: libatspi saw no applications because the Qt/Xvfb D-Bus export is unavailable."
-            echo "The failure is non-fatal because the D-Bus root check already failed and the Qt accessibility cache passed."
           fi
+          echo "KeePassXC accessibility tree confirmed through Qt cache evidence."
 
-          echo "=== KeePassXC AT-SPI cache path ==="
-          gdbus introspect --address="$AT_SPI_BUS_ADDRESS" \
-            --dest "$KEEPASS_BUS_NAME" --object-path /org/a11y/atspi/cache 2>&1 || true
+          echo "=== AT-SPI application bus diagnostics ==="
+          busctl --address="$AT_SPI_BUS_ADDRESS" tree "$KEEPASS_BUS_NAME" 2>&1 || true
+          gdbus introspect --address="$AT_SPI_BUS_ADDRESS" --dest "$KEEPASS_BUS_NAME" \
+            --object-path /org/a11y/atspi/accessible/root 2>&1 || true
 
           echo "=== KeePassXC process status ==="
           ps -p "$APP_PID" -o pid=,stat=,cmd=
@@ -292,10 +291,12 @@ jobs:
           kill "$APP_PID" 2>/dev/null || true
           [ -n "${ATSPIS_REGISTRY_PID:-}" ] && kill "$ATSPIS_REGISTRY_PID" 2>/dev/null || true
           kill "$ATSPI_LAUNCHER_PID" 2>/dev/null || true
+          kill "$FLUXBOX_PID" 2>/dev/null || true
           ATSPISCRIPT
 
           chmod +x /tmp/run-atspi-check.sh
           dbus-run-session -- /tmp/run-atspi-check.sh
+          kill "$XVFB_PID" 2>/dev/null || true
 
       - name: Upload AT-SPI diagnostics
         if: always()

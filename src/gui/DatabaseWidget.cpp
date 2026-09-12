@@ -1027,11 +1027,19 @@ void DatabaseWidget::openUrlForEntry(Entry* entry)
             auto checkbox = new QCheckBox(tr("Remember my choice"), &msgbox);
             msgbox.setCheckBox(checkbox);
             bool remember = false;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+            QObject::connect(checkbox, &QCheckBox::checkStateChanged, [&](Qt::CheckState state) {
+                if (state == Qt::CheckState::Checked) {
+                    remember = true;
+                }
+            });
+#else
             QObject::connect(checkbox, &QCheckBox::stateChanged, [&](int state) {
                 if (static_cast<Qt::CheckState>(state) == Qt::CheckState::Checked) {
                     remember = true;
                 }
             });
+#endif
 
             int result = msgbox.exec();
             launch = (result == QMessageBox::Yes);

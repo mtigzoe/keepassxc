@@ -174,6 +174,105 @@ if ($LASTEXITCODE -ne 0) {
 $env:VCPKG_ROOT = $VcpkgRoot
 
 # ============================================================
+# Check Windows SDK
+# ============================================================
+# Required for the POST_BUILD windeployqt step that runs when building
+# testwindowsaccessibility and testwindowsaccessibilitytree (they embed
+# $<TARGET_FILE:${PROGNAME}> and thus build the full KeePassXC.exe app).
+
+Write-Host ""
+Write-Host "============================================================"
+Write-Host "Checking Windows SDK..."
+Write-Host "============================================================"
+
+$WindowsSdkRoot = ""
+$WindowsSdkVersion = ""
+
+# The Windows 10/11 SDK installer records its install location in the
+# registry under "KitsRoot10" (Windows 11 SDKs are still versioned
+# under "...Windows Kits\10"). The installer is 32-bit, so on 64-bit
+# Windows it writes to the WOW6432Node key; check the native key too
+# in case the SDK was registered under 32-bit or ARM64 Windows.
+$KitsRootRegistryPaths = @(
+    "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows Kits\Installed Roots",
+    "HKLM:\SOFTWARE\Microsoft\Windows Kits\Installed Roots"
+)
+
+foreach ($RegPath in $KitsRootRegistryPaths) {
+    $RegValue = Get-ItemProperty -Path $RegPath -Name "KitsRoot10" -ErrorAction SilentlyContinue
+    if ($RegValue -and (Test-Path $RegValue.KitsRoot10)) {
+        $WindowsSdkRoot = $RegValue.KitsRoot10.TrimEnd('\')
+        break
+    }
+}
+
+if (-not $WindowsSdkRoot) {
+    # Registry lookup failed; fall back to the standard install
+    # locations before giving up.
+    $WindowsSdkRootCandidates = @(
+        "${env:ProgramFiles(x86)}\Windows Kits\10",
+        "${env:ProgramFiles}\Windows Kits\10"
+    )
+
+    $WindowsSdkRoot = $WindowsSdkRootCandidates |
+        Where-Object { $_ -and (Test-Path $_) } |
+        Select-Object -First 1
+}
+
+if (-not $WindowsSdkRoot) {
+    throw "Could not auto-detect an installed Windows 10/11 SDK."
+}
+
+Write-Host ""
+Write-Host "Windows SDK root:"
+Write-Host $WindowsSdkRoot
+
+$DetectedSdkVersion = Get-ChildItem "$WindowsSdkRoot\bin" -Directory -ErrorAction SilentlyContinue |
+    Where-Object { $_.Name -match '^\d+\.\d+\.\d+\.\d+$' } |
+    Sort-Object { [version]$_.Name } -Descending |
+    Select-Object -First 1
+
+if (-not $DetectedSdkVersion) {
+    throw "Could not auto-detect an installed Windows SDK version under $WindowsSdkRoot\bin."
+}
+
+$WindowsSdkVersion = $DetectedSdkVersion.Name
+
+Write-Host ""
+Write-Host "Windows SDK version:"
+Write-Host $WindowsSdkVersion
+
+$env:WindowsSdkDir = "$WindowsSdkRoot\"
+$env:WindowsSDKVersion = "$WindowsSdkVersion\"
+
+$SdkBin = "$WindowsSdkRoot\bin\$WindowsSdkVersion\x64"
+$SdkLib = "$WindowsSdkRoot\Lib\$WindowsSdkVersion\um\x64"
+
+if (-not (Test-Path "$SdkBin\rc.exe")) {
+    throw "rc.exe was not found: $SdkBin\rc.exe"
+}
+
+if (-not (Test-Path "$SdkBin\mt.exe")) {
+    throw "mt.exe was not found: $SdkBin\mt.exe"
+}
+
+if (-not (Test-Path "$SdkLib\kernel32.lib")) {
+    throw "kernel32.lib was not found: $SdkLib\kernel32.lib"
+}
+
+if (-not (Test-Path "$SdkLib\uuid.lib")) {
+    throw "uuid.lib was not found: $SdkLib\uuid.lib"
+}
+
+# Make sure Windows SDK tools are first in PATH.
+$env:PATH = "$SdkBin;$env:PATH"
+
+# Make sure Windows SDK libraries are available to the linker.
+$env:LIB = "$SdkLib;$env:LIB"
+
+Write-Host "Windows SDK is OK."
+
+# ============================================================
 # Check Ninja
 # ============================================================
 
@@ -205,6 +304,8 @@ $QtDebugBin = Join-Path $QtRoot "debug\bin"
 $QtSvgConfig = Join-Path $QtRoot "share\Qt6Svg\Qt6SvgConfig.cmake"
 $QtSvgWidgetsConfig = Join-Path $QtRoot "share\Qt6SvgWidgets\Qt6SvgWidgetsConfig.cmake"
 $WinDeployQtDebug = Join-Path $QtToolsBin "windeployqt.debug.bat"
+$QtTranslationsRoot = Join-Path $QtRoot "translations\Qt6"
+$QtTranslationsCatalog = Join-Path $QtTranslationsRoot "catalogs.json"
 
 if (-not (Test-Path $QtConfig)) {
     throw "Qt6Config.cmake was not found: $QtConfig`nRun your normal build-debug.ps1 first so vcpkg can install Qt."
@@ -237,6 +338,13 @@ if (-not (Test-Path $WinDeployQtDebug)) {
     throw "Debug windeployqt wrapper was not found: $WinDeployQtDebug`nRun your normal build-debug.ps1 first so vcpkg can install qtbase[windeployqt]."
 }
 
+# Qt translations are used by windeployqt during deployment. The POST_BUILD
+# step for testwindowsaccessibility and testwindowsaccessibilitytree invokes
+# windeployqt on the full KeePassXC.exe, which requires the translations catalog.
+if (-not (Test-Path $QtTranslationsCatalog)) {
+    throw "Qt translations catalog was not found: $QtTranslationsCatalog`nRun your normal build-debug.ps1 first so vcpkg can install qttranslations."
+}
+
 Write-Host ""
 Write-Host "Qt:"
 Write-Host $QtConfig
@@ -248,6 +356,10 @@ Write-Host $QtDebugBin
 Write-Host ""
 Write-Host "Debug windeployqt wrapper:"
 Write-Host $WinDeployQtDebug
+
+Write-Host ""
+Write-Host "Qt translations catalog:"
+Write-Host $QtTranslationsCatalog
 
 # Make Qt tools and debug DLLs available.
 $env:PATH = "$QtDebugBin;$QtToolsBin;$env:PATH"
@@ -341,50 +453,8 @@ foreach ($Target in $Targets) {
 }
 
 # ============================================================
-# Locate test executables
+# Optionally run the requested test(s) via CTest
 # ============================================================
-
-Write-Host ""
-Write-Host "============================================================"
-Write-Host "Accessibility test executables"
-Write-Host "============================================================"
-
-$TestExecutables = @(
-    "testaccessibility.exe",
-    "testwindowsaccessibility.exe",
-    "testwindowsaccessibilitytree.exe"
-)
-
-$FoundExecutables = @{}
-
-foreach ($Executable in $TestExecutables) {
-    $Found = Get-ChildItem $BuildDir `
-        -Recurse `
-        -Filter $Executable `
-        -File `
-        -ErrorAction SilentlyContinue |
-        Select-Object -First 1
-
-    if ($Found) {
-        $FoundExecutables[$Executable] = $Found.FullName
-        Write-Host ""
-        Write-Host "${Executable}:"
-        Write-Host $Found.FullName
-    }
-    else {
-        throw "Could not find $Executable under $BuildDir"
-    }
-}
-
-# ============================================================
-# Optionally run the requested test(s)
-# ============================================================
-
-$TestsToRun = @(
-    @{ Exe = "testaccessibility.exe"; Requested = $RunAccessibilityTest; Label = "Qt accessibility (testaccessibility)" },
-    @{ Exe = "testwindowsaccessibility.exe"; Requested = $RunWindowsAccessibilityTest; Label = "Windows UIA accessibility (testwindowsaccessibility)" },
-    @{ Exe = "testwindowsaccessibilitytree.exe"; Requested = $RunWindowsAccessibilityTreeTest; Label = "Windows UIA accessibility tree (testwindowsaccessibilitytree)" }
-)
 
 $AnyTestRequested = $RunAccessibilityTest -or $RunWindowsAccessibilityTest -or $RunWindowsAccessibilityTreeTest
 
@@ -393,34 +463,71 @@ if ($AnyTestRequested) {
     $env:QT_QPA_PLATFORM = "windows"
     $env:QT_ACCESSIBILITY = "1"
 
-    foreach ($Test in $TestsToRun) {
-        if (-not $Test.Requested) {
-            continue
-        }
-
-        $TestExecutable = $FoundExecutables[$Test.Exe]
-
+    # testwindowsaccessibility and testwindowsaccessibilitytree embed
+    # KeePassXC.exe's path via a target_compile_definitions(...
+    # "$<TARGET_FILE:${PROGNAME}>") generator expression in CMakeLists.txt.
+    # That only embeds the path string -- it does not add KeePassXC as a
+    # CMake build-order dependency of the test target, so the loop above
+    # can build testwindowsaccessibility / testwindowsaccessibilitytree
+    # without ever building KeePassXC.exe itself. Build it explicitly here
+    # so either -RunWindowsAccessibilityTest or
+    # -RunWindowsAccessibilityTreeTest works from a clean build-tests
+    # directory, without needing a separate manual build step first.
+    if ($RunWindowsAccessibilityTest -or $RunWindowsAccessibilityTreeTest) {
         Write-Host ""
-        Write-Host "============================================================"
-        Write-Host "Running $($Test.Label)..."
-        Write-Host "============================================================"
+        Write-Host "------------------------------------------------------------"
+        Write-Host "Building target: KeePassXC (required by the Windows UIA tests)"
+        Write-Host "------------------------------------------------------------"
 
-        if ($VerboseTest) {
-            Write-Host ""
-            Write-Host "Running $($Test.Exe) with QTest -v2..."
-            & $TestExecutable -v2
-        }
-        else {
-            & $TestExecutable
-        }
+        cmake --build $BuildDir --config Debug --target KeePassXC
 
         if ($LASTEXITCODE -ne 0) {
-            throw "$($Test.Exe) failed with exit code $LASTEXITCODE."
+            throw "Build failed for target: KeePassXC"
         }
-
-        Write-Host ""
-        Write-Host "$($Test.Exe) passed."
     }
+
+    # Build the CTest regex filter from requested tests.
+    # Each -Run* switch maps to the exact CTest test name.
+    $TestFilters = @()
+    if ($RunAccessibilityTest) {
+        $TestFilters += '^testaccessibility$'
+    }
+    if ($RunWindowsAccessibilityTest) {
+        $TestFilters += '^testwindowsaccessibility$'
+    }
+    if ($RunWindowsAccessibilityTreeTest) {
+        $TestFilters += '^testwindowsaccessibilitytree$'
+    }
+
+    # Join with '|' for CTest's -R regex (OR semantics).
+    $FilterRegex = $TestFilters -join '|'
+
+    $CtestArgs = @(
+        "--test-dir", $BuildDir,
+        "-C", "Debug",
+        "-R", $FilterRegex,
+        "--output-on-failure"
+    )
+
+    if ($VerboseTest) {
+        $CtestArgs += "--verbose"
+    }
+
+    Write-Host ""
+    Write-Host "============================================================"
+    Write-Host "Running accessibility tests via CTest..."
+    Write-Host "============================================================"
+    Write-Host ""
+    Write-Host "ctest $CtestArgs"
+
+    ctest @CtestArgs
+
+    if ($LASTEXITCODE -ne 0) {
+        throw "CTest failed with exit code $LASTEXITCODE."
+    }
+
+    Write-Host ""
+    Write-Host "All requested accessibility tests passed."
 }
 
 # ============================================================
@@ -436,13 +543,6 @@ Write-Host ""
 Write-Host "Build directory:"
 Write-Host $BuildDir
 
-Write-Host ""
-Write-Host "Available accessibility tests:"
-
-foreach ($Executable in $FoundExecutables.Keys) {
-    Write-Host $FoundExecutables[$Executable]
-}
-
 if (-not $AnyTestRequested) {
     Write-Host ""
     Write-Host "To build and run a test with detailed QTest output, e.g.:"
@@ -450,4 +550,8 @@ if (-not $AnyTestRequested) {
     Write-Host ".\build-tests-debug.ps1 -RunAccessibilityTest -VerboseTest"
     Write-Host ".\build-tests-debug.ps1 -RunWindowsAccessibilityTest -VerboseTest"
     Write-Host ".\build-tests-debug.ps1 -RunWindowsAccessibilityTreeTest -VerboseTest"
+    Write-Host ""
+    Write-Host "To run all accessibility tests:"
+    Write-Host ""
+    Write-Host ".\build-tests-debug.ps1 -RunAccessibilityTest -RunWindowsAccessibilityTest -RunWindowsAccessibilityTreeTest -VerboseTest"
 }
