@@ -162,9 +162,10 @@ jobs:
           echo "KEEPASS_BUS_NAME=$KEEPASS_BUS_NAME"
 
           echo "=== Direct AT-SPI application-root accessibility probe ==="
-          # AT-SPI applications expose a root Accessible object at the standard
-          # /org/a11y/atspi/accessible/root path. The registry also exposes a
-          # root path, so the application bus name must be used here.
+          # The registry root is the discovery point for registered applications.
+          # Applications provide their own root object, but its object reference
+          # is obtained from the registry. Do not assume that the registry root
+          # path is also exported by the application bus.
           DBUS_SESSION_BUS_ADDRESS="$AT_SPI_BUS_ADDRESS" python3 - "$KEEPASS_BUS_NAME" <<'PY'
           import os
           import sys
@@ -175,6 +176,7 @@ jobs:
 
           bus_name = sys.argv[1]
           address = os.environ["DBUS_SESSION_BUS_ADDRESS"]
+          registry_bus = "org.a11y.atspi.Registry"
           root_path = "/org/a11y/atspi/accessible/root"
           accessible_iface = "org.a11y.atspi.Accessible"
 
@@ -190,9 +192,9 @@ jobs:
               None,
           )
 
-          def call(path, method):
+          def call(destination, path, method):
               return connection.call_sync(
-                  bus_name,
+                  destination,
                   path,
                   accessible_iface,
                   method,
@@ -203,51 +205,69 @@ jobs:
                   None,
               )
 
-          def get_name(path):
-              return call(path, "GetName").unpack()[0]
+          def get_name(destination, path):
+              return call(destination, path, "GetName").unpack()[0]
 
-          def get_children(path):
-              return list(call(path, "GetChildren").unpack()[0])
+          def get_children(destination, path):
+              return list(call(destination, path, "GetChildren").unpack()[0])
 
           found_names = set()
-          queue = [(root_path, 0)]
-          visited = set()
+          application_roots = []
           max_nodes = 2000
 
           for attempt in range(15):
               found_names.clear()
-              queue = [(root_path, 0)]
-              visited.clear()
-              nodes = 0
+              application_roots.clear()
               try:
+                  # First discover the application's root reference from the
+                  # registry. The child reference contains the application's
+                  # unique bus name and its actual root object path.
+                  registry_children = get_children(registry_bus, root_path)
+                  print(f"Registry root children={len(registry_children)}")
+                  for child_bus, child_path in registry_children:
+                      if child_bus == bus_name:
+                          application_roots.append(child_path)
+
+                  print(f"KeePassXC application root references={application_roots}")
+                  if not application_roots:
+                      time.sleep(1)
+                      continue
+
+                  queue = [(path, 0) for path in application_roots]
+                  visited = set()
+                  nodes = 0
+
                   while queue and nodes < max_nodes:
                       path, depth = queue.pop(0)
-                      if path in visited:
+                      key = (bus_name, path)
+                      if key in visited:
                           continue
-                      visited.add(path)
+                      visited.add(key)
                       nodes += 1
+
                       try:
-                          name = get_name(path)
+                          name = get_name(bus_name, path)
                       except Exception as exc:
                           print(f"GetName failed for {path}: {exc}")
                           continue
+
                       if name:
                           found_names.add(name)
                       if depth < 12:
                           try:
-                              for child in get_children(path):
-                                  child_bus, child_path = child
-                                  if child_bus in ("", bus_name) and child_path not in visited:
+                              for child_bus, child_path in get_children(bus_name, path):
+                                  if child_bus in ("", bus_name) and child_path not in {p for _, p in queue}:
                                       queue.append((child_path, depth + 1))
                           except Exception as exc:
                               print(f"GetChildren failed for {path}: {exc}")
+
                   print(f"AT-SPI application tree nodes visited={nodes}")
                   print(f"Observed required names: {sorted(found_names.intersection({'KeePassXC', 'Create Database', 'Open Database', 'Import File'}))}")
                   if "KeePassXC" in found_names and {"Create Database", "Open Database", "Import File"}.intersection(found_names):
                       print("KeePassXC accessibility objects are present in the AT-SPI application tree.")
                       raise SystemExit(0)
               except Exception as exc:
-                  print(f"AT-SPI root probe attempt {attempt + 1} failed: {exc}")
+                  print(f"AT-SPI application-root probe attempt {attempt + 1} failed: {exc}")
               time.sleep(1)
 
           print("ERROR: KeePassXC accessibility objects were not found in the AT-SPI application tree")
