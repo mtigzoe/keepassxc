@@ -59,6 +59,16 @@ Run the Windows UIA tree suite:
 .\build-tests-debug.ps1 -RunWindowsAccessibilityTreeTest
 ```
 
+### Run all accessibility suites
+
+To clean the test build, build the application and all three accessibility test targets, and run all three suites with verbose QTest output:
+
+```powershell
+.\build-tests-debug.ps1 -Clean -RunAccessibilityTest -RunWindowsAccessibilityTest -RunWindowsAccessibilityTreeTest -VerboseTest
+```
+
+This is the recommended single command for validating a Windows accessibility change before pushing it.
+
 Run a test with verbose QTest output by adding `-VerboseTest`.
 
 If the test build has stale CMake or vcpkg paths, use `-Clean` to recreate the `build-tests` directory:
