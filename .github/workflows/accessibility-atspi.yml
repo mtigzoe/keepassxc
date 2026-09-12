@@ -161,79 +161,101 @@ jobs:
           fi
           echo "KEEPASS_BUS_NAME=$KEEPASS_BUS_NAME"
 
-          echo "=== Direct AT-SPI cache accessibility probe ==="
-          # AT-SPI applications expose /org/a11y/atspi/cache with Cache.GetItems.
-          # Querying the application cache directly avoids relying on libatspi's
-          # desktop enumeration, which can be empty in this isolated CI setup even
-          # when the application's AT-SPI objects are correctly exported.
+          echo "=== Direct AT-SPI application-root accessibility probe ==="
+          # AT-SPI applications expose a root Accessible object at the standard
+          # /org/a11y/atspi/accessible/root path. The registry also exposes a
+          # root path, so the application bus name must be used here.
           DBUS_SESSION_BUS_ADDRESS="$AT_SPI_BUS_ADDRESS" python3 - "$KEEPASS_BUS_NAME" <<'PY'
-          import ast
           import os
-          import subprocess
           import sys
           import time
+          import gi
+          gi.require_version("Gio", "2.0")
+          from gi.repository import Gio
 
           bus_name = sys.argv[1]
           address = os.environ["DBUS_SESSION_BUS_ADDRESS"]
-          cache_path = "/org/a11y/atspi/cache"
-          cache_iface = "org.a11y.atspi.Cache"
+          root_path = "/org/a11y/atspi/accessible/root"
+          accessible_iface = "org.a11y.atspi.Accessible"
 
           print(f"DBUS_SESSION_BUS_ADDRESS={address}")
           print(f"AT_SPI_BUS_ADDRESS={os.environ.get('AT_SPI_BUS_ADDRESS')}")
           print(f"KeePassXC AT-SPI bus name={bus_name}")
 
-          def call_get_items():
-              return subprocess.run(
-                  [
-                      "gdbus", "call", "--address", address,
-                      "--dest", bus_name,
-                      "--object-path", cache_path,
-                      "--method", f"{cache_iface}.GetItems",
-                  ],
-                  capture_output=True,
-                  text=True,
-                  check=False,
+          connection = Gio.DBusConnection.new_for_address_sync(
+              address,
+              Gio.DBusConnectionFlags.AUTHENTICATION_CLIENT
+              | Gio.DBusConnectionFlags.MESSAGE_BUS_CONNECTION,
+              None,
+              None,
+          )
+
+          def call(path, method):
+              return connection.call_sync(
+                  bus_name,
+                  path,
+                  accessible_iface,
+                  method,
+                  None,
+                  None,
+                  Gio.DBusCallFlags.NONE,
+                  5000,
+                  None,
               )
 
-          found_names = set()
-          found_roles = []
-          for attempt in range(15):
-              result = call_get_items()
-              print(f"Cache.GetItems attempt {attempt + 1}: exit={result.returncode}")
-              if result.stderr:
-                  print(result.stderr.rstrip())
-              if result.returncode == 0:
-                  try:
-                      items = ast.literal_eval(result.stdout.strip())
-                  except Exception as exc:
-                      print(f"ERROR: Could not parse Cache.GetItems response: {exc}")
-                      print(result.stdout)
-                      raise SystemExit(1)
+          def get_name(path):
+              return call(path, "GetName").unpack()[0]
 
-                  print(f"AT-SPI cache item count={len(items)}")
-                  for item in items:
-                      if not isinstance(item, tuple) or len(item) < 8:
+          def get_children(path):
+              return list(call(path, "GetChildren").unpack()[0])
+
+          found_names = set()
+          queue = [(root_path, 0)]
+          visited = set()
+          max_nodes = 2000
+
+          for attempt in range(15):
+              found_names.clear()
+              queue = [(root_path, 0)]
+              visited.clear()
+              nodes = 0
+              try:
+                  while queue and nodes < max_nodes:
+                      path, depth = queue.pop(0)
+                      if path in visited:
                           continue
-                      name = item[6] if isinstance(item[6], str) else ""
-                      role = item[7] if isinstance(item[7], int) else -1
+                      visited.add(path)
+                      nodes += 1
+                      try:
+                          name = get_name(path)
+                      except Exception as exc:
+                          print(f"GetName failed for {path}: {exc}")
+                          continue
                       if name:
                           found_names.add(name)
-                      found_roles.append((name, role))
-
-                  required = {"KeePassXC", "Create Database", "Open Database"}
-                  matched = required.intersection(found_names)
-                  print(f"Matched required accessible names: {sorted(matched)}")
-                  if "KeePassXC" in found_names and len({"Create Database", "Open Database"}.intersection(found_names)) >= 1:
-                      print("KeePassXC accessibility objects are present in the AT-SPI cache.")
+                      if depth < 12:
+                          try:
+                              for child in get_children(path):
+                                  child_bus, child_path = child
+                                  if child_bus in ("", bus_name) and child_path not in visited:
+                                      queue.append((child_path, depth + 1))
+                          except Exception as exc:
+                              print(f"GetChildren failed for {path}: {exc}")
+                  print(f"AT-SPI application tree nodes visited={nodes}")
+                  print(f"Observed required names: {sorted(found_names.intersection({'KeePassXC', 'Create Database', 'Open Database', 'Import File'}))}")
+                  if "KeePassXC" in found_names and {"Create Database", "Open Database", "Import File"}.intersection(found_names):
+                      print("KeePassXC accessibility objects are present in the AT-SPI application tree.")
                       raise SystemExit(0)
+              except Exception as exc:
+                  print(f"AT-SPI root probe attempt {attempt + 1} failed: {exc}")
               time.sleep(1)
 
-          print("ERROR: KeePassXC accessibility objects were not found in Cache.GetItems")
+          print("ERROR: KeePassXC accessibility objects were not found in the AT-SPI application tree")
           print(f"Observed names: {sorted(found_names)[:100]}")
           raise SystemExit(1)
           PY
 
-          echo "KeePassXC is visible through the AT-SPI application cache."
+          echo "KeePassXC is visible through the AT-SPI application tree."
 
           echo "=== Qt accessibility evidence ==="
           REQUIRED_ROOT_PATTERN='qt\.accessibility\.cache: insert.*name="KeePassXC".*role=Window'
@@ -259,10 +281,9 @@ jobs:
           echo "KeePassXC accessibility tree confirmed through Qt cache evidence."
 
           echo "=== AT-SPI application bus diagnostics ==="
-          echo "No fixed application object path is required: AT-SPI application object paths are implementation/runtime dependent."
           busctl --address="$AT_SPI_BUS_ADDRESS" tree "$KEEPASS_BUS_NAME" 2>&1 || true
           gdbus introspect --address="$AT_SPI_BUS_ADDRESS" --dest "$KEEPASS_BUS_NAME" \
-            --object-path /org/a11y/atspi/cache 2>&1 || true
+            --object-path /org/a11y/atspi/accessible/root 2>&1 || true
 
           echo "=== KeePassXC process status ==="
           ps -p "$APP_PID" -o pid=,stat=,cmd=
