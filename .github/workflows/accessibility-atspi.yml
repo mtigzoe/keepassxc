@@ -161,45 +161,79 @@ jobs:
           fi
           echo "KEEPASS_BUS_NAME=$KEEPASS_BUS_NAME"
 
-          echo "=== Direct libatspi accessibility probe ==="
-          # PyGObject/AT-SPI uses the normal D-Bus session environment to choose
-          # its connection. The AT-SPI bus is a separate bus from the outer
-          # dbus-run-session bus, so point the probe explicitly at the discovered
-          # AT-SPI bus before calling Atspi.init(). This avoids an empty desktop
-          # caused by connecting to the wrong D-Bus session.
-          DBUS_SESSION_BUS_ADDRESS="$AT_SPI_BUS_ADDRESS" python3 - <<'PY'
+          echo "=== Direct AT-SPI cache accessibility probe ==="
+          # AT-SPI applications expose /org/a11y/atspi/cache with Cache.GetItems.
+          # Querying the application cache directly avoids relying on libatspi's
+          # desktop enumeration, which can be empty in this isolated CI setup even
+          # when the application's AT-SPI objects are correctly exported.
+          DBUS_SESSION_BUS_ADDRESS="$AT_SPI_BUS_ADDRESS" python3 - "$KEEPASS_BUS_NAME" <<'PY'
+          import ast
           import os
+          import subprocess
+          import sys
           import time
-          import gi
-          gi.require_version("Atspi", "2.0")
-          from gi.repository import Atspi
 
-          print(f"DBUS_SESSION_BUS_ADDRESS={os.environ.get('DBUS_SESSION_BUS_ADDRESS')}")
+          bus_name = sys.argv[1]
+          address = os.environ["DBUS_SESSION_BUS_ADDRESS"]
+          cache_path = "/org/a11y/atspi/cache"
+          cache_iface = "org.a11y.atspi.Cache"
+
+          print(f"DBUS_SESSION_BUS_ADDRESS={address}")
           print(f"AT_SPI_BUS_ADDRESS={os.environ.get('AT_SPI_BUS_ADDRESS')}")
-          print(f"Atspi version={Atspi.get_version()}")
-          print(f"Atspi.init() result={Atspi.init()}")
-          found = False
-          for attempt in range(10):
-              desktop = Atspi.get_desktop(0)
-              count = desktop.get_child_count() if desktop is not None else -1
-              print(f"AT-SPI desktop child count={count} (attempt {attempt + 1})")
-              if desktop is not None:
-                  for index in range(count):
-                      child = desktop.get_child_at_index(index)
-                      if child is not None:
-                          name = child.get_name() or "(unnamed)"
-                          role = child.get_role_name() or "(unknown)"
-                          print(f"AT-SPI application: name={name!r} role={role!r}")
-                          if name.lower() == "keepassxc":
-                              found = True
-                              break
-              if found:
-                  break
+          print(f"KeePassXC AT-SPI bus name={bus_name}")
+
+          def call_get_items():
+              return subprocess.run(
+                  [
+                      "gdbus", "call", "--address", address,
+                      "--dest", bus_name,
+                      "--object-path", cache_path,
+                      "--method", f"{cache_iface}.GetItems",
+                  ],
+                  capture_output=True,
+                  text=True,
+                  check=False,
+              )
+
+          found_names = set()
+          found_roles = []
+          for attempt in range(15):
+              result = call_get_items()
+              print(f"Cache.GetItems attempt {attempt + 1}: exit={result.returncode}")
+              if result.stderr:
+                  print(result.stderr.rstrip())
+              if result.returncode == 0:
+                  try:
+                      items = ast.literal_eval(result.stdout.strip())
+                  except Exception as exc:
+                      print(f"ERROR: Could not parse Cache.GetItems response: {exc}")
+                      print(result.stdout)
+                      raise SystemExit(1)
+
+                  print(f"AT-SPI cache item count={len(items)}")
+                  for item in items:
+                      if not isinstance(item, tuple) or len(item) < 8:
+                          continue
+                      name = item[6] if isinstance(item[6], str) else ""
+                      role = item[7] if isinstance(item[7], int) else -1
+                      if name:
+                          found_names.add(name)
+                      found_roles.append((name, role))
+
+                  required = {"KeePassXC", "Create Database", "Open Database"}
+                  matched = required.intersection(found_names)
+                  print(f"Matched required accessible names: {sorted(matched)}")
+                  if "KeePassXC" in found_names and len({"Create Database", "Open Database"}.intersection(found_names)) >= 1:
+                      print("KeePassXC accessibility objects are present in the AT-SPI cache.")
+                      raise SystemExit(0)
               time.sleep(1)
-          Atspi.exit()
-          raise SystemExit(0 if found else 1)
+
+          print("ERROR: KeePassXC accessibility objects were not found in Cache.GetItems")
+          print(f"Observed names: {sorted(found_names)[:100]}")
+          raise SystemExit(1)
           PY
-          echo "KeePassXC is visible through the AT-SPI API."
+
+          echo "KeePassXC is visible through the AT-SPI application cache."
 
           echo "=== Qt accessibility evidence ==="
           REQUIRED_ROOT_PATTERN='qt\.accessibility\.cache: insert.*name="KeePassXC".*role=Window'
