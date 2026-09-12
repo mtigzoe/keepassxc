@@ -521,24 +521,52 @@ void EditEntryWidget::setupEntryUpdate()
     connect(m_mainUi->urlEdit, SIGNAL(textChanged(QString)), this, SLOT(updateFaviconButtonEnable(QString)));
 #endif
     connect(m_mainUi->tagsList, SIGNAL(tagsEdited()), this, SLOT(setModified()));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     connect(m_mainUi->expireCheck, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(setModified()));
+#else
+    connect(m_mainUi->expireCheck, SIGNAL(stateChanged(int)), this, SLOT(setModified()));
+#endif
     connect(m_mainUi->expireDatePicker, SIGNAL(dateTimeChanged(QDateTime)), this, SLOT(setModified()));
     connect(m_mainUi->notesEdit, SIGNAL(textChanged()), this, SLOT(setModified()));
 
     // Advanced tab
     connect(m_advancedUi->attributesEdit, SIGNAL(textChanged()), this, SLOT(setModified()));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     connect(m_advancedUi->protectAttributeButton, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(setModified()));
+#else
+    connect(m_advancedUi->protectAttributeButton, SIGNAL(stateChanged(int)), this, SLOT(setModified()));
+#endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     connect(m_advancedUi->excludeReportsCheckBox, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(setModified()));
+#else
+    connect(m_advancedUi->excludeReportsCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setModified()));
+#endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     connect(m_advancedUi->fgColorCheckBox, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(setModified()));
+#else
+    connect(m_advancedUi->fgColorCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setModified()));
+#endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     connect(m_advancedUi->bgColorCheckBox, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(setModified()));
+#else
+    connect(m_advancedUi->bgColorCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setModified()));
+#endif
     connect(m_advancedUi->attachmentsWidget, SIGNAL(widgetUpdated()), this, SLOT(setModified()));
 
     // Icon tab
     connect(m_iconsWidget, SIGNAL(widgetUpdated()), this, SLOT(setModified()));
 
     // Auto-Type tab
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     connect(m_autoTypeUi->enableButton, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(setModified()));
+#else
+    connect(m_autoTypeUi->enableButton, SIGNAL(stateChanged(int)), this, SLOT(setModified()));
+#endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
     connect(m_autoTypeUi->customWindowSequenceButton, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(setModified()));
+#else
+    connect(m_autoTypeUi->customWindowSequenceButton, SIGNAL(stateChanged(int)), this, SLOT(setModified()));
+#endif
     connect(m_autoTypeUi->inheritSequenceButton, SIGNAL(toggled(bool)), this, SLOT(setModified()));
     connect(m_autoTypeUi->customSequenceButton, SIGNAL(toggled(bool)), this, SLOT(setModified()));
     connect(m_autoTypeUi->windowSequenceEdit, SIGNAL(textChanged(QString)), this, SLOT(setModified()));
@@ -556,10 +584,26 @@ void EditEntryWidget::setupEntryUpdate()
         connect(m_sshAgentUi->attachmentComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(setModified()));
         connect(m_sshAgentUi->attachmentComboBox, SIGNAL(editTextChanged(QString)), this, SLOT(setModified()));
         connect(m_sshAgentUi->externalFileEdit, SIGNAL(textChanged(QString)), this, SLOT(setModified()));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
         connect(m_sshAgentUi->addKeyToAgentCheckBox, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(setModified()));
+#else
+        connect(m_sshAgentUi->addKeyToAgentCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setModified()));
+#endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
         connect(m_sshAgentUi->removeKeyFromAgentCheckBox, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(setModified()));
+#else
+        connect(m_sshAgentUi->removeKeyFromAgentCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setModified()));
+#endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
         connect(m_sshAgentUi->requireUserConfirmationCheckBox, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(setModified()));
+#else
+        connect(m_sshAgentUi->requireUserConfirmationCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setModified()));
+#endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
         connect(m_sshAgentUi->lifetimeCheckBox, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(setModified()));
+#else
+        connect(m_sshAgentUi->lifetimeCheckBox, SIGNAL(stateChanged(int)), this, SLOT(setModified()));
+#endif
         connect(m_sshAgentUi->lifetimeSpinBox, SIGNAL(valueChanged(int)), this, SLOT(setModified()));
     }
 #endif
