@@ -161,36 +161,7 @@ jobs:
           fi
           echo "KEEPASS_BUS_NAME=$KEEPASS_BUS_NAME"
 
-          echo "=== Checking KeePassXC accessibility root ==="
-          KEEPASS_ROOT_READY=0
-          for i in {1..30}; do
-            if gdbus introspect --address="$AT_SPI_BUS_ADDRESS" \
-                --dest "$KEEPASS_BUS_NAME" \
-                --object-path /org/a11y/atspi/accessible/root 2>/dev/null \
-                | grep -q 'org.a11y.atspi.Accessible'; then
-              KEEPASS_ROOT_READY=1
-              break
-            fi
-            sleep 1
-          done
-          if [ "$KEEPASS_ROOT_READY" -ne 1 ]; then
-            echo "ERROR: KeePassXC accessibility root was not exported over AT-SPI D-Bus"
-            cat /tmp/keepassxc.log || true
-            gdbus introspect --address="$AT_SPI_BUS_ADDRESS" \
-              --dest "$KEEPASS_BUS_NAME" \
-              --object-path /org/a11y/atspi/accessible/root 2>&1 || true
-            exit 1
-          fi
-          gdbus introspect --address="$AT_SPI_BUS_ADDRESS" \
-            --dest "$KEEPASS_BUS_NAME" \
-            --object-path /org/a11y/atspi/accessible/root >/tmp/keepassxc-atspi-root.txt
-          echo "KeePassXC accessibility root confirmed over AT-SPI D-Bus."
-
-          echo "=== Qt accessibility evidence ==="
-          grep -E 'name="(KeePassXC|Database toolbar|Search|Create Database|Open Database|Toggle Password|Generate Password|New Entry|Edit Entry|Delete Entry|Copy Username|Copy Password|Perform Auto-Type|Copy URL|Lock Database)"' \
-            /tmp/keepassxc.log | head -50 || true
-
-          echo "=== Direct libatspi probe ==="
+          echo "=== Direct libatspi accessibility probe ==="
           python3 - <<'PY'
           import os
           import time
@@ -222,10 +193,36 @@ jobs:
           Atspi.exit()
           raise SystemExit(0 if found else 1)
           PY
+          echo "KeePassXC is visible through the AT-SPI API."
 
-          echo "=== KeePassXC AT-SPI cache path ==="
-          gdbus introspect --address="$AT_SPI_BUS_ADDRESS" \
-            --dest "$KEEPASS_BUS_NAME" --object-path /org/a11y/atspi/cache 2>&1 || true
+          echo "=== Qt accessibility evidence ==="
+          REQUIRED_ROOT_PATTERN='qt\.accessibility\.cache: insert.*name="KeePassXC".*role=Window'
+          REQUIRED_CONTROL_PATTERNS=(
+            'qt\.accessibility\.cache: insert.*name="Create Database"'
+            'qt\.accessibility\.cache: insert.*name="Open Database"'
+            'qt\.accessibility\.cache: insert.*name="Import File"'
+          )
+          CACHE_FALLBACK_OK=1
+          grep -qE "$REQUIRED_ROOT_PATTERN" /tmp/keepassxc.log || CACHE_FALLBACK_OK=0
+          MATCHED_CONTROLS=0
+          for pattern in "${REQUIRED_CONTROL_PATTERNS[@]}"; do
+            if grep -qE "$pattern" /tmp/keepassxc.log; then
+              MATCHED_CONTROLS=$((MATCHED_CONTROLS + 1))
+            fi
+          done
+          echo "Matched $MATCHED_CONTROLS/${#REQUIRED_CONTROL_PATTERNS[@]} required named controls in the accessibility cache trace."
+          if [ "$CACHE_FALLBACK_OK" -ne 1 ] || [ "$MATCHED_CONTROLS" -lt 2 ]; then
+            echo "ERROR: Qt accessibility cache evidence failed"
+            cat /tmp/keepassxc.log || true
+            exit 1
+          fi
+          echo "KeePassXC accessibility tree confirmed through Qt cache evidence."
+
+          echo "=== AT-SPI application bus diagnostics ==="
+          echo "No fixed application object path is required: AT-SPI application object paths are implementation/runtime dependent."
+          busctl --address="$AT_SPI_BUS_ADDRESS" tree "$KEEPASS_BUS_NAME" 2>&1 || true
+          gdbus introspect --address="$AT_SPI_BUS_ADDRESS" --dest "$KEEPASS_BUS_NAME" \
+            --object-path /org/a11y/atspi/cache 2>&1 || true
 
           echo "=== KeePassXC process status ==="
           ps -p "$APP_PID" -o pid=,stat=,cmd=
@@ -247,7 +244,6 @@ jobs:
           name: atspi-diagnostics
           path: |
             /tmp/keepassxc.log
-            /tmp/keepassxc-atspi-root.txt
             /tmp/at-spi-bus-launcher.log
             /tmp/at-spi-registryd.log
             /tmp/xvfb.log
