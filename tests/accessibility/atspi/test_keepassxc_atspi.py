@@ -169,6 +169,82 @@ def accessible_tree(keepassxc_app):
     return nodes_by_name
 
 
+def _has_state(node, state_type):
+    """Whether an accessible's AT-SPI state set contains the given state."""
+    try:
+        return bool(node.get_state_set().contains(state_type))
+    except Exception:
+        return False
+
+
+def _state_names(node):
+    """Human-readable state names for an accessible, for diagnostics only."""
+    try:
+        return sorted(s.value_nick for s in node.get_state_set().get_states())
+    except Exception:
+        return ["<error reading state set>"]
+
+
+def _interfaces(node):
+    """The AT-SPI D-Bus interfaces an accessible reports, for diagnostics
+    and for the (secondary) Action-interface check below."""
+    try:
+        return list(node.get_interfaces())
+    except Exception:
+        return ["<error reading interfaces>"]
+
+
+def _action_count(node):
+    """Number of AT-SPI actions an accessible exposes, or 0 if unsupported/unavailable."""
+    try:
+        n = node.get_n_actions()
+        return n if n is not None else 0
+    except Exception:
+        return 0
+
+
+def _describe(node):
+    """Compact diagnostic string: name, role, states, interfaces, action count.
+
+    Used in every assertion message below so a failure shows what a
+    screen reader would actually perceive (or fail to perceive) about
+    the object, not just a bare True/False.
+    """
+    try:
+        name = node.get_name()
+    except Exception:
+        name = "<error>"
+    try:
+        role = node.get_role_name()
+    except Exception:
+        role = "<error>"
+    return (
+        f"[name={name!r} role={role!r} states={_state_names(node)} "
+        f"interfaces={_interfaces(node)} n_actions={_action_count(node)}]"
+    )
+
+
+def _find_control(accessible_tree, name, expected_role):
+    """Return the accessible named `name` that also has `expected_role`.
+
+    A required control's name can legitimately be shared by an unrelated
+    tree node (e.g. a menu action with the same text as a Welcome-screen
+    button); tests that check a role-specific property (state, actions,
+    parent link, ...) must anchor on the node that actually has the
+    expected role rather than an arbitrary same-named one. Returns None
+    if no candidate has that role -- callers should still assert and
+    report accessible_tree.get(name, []) for diagnostics in that case.
+    """
+    for node in accessible_tree.get(name, []):
+        try:
+            role = node.get_role_name()
+        except Exception:
+            continue
+        if role == expected_role:
+            return node
+    return None
+
+
 def test_keepassxc_is_exposed_as_an_application(keepassxc_app):
     """KeePassXC must be visible as its own application on the AT-SPI desktop."""
     name = keepassxc_app.get_name()
@@ -222,4 +298,258 @@ def test_required_control_has_expected_role(accessible_tree, expected_name):
     assert expected_role in roles_seen, (
         f"None of the {len(candidates)} accessible object(s) named "
         f"'{expected_name}' have role '{expected_role}'. Roles found: {roles_seen}"
+    )
+
+
+@pytest.mark.parametrize("expected_name", sorted(REQUIRED_CONTROLS))
+def test_required_control_has_accessible_name(accessible_tree, expected_name):
+    """The accessible name must be exactly the expected text.
+
+    This is a different check from "is present in the tree": that check
+    finds the node *by* this name, so it can't catch the name itself
+    being wrong. This confirms Qt's mnemonic marker ('&') and any
+    accidental leading/trailing whitespace never leak into the name a
+    screen reader would actually announce.
+    """
+    expected_role = REQUIRED_CONTROLS[expected_name]
+    node = _find_control(accessible_tree, expected_name, expected_role)
+    assert node is not None, (
+        f"No '{expected_role}' named '{expected_name}' found to check its accessible name "
+        "(see test_required_control_has_expected_role for the role-level failure)."
+    )
+
+    name = node.get_name()
+    assert name == expected_name, (
+        f"Accessible name was {name!r}, expected exactly {expected_name!r} -- a mnemonic "
+        f"marker or stray whitespace may be leaking into the AT-SPI name. {_describe(node)}"
+    )
+
+
+@pytest.mark.parametrize("expected_name", sorted(REQUIRED_CONTROLS))
+def test_required_control_exposes_action_interface(accessible_tree, expected_name):
+    """Required controls must expose at least one AT-SPI action.
+
+    get_n_actions() > 0 is what actually lets an AT invoke the control
+    (Orca's "click" via the Action interface), as opposed to merely
+    announcing it -- a control can keep its name and role while losing
+    this and still look fine in a superficial check.
+    """
+    expected_role = REQUIRED_CONTROLS[expected_name]
+    node = _find_control(accessible_tree, expected_name, expected_role)
+    assert node is not None, (
+        f"No '{expected_role}' named '{expected_name}' found to check for an action interface."
+    )
+
+    n_actions = _action_count(node)
+    assert n_actions > 0, (
+        f"'{expected_name}' exposes no AT-SPI actions (get_n_actions() == {n_actions}); "
+        f"an assistive technology could announce it but not activate it. {_describe(node)}"
+    )
+    # DBUS_INTERFACE_ACTION ("org.a11y.atspi.Action") is the interfaces()-list
+    # was verified against the actual installed bindings; get_n_actions() > 0
+    # above is the primary, unambiguous signal, and this membership check is
+    # kept secondary since it depends on the exact interface-name strings
+    # get_interfaces() returns, which weren't reachable to confirm end-to-end
+    # in this sandbox (see the accompanying report).
+    interfaces = _interfaces(node)
+    if interfaces and not any("error" in i for i in interfaces):
+        assert Atspi.DBUS_INTERFACE_ACTION in interfaces, (
+            f"'{expected_name}' has {n_actions} action(s) but its AT-SPI interface list "
+            f"does not include {Atspi.DBUS_INTERFACE_ACTION!r}: {interfaces}. {_describe(node)}"
+        )
+
+
+@pytest.mark.parametrize("expected_name", sorted(REQUIRED_CONTROLS))
+def test_required_control_is_enabled(accessible_tree, expected_name):
+    """Required controls must be reported as enabled/sensitive.
+
+    A control that is present, named, and has the right role but is
+    reported SENSITIVE=False or ENABLED=False would be announced by a
+    screen reader as greyed out / unusable -- effectively invisible to
+    someone who can't see that it's merely styled to look disabled.
+    """
+    expected_role = REQUIRED_CONTROLS[expected_name]
+    node = _find_control(accessible_tree, expected_name, expected_role)
+    assert node is not None, f"No '{expected_role}' named '{expected_name}' found to check state."
+
+    assert _has_state(node, Atspi.StateType.SENSITIVE), (
+        f"'{expected_name}' is not SENSITIVE. {_describe(node)}"
+    )
+    assert _has_state(node, Atspi.StateType.ENABLED), (
+        f"'{expected_name}' is not ENABLED. {_describe(node)}"
+    )
+
+
+@pytest.mark.parametrize("expected_name", sorted(REQUIRED_CONTROLS))
+def test_required_control_is_focusable(accessible_tree, expected_name):
+    """Required controls must be reported as focusable.
+
+    Keyboard/screen-reader users navigate by focus, not by mouse
+    position; a button that is visible and enabled but not FOCUSABLE is
+    unreachable to them even though a sighted mouse user would never
+    notice anything wrong.
+    """
+    expected_role = REQUIRED_CONTROLS[expected_name]
+    node = _find_control(accessible_tree, expected_name, expected_role)
+    assert node is not None, f"No '{expected_role}' named '{expected_name}' found to check state."
+
+    assert _has_state(node, Atspi.StateType.FOCUSABLE), (
+        f"'{expected_name}' is not FOCUSABLE. {_describe(node)}"
+    )
+
+
+@pytest.mark.parametrize("expected_name", sorted(REQUIRED_CONTROLS))
+def test_required_control_parent_link_is_consistent(accessible_tree, expected_name):
+    """A required control's AT-SPI parent link must round-trip correctly.
+
+    Real assistive technology walks the tree via parent/child links (and
+    reports position, e.g. "button 2 of 3"), so a control that is
+    reachable in a top-down walk but whose own get_parent()/
+    get_index_in_parent() do not agree with that parent's children would
+    still confuse an AT doing its own top-down-then-verify navigation,
+    even though this suite's own top-down walk already found it.
+    """
+    expected_role = REQUIRED_CONTROLS[expected_name]
+    node = _find_control(accessible_tree, expected_name, expected_role)
+    assert node is not None, f"No '{expected_role}' named '{expected_name}' found to check its parent link."
+
+    try:
+        parent = node.get_parent()
+    except Exception as exc:
+        parent = None
+        parent_error = str(exc)
+    else:
+        parent_error = None
+    assert parent is not None, (
+        f"'{expected_name}' has no AT-SPI parent (get_parent() returned None"
+        + (f", raised {parent_error}" if parent_error else "")
+        + f"). {_describe(node)}"
+    )
+
+    try:
+        index = node.get_index_in_parent()
+    except Exception:
+        index = -1
+    assert index is not None and index >= 0, (
+        f"'{expected_name}' reports an invalid get_index_in_parent() ({index}). {_describe(node)}"
+    )
+
+    sibling_at_index = None
+    try:
+        sibling_at_index = parent.get_child_at_index(index)
+    except Exception:
+        sibling_at_index = None
+    assert sibling_at_index is not None, (
+        f"'{expected_name}''s reported parent (name={parent.get_name()!r}, "
+        f"role={parent.get_role_name()!r}) has no child at index {index}."
+    )
+    assert sibling_at_index.get_name() == expected_name and sibling_at_index.get_role_name() == expected_role, (
+        f"'{expected_name}''s parent's child at index {index} does not match: got "
+        f"name={sibling_at_index.get_name()!r} role={sibling_at_index.get_role_name()!r}. "
+        "The parent/child relationship is inconsistent, which would confuse an AT navigating "
+        "by position (e.g. Orca announcing 'item N of M')."
+    )
+
+
+@pytest.mark.parametrize("expected_name", sorted(REQUIRED_CONTROLS))
+def test_required_control_belongs_to_keepassxc_application(accessible_tree, keepassxc_app, expected_name):
+    """A required control's owning application must resolve back to KeePassXC.
+
+    This is the other half of the parent/child story: not just "does
+    this node have *a* parent" but "does walking up from it land back on
+    the same application a screen reader already announced when it
+    switched focus to KeePassXC".
+    """
+    expected_role = REQUIRED_CONTROLS[expected_name]
+    node = _find_control(accessible_tree, expected_name, expected_role)
+    assert node is not None, f"No '{expected_role}' named '{expected_name}' found to check its owning application."
+
+    try:
+        owning_app = node.get_application()
+    except Exception as exc:
+        pytest.fail(f"'{expected_name}'.get_application() raised {exc!r}. {_describe(node)}")
+
+    assert owning_app is not None, f"'{expected_name}' reports no owning application. {_describe(node)}"
+    owning_name = owning_app.get_name() or ""
+    assert owning_name.lower() == APP_NAME.lower(), (
+        f"'{expected_name}' reports owning application {owning_name!r}, expected {APP_NAME!r}."
+    )
+
+
+def test_application_root_is_not_defunct(keepassxc_app):
+    """The application root itself must not be reported as defunct.
+
+    DEFUNCT means the underlying object is gone; every other test in
+    this module assumes the application root is still a live, queryable
+    object, so this failing is the first thing to check before any
+    control-level failure above is taken at face value.
+    """
+    assert not _has_state(keepassxc_app, Atspi.StateType.DEFUNCT), (
+        f"KeePassXC's application accessible object is DEFUNCT. {_describe(keepassxc_app)}"
+    )
+
+
+def test_application_root_reports_a_toolkit_name(keepassxc_app):
+    """Real ATs use the reported toolkit name/version for toolkit-specific
+    quirks handling (Orca does this for Qt vs. GTK apps); an application
+    root that reports no toolkit name at all degrades that handling.
+    """
+    toolkit_name = keepassxc_app.get_toolkit_name()
+    assert toolkit_name, (
+        f"KeePassXC's application object reports no AT-SPI toolkit name. {_describe(keepassxc_app)}"
+    )
+
+
+def test_application_root_exposes_accessible_interfaces(keepassxc_app):
+    """The application root should expose at least one AT-SPI interface.
+
+    A bare empty interface list on the root -- distinct from
+    test_accessible_tree_is_reachable, which checks that children exist
+    at all -- would mean even basic Accessible-level introspection isn't
+    being offered for the application object itself.
+    """
+    interfaces = _interfaces(keepassxc_app)
+    assert interfaces and not all("error" in i for i in interfaces), (
+        f"KeePassXC's application object exposes no usable AT-SPI interfaces. "
+        f"{_describe(keepassxc_app)}"
+    )
+
+
+@pytest.mark.parametrize("expected_name", sorted(REQUIRED_CONTROLS))
+def test_required_control_full_accessibility_contract(accessible_tree, expected_name):
+    """Regression guard: catches a control keeping its *name* while silently
+    losing everything that makes it actually usable via AT-SPI.
+
+    The tests above isolate role / action / state / parent-link failures
+    individually so a break is easy to diagnose. This test re-checks all
+    of them together against the exact same node and reports every
+    failing property in one message, so a future find/replace-style
+    Qt change (e.g. one that swaps a QPushButton for a bare QWidget with
+    the same text) is caught as a single, unambiguous "this control lost
+    its accessibility contract" failure rather than only surfacing as a
+    handful of unrelated-looking test failures elsewhere in this file.
+    """
+    expected_role = REQUIRED_CONTROLS[expected_name]
+    node = _find_control(accessible_tree, expected_name, expected_role)
+    assert node is not None, (
+        f"'{expected_name}' has no accessible object with role '{expected_role}' at all -- "
+        f"names found for '{expected_name}': "
+        f"{[c.get_role_name() for c in accessible_tree.get(expected_name, [])]}"
+    )
+
+    failures = []
+    if node.get_name() != expected_name:
+        failures.append(f"name is {node.get_name()!r}, expected {expected_name!r}")
+    if not _has_state(node, Atspi.StateType.SENSITIVE):
+        failures.append("missing SENSITIVE state")
+    if not _has_state(node, Atspi.StateType.ENABLED):
+        failures.append("missing ENABLED state")
+    if not _has_state(node, Atspi.StateType.FOCUSABLE):
+        failures.append("missing FOCUSABLE state")
+    if _action_count(node) <= 0:
+        failures.append(f"has {_action_count(node)} AT-SPI actions, expected at least 1")
+
+    assert not failures, (
+        f"'{expected_name}' kept its name and role but lost part of its accessibility "
+        f"contract: {'; '.join(failures)}. {_describe(node)}"
     )
