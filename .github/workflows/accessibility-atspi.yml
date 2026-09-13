@@ -85,7 +85,7 @@ jobs:
           sleep 2
 
           echo "=== Discovering AT-SPI bus ==="
-          AT_SPI_BUS_ADDRESS="$(busctl --user call org.a11y.Bus /org/a11y/bus org.a11y.Bus GetAddress | sed -n 's/^s \"\\(.*\\)\"$/\1/p')"
+          AT_SPI_BUS_ADDRESS="$(busctl --user call org.a11y.Bus /org/a11y/bus org.a11y.Bus GetAddress | sed -n 's/^s "\(.*\)"$/\1/p')"
           if [ -z "$AT_SPI_BUS_ADDRESS" ]; then
             echo "ERROR: org.a11y.Bus did not return an AT-SPI bus address"
             exit 1
