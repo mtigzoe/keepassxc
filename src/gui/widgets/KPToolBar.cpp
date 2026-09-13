@@ -76,6 +76,21 @@ void KPToolBar::updateButtonAccessibility()
             button->setFocusPolicy(Qt::TabFocus);
         }
     }
+
+    // m_expandButton (Qt's internal "qt_toolbar_ext_button", located via
+    // findChild() in init()) is not backed by a QAction, so the loop above
+    // never reaches it -- Qt never gives it an accessible name of its own.
+    // Screen readers therefore announced it as an unlabeled checkbox. It's
+    // the control that toggles this KPToolBar between its compact and
+    // expanded states (see isExpanded()/canExpand()/setExpanded()), so name
+    // it accordingly and make sure it's a Tab stop like every other button
+    // here, consistent with the "Show <panel>" naming already used for the
+    // other checkable toolbar toggles (actionDatabaseSettings, actionReports,
+    // actionPasswordGenerator, actionSettings).
+    if (m_expandButton) {
+        m_expandButton->setAccessibleName(tr("Show More Toolbar Buttons"));
+        m_expandButton->setFocusPolicy(Qt::TabFocus);
+    }
 }
 
 bool KPToolBar::event(QEvent* event)

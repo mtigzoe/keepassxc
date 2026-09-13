@@ -48,6 +48,42 @@ namespace
         HWND result = nullptr;
     };
 
+    // Narrows the main window just for testToolbarExpandButtonAccessible()
+    // (so the toolbar is forced to overflow and its extension button
+    // becomes visible), then unconditionally restores the original size --
+    // including if a QVERIFY2 in that test triggers an early "return;" --
+    // so later test slots aren't affected by a previous slot's window size.
+    class ScopedWindowResize
+    {
+    public:
+        explicit ScopedWindowResize(HWND hwnd)
+            : m_hwnd(hwnd)
+        {
+            GetWindowRect(m_hwnd, &m_originalRect);
+        }
+
+        ~ScopedWindowResize()
+        {
+            SetWindowPos(m_hwnd,
+                         nullptr,
+                         m_originalRect.left,
+                         m_originalRect.top,
+                         m_originalRect.right - m_originalRect.left,
+                         m_originalRect.bottom - m_originalRect.top,
+                         SWP_NOZORDER | SWP_NOACTIVATE);
+        }
+
+        void shrinkTo(int width, int height) const
+        {
+            ShowWindow(m_hwnd, SW_RESTORE);
+            SetWindowPos(m_hwnd, nullptr, 0, 0, width, height, SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+        }
+
+    private:
+        HWND m_hwnd;
+        RECT m_originalRect{};
+    };
+
     BOOL CALLBACK enumWindowsForProcess(HWND hwnd, LPARAM lParam)
     {
         auto* context = reinterpret_cast<FindWindowContext*>(lParam);
@@ -364,6 +400,18 @@ bool TestWindowsAccessibility::isDescendantOfMainWindow(
     return false;
 }
 
+bool TestWindowsAccessibility::elementSupportsTogglePattern(
+    const Microsoft::WRL::ComPtr<IUIAutomationElement>& element) const
+{
+    if (!element) {
+        return false;
+    }
+
+    Microsoft::WRL::ComPtr<IUIAutomationTogglePattern> pattern;
+    HRESULT hr = element->GetCurrentPatternAs(UIA_TogglePatternId, IID_PPV_ARGS(&pattern));
+    return SUCCEEDED(hr) && pattern;
+}
+
 void TestWindowsAccessibility::testMainWindowIdentity()
 {
     // === Verify its UIA Name is "KeePassXC". ===
@@ -410,4 +458,38 @@ void TestWindowsAccessibility::testWelcomeScreenButtonsTreeRelationships()
                  qPrintable(QString("\"%1\" should be a UI Automation descendant of the KeePassXC main window")
                                 .arg(buttonName)));
     }
+}
+
+void TestWindowsAccessibility::testToolbarExpandButtonAccessible()
+{
+    // === Force the toolbar to overflow so its extension button appears. ===
+    // A generously narrow width -- comfortably less than the "Database
+    // toolbar"'s natural width with every action visible -- guarantees
+    // overflow regardless of the runner's DPI/font metrics.
+    ScopedWindowResize resize(m_mainWindowHandle);
+    resize.shrinkTo(360, 500);
+
+    // === Find the extension button by its new accessible name. ===
+    VERIFY_UIA_ELEMENT(element, "Show More Toolbar Buttons");
+
+    // === Verify it is exposed as a CheckBox. ===
+    // (Matches the ControlType Qt already reports for this app's other
+    // checkable toolbar toggles, e.g. "Show Database Settings" --
+    // confirmed against a live UIA dump of this build.)
+    QCOMPARE(elementControlType(element), static_cast<CONTROLTYPEID>(UIA_CheckBoxControlTypeId));
+
+    // === Verify its UIA Name matches exactly. ===
+    QCOMPARE(elementName(element), QString("Show More Toolbar Buttons"));
+
+    // === Verify it's a genuine descendant of the main window. ===
+    QVERIFY2(isDescendantOfMainWindow(element),
+             "\"Show More Toolbar Buttons\" should be a UI Automation descendant of the KeePassXC main window");
+
+    // === Verify it exposes a working Toggle pattern. ===
+    // A CheckBox ControlType with no Toggle pattern is a name/role match
+    // that still leaves JAWS unable to report or drive its checked state --
+    // this is the "any other important properties" check the plain name
+    // assertion above would miss.
+    QVERIFY2(elementSupportsTogglePattern(element),
+             "\"Show More Toolbar Buttons\" should expose a UI Automation Toggle pattern");
 }

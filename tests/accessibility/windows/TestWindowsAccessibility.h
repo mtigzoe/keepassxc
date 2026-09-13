@@ -78,6 +78,14 @@ private slots:
     //         button is a genuine UIA descendant of the main window.
     void testWelcomeScreenButtonsTreeRelationships();
 
+    // Covers: KPToolBar's internal "more items" extension button
+    // (Qt's qt_toolbar_ext_button, not backed by a QAction) has a real UIA
+    // Name, the CheckBox ControlType Qt already gives it, and a working
+    // Toggle pattern -- not just an unlabeled checkbox. The button is only
+    // present in the accessible tree once the toolbar can't fit all of its
+    // actions, so this test shrinks the main window first.
+    void testToolbarExpandButtonAccessible();
+
 private:
     bool launchKeePassXC();
     HWND waitForTopLevelWindow(DWORD processId, int timeoutMs) const;
@@ -94,6 +102,7 @@ private:
     CONTROLTYPEID elementControlType(const Microsoft::WRL::ComPtr<IUIAutomationElement>& element) const;
     bool elementIsEnabled(const Microsoft::WRL::ComPtr<IUIAutomationElement>& element) const;
     bool isDescendantOfMainWindow(const Microsoft::WRL::ComPtr<IUIAutomationElement>& element) const;
+    bool elementSupportsTogglePattern(const Microsoft::WRL::ComPtr<IUIAutomationElement>& element) const;
 
     Microsoft::WRL::ComPtr<IUIAutomation> m_automation;
     Microsoft::WRL::ComPtr<IUIAutomationElement> m_mainWindowElement;
