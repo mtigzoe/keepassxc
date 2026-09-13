@@ -27,7 +27,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            build-essential cmake ninja-build pkg-config git \
+            build-essential cmake ninja-build pkg-config git gdb \
             qt6-base-dev qt6-tools-dev qt6-tools-dev-tools qt6-l10n-tools libqt6svg6-dev \
             libbotan-2-dev zlib1g-dev libminizip-dev libargon2-dev libqrencode-dev libreadline-dev \
             libpcsclite-dev libusb-1.0-0-dev libkeyutils-dev \
@@ -57,6 +57,11 @@ jobs:
           #!/usr/bin/env bash
           set -euo pipefail
 
+          # Keep a core-dump limit available in case the runner/kernel permits
+          # writing one. The gdb wrapper below is the primary crash diagnostic.
+          ulimit -c unlimited || true
+          echo 'core.%p' | sudo tee /proc/sys/kernel/core_pattern >/dev/null 2>&1 || true
+
           fluxbox >/dev/null 2>&1 &
           FLUXBOX_PID=$!
           sleep 1
@@ -75,6 +80,8 @@ jobs:
           echo "QT_LINUX_ACCESSIBILITY_ALWAYS_ON=$QT_LINUX_ACCESSIBILITY_ALWAYS_ON"
           echo "QT_QPA_PLATFORM=$QT_QPA_PLATFORM"
           echo "toolkit-accessibility=$(gsettings get org.gnome.desktop.interface toolkit-accessibility)"
+          echo "core_pattern=$(cat /proc/sys/kernel/core_pattern 2>/dev/null || true)"
+          echo "core_limit=$(ulimit -c)"
 
           echo "=== Starting AT-SPI bus launcher ==="
           if [ -x /usr/libexec/at-spi-bus-launcher ]; then
@@ -168,13 +175,33 @@ jobs:
           fi
           echo "AT-SPI registry Socket is ready"
 
-          echo "=== Launching KeePassXC ==="
-          ./build-debug/src/keepassxc >/tmp/keepassxc.log 2>&1 &
+          echo "=== Launching KeePassXC under gdb ==="
+          # Running the GUI under gdb lets us capture the exact Qt/AT-SPI stack
+          # when the application receives SIGSEGV. The debugger remains attached
+          # while pytest exercises the accessibility API.
+          gdb -q -batch \
+            -ex 'set pagination off' \
+            -ex 'set confirm off' \
+            -ex 'set logging file /tmp/keepassxc-gdb.txt' \
+            -ex 'set logging overwrite on' \
+            -ex 'set logging on' \
+            -ex run \
+            -ex 'echo \\n=== gdb crash/exit diagnostics ===\\n' \
+            -ex 'info program' \
+            -ex 'info signals' \
+            -ex 'info registers' \
+            -ex 'thread apply all bt full' \
+            -ex 'set logging off' \
+            --args ./build-debug/src/keepassxc >/tmp/keepassxc.log 2>&1 &
           APP_PID=$!
           sleep 2
 
           echo "=== KeePassXC environment ==="
-          tr '\0' '\n' </proc/$APP_PID/environ | grep -E '^(DISPLAY|DBUS_SESSION_BUS_ADDRESS|AT_SPI_BUS_ADDRESS|ATSPI_BUS_ADDRESS|QT_ACCESSIBILITY|QT_LINUX_ACCESSIBILITY_ALWAYS_ON|QT_QPA_PLATFORM|QT_DEBUG_PLUGINS)=' | sort || true
+          if [ -r "/proc/$APP_PID/environ" ]; then
+            tr '\0' '\n' </proc/$APP_PID/environ | grep -E '^(DISPLAY|DBUS_SESSION_BUS_ADDRESS|AT_SPI_BUS_ADDRESS|ATSPI_BUS_ADDRESS|QT_ACCESSIBILITY|QT_LINUX_ACCESSIBILITY_ALWAYS_ON|QT_QPA_PLATFORM|QT_DEBUG_PLUGINS)=' | sort || true
+          else
+            echo "gdb process environment is no longer available"
+          fi
 
           echo "=== Running the AT-SPI accessibility regression test ==="
           set +e
@@ -194,10 +221,16 @@ jobs:
           fi
 
           echo "=== Qt accessibility diagnostics ==="
-          grep -E 'QFactoryLoader|QSpi|AT-SPI|Accessibility|DBus|accessiblebridge|qspi' /tmp/keepassxc.log || true
+          grep -E 'QFactoryLoader|QSpi|AT-SPI|Accessibility|DBus|accessiblebridge|qspi|segmentation|SIGSEGV' /tmp/keepassxc.log || true
 
           echo "=== KeePassXC process status ==="
           ps -p "$APP_PID" -o pid=,stat=,cmd= || true
+
+          echo "=== gdb backtrace ==="
+          cat /tmp/keepassxc-gdb.txt 2>/dev/null || echo "No gdb diagnostic log was produced."
+
+          echo "=== Core files ==="
+          find . /tmp -maxdepth 2 -type f -name 'core*' -printf '%p %s bytes\\n' 2>/dev/null || true
 
           kill "$APP_PID" 2>/dev/null || true
           [ -n "${ATSPI_REGISTRY_PID:-}" ] && kill "$ATSPI_REGISTRY_PID" 2>/dev/null || true
@@ -220,8 +253,10 @@ jobs:
           name: atspi-diagnostics
           path: |
             /tmp/keepassxc.log
+            /tmp/keepassxc-gdb.txt
             /tmp/at-spi-bus-launcher.log
             /tmp/at-spi-registryd.log
             /tmp/xvfb.log
             /tmp/atspi-test-results.xml
+            /tmp/core*
           if-no-files-found: ignore
