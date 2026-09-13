@@ -110,9 +110,21 @@ ReportsWidgetBrowserStatistics::ReportsWidgetBrowserStatistics(QWidget* parent)
             SLOT(customMenuRequested(QPoint)));
     connect(
         m_ui->browserStatisticsTableView, SIGNAL(doubleClicked(QModelIndex)), SLOT(emitEntryActivated(QModelIndex)));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    connect(m_ui->showEntriesWithUrlOnlyCheckBox, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(calculateBrowserStatistics()));
+#else
     connect(m_ui->showEntriesWithUrlOnlyCheckBox, SIGNAL(stateChanged(int)), this, SLOT(calculateBrowserStatistics()));
+#endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    connect(m_ui->showAllowDenyCheckBox, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(calculateBrowserStatistics()));
+#else
     connect(m_ui->showAllowDenyCheckBox, SIGNAL(stateChanged(int)), this, SLOT(calculateBrowserStatistics()));
+#endif
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    connect(m_ui->showExpired, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(calculateBrowserStatistics()));
+#else
     connect(m_ui->showExpired, SIGNAL(stateChanged(int)), this, SLOT(calculateBrowserStatistics()));
+#endif
 
     new QShortcut(Qt::Key_Delete, this, SLOT(deleteSelectedEntries()));
 }

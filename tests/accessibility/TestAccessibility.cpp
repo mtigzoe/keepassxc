@@ -300,8 +300,8 @@ void TestAccessibility::testToolbarButtonsAccessible()
         const char* actionName;
         const char* expectedName;
     } controls[] = {
-        {"actionDatabaseNew", "Create Database"},
         {"actionDatabaseOpen", "Open Database"},
+        {"actionDatabaseSave", "Save Database"},
         {"actionEntryNew", "New Entry"},
         {"actionEntryEdit", "Edit Entry"},
     };
@@ -322,20 +322,65 @@ void TestAccessibility::testToolbarButtonsAccessible()
         // Toolbar buttons must be reachable via Tab while enabled, not just
         // mouse click or the underlying action's shortcut -- regression
         // coverage in the same spirit as the PasswordWidget toggle/generator
-        // focus fix. A disabled control should NOT be a Tab stop, and the
-        // accessible tree must say so too -- a screen reader user landing on
-        // a "focusable but disabled" control gets an inconsistent
-        // experience. actionEntryEdit starts disabled here (no entry is
+        // focus fix. actionEntryEdit starts disabled here (no entry is
         // selected yet), which lets this loop check both states for free.
+        //
+        // NOTE on `focusable` and disabled controls: QAccessibleWidget::state()
+        // (the base every QAbstractButton/QToolButton accessible interface
+        // builds on) derives `focusable` purely from QWidget::focusPolicy(),
+        // never from QWidget::isEnabled() -- confirmed against qtbase across
+        // Qt4 through current Qt6, and consistent with the documented meaning
+        // of QAccessible::State::focusable ("The object can receive focus",
+        // qaccessible-state.html), which says nothing about enabled state.
+        // KPToolBar::updateButtonAccessibility() (KPToolBar.cpp) gives every
+        // toolbar button Qt::TabFocus unconditionally, enabled or not, so
+        // that individual buttons are Tab-reachable at all; it doesn't (and
+        // per upstream Qt convention shouldn't) revoke that policy just
+        // because the button is temporarily disabled -- every other disabled
+        // Qt widget with a focus policy behaves the same way. So a disabled
+        // toolbar button legitimately reports `focusable == true` here; that
+        // is not a KeePassXC bug. What screen readers and this test actually
+        // need verified is (a) `disabled` is reported correctly, which is
+        // what an AT client keys off of, and (b) real keyboard Tab traversal
+        // -- not the `focusable` bit -- genuinely skips the disabled button,
+        // which is checked separately below via QTest key events.
         QCOMPARE(buttonIface->state().disabled, !button->isEnabled());
         if (button->isEnabled()) {
             QVERIFY2(buttonIface->state().focusable,
                      qPrintable(QString("%1 should be keyboard-focusable while enabled").arg(control.actionName)));
-        } else {
-            QVERIFY2(!buttonIface->state().focusable,
-                     qPrintable(QString("%1 should not be a Tab stop while disabled").arg(control.actionName)));
         }
     }
+
+    // Real keyboard-reachability regression for a disabled toolbar button:
+    // Tab from the enabled "Open Database" button must move focus away from
+    // "Open Database" and must not land on the disabled "Save Database"
+    // button (no unsaved changes yet). This is the property that actually
+    // matters for keyboard/screen-reader users -- unlike the accessible
+    // `focusable` bit (see note above), Qt's real focus-chain traversal does
+    // exclude disabled widgets regardless of their focus policy.
+    //
+    // This deliberately does NOT assert which specific widget comes next
+    // (same spirit as the welcome-screen Tab check above): KPToolBar can
+    // collapse overflowing buttons behind an expand button depending on
+    // window width, so the exact next stop after "Open Database" isn't
+    // stable -- e.g. at this test's window size it's the search field, not
+    // the next toolbar action. Asserting a specific destination would make
+    // this test brittle against layout changes unrelated to accessibility.
+    auto* openAction = m_mainWindow->findChild<QAction*>("actionDatabaseOpen");
+    auto* saveAction = m_mainWindow->findChild<QAction*>("actionDatabaseSave");
+    auto* openButton = toolBar->widgetForAction(openAction);
+    auto* saveButton = toolBar->widgetForAction(saveAction);
+    QVERIFY2(!saveButton->isEnabled(), "actionDatabaseSave should still be disabled (no unsaved changes)");
+
+    openButton->setFocus(Qt::TabFocusReason);
+    QTRY_VERIFY(openButton->hasFocus());
+    QTest::keyClick(openButton, Qt::Key_Tab);
+    QApplication::processEvents();
+    auto* focusAfterTab = QApplication::focusWidget();
+    QVERIFY2(focusAfterTab && focusAfterTab != openButton,
+             "Tab should move keyboard focus away from Open Database");
+    QVERIFY2(focusAfterTab != saveButton,
+             "Tab should skip the disabled Save Database button, not land on it");
 
     // Round-trip actionEntryEdit specifically: selecting an entry should
     // flip it from disabled to enabled, and the accessible tree needs to

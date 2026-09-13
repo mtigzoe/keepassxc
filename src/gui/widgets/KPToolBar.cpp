@@ -76,6 +76,19 @@ void KPToolBar::updateButtonAccessibility()
             button->setFocusPolicy(Qt::TabFocus);
         }
     }
+
+    // The overflow/"extension" chevron Qt itself creates (QToolBarExtension,
+    // objectName "qt_toolbar_ext_button") when not all actions fit at the
+    // current toolbar width isn't backed by a QAction, so the loop above
+    // never reaches it. It also has no accessible name of its own to fall
+    // back on: QToolBarExtension's constructor (qtoolbarextension.cpp) only
+    // sets an object name, auto-raise, size policy, checkable, and an icon
+    // via a custom paintEvent() -- it never calls setText(), setToolTip(),
+    // or setAccessibleName(). Screen reader users tabbing to it otherwise
+    // hear only "button" with no indication of what it does.
+    if (m_expandButton) {
+        m_expandButton->setAccessibleName(tr("Show more toolbar items"));
+    }
 }
 
 bool KPToolBar::event(QEvent* event)

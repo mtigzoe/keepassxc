@@ -106,7 +106,11 @@ ReportsWidgetPasskeys::ReportsWidgetPasskeys(QWidget* parent)
             SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
             this,
             SLOT(selectionChanged()));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    connect(m_ui->showExpired, SIGNAL(checkStateChanged(Qt::CheckState)), this, SLOT(updateEntries()));
+#else
     connect(m_ui->showExpired, SIGNAL(stateChanged(int)), this, SLOT(updateEntries()));
+#endif
     connect(m_ui->exportButton, SIGNAL(clicked(bool)), this, SLOT(exportPasskey()));
     connect(m_ui->importButton, SIGNAL(clicked(bool)), this, SLOT(importPasskey()));
 

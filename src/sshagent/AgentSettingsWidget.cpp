@@ -35,7 +35,11 @@ AgentSettingsWidget::AgentSettingsWidget(QWidget* parent)
     m_ui->sshAuthSockMessageWidget->setVisible(sshAgent()->isEnabled());
     m_ui->sshAuthSockMessageWidget->setCloseButtonVisible(false);
     m_ui->sshAuthSockMessageWidget->setAutoHideTimeout(-1);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 7, 0)
+    connect(m_ui->enableSSHAgentCheckBox, SIGNAL(checkStateChanged(Qt::CheckState)), SLOT(toggleSettingsEnabled()));
+#else
     connect(m_ui->enableSSHAgentCheckBox, SIGNAL(stateChanged(int)), SLOT(toggleSettingsEnabled()));
+#endif
 }
 
 AgentSettingsWidget::~AgentSettingsWidget()
