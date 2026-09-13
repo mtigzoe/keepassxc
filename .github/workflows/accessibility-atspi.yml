@@ -1,10 +1,11 @@
 # AT-SPI accessibility regression check on Linux.
 # Exercises the accessibility tree used by Orca and other screen readers.
 #
-# This workflow only sets up the environment (Xvfb, the AT-SPI bus and
-# registry, a running KeePassXC process) and runs the regression suite in
-# tests/accessibility/atspi/test_keepassxc_atspi.py. All AT-SPI assertions
-# live in that test file, not here -- see its module docstring.
+# The application runs inside dbus-run-session so Qt can discover the
+# accessibility bus through org.a11y.Bus on its normal session bus. We do not
+# export AT_SPI_BUS_ADDRESS to KeePassXC because Qt 6.4 has a different
+# initialization path for that override; the normal discovery path is the
+# portable configuration for this CI environment.
 
 name: Accessibility (AT-SPI)
 
@@ -64,12 +65,15 @@ jobs:
           export QT_LINUX_ACCESSIBILITY_ALWAYS_ON=1
           export QT_ACCESSIBILITY=1
           export QT_QPA_PLATFORM=xcb
-          export QT_LOGGING_RULES="qt.accessibility.*=true"
+          export QT_LOGGING_RULES="qt.accessibility.*=true;qt.qpa.*=true"
+          export QT_DEBUG_PLUGINS=1
 
           echo "=== Accessibility environment ==="
           echo "DISPLAY=$DISPLAY"
+          echo "DBUS_SESSION_BUS_ADDRESS=${DBUS_SESSION_BUS_ADDRESS:-<unset>}"
           echo "QT_ACCESSIBILITY=$QT_ACCESSIBILITY"
           echo "QT_LINUX_ACCESSIBILITY_ALWAYS_ON=$QT_LINUX_ACCESSIBILITY_ALWAYS_ON"
+          echo "QT_QPA_PLATFORM=$QT_QPA_PLATFORM"
           echo "toolkit-accessibility=$(gsettings get org.gnome.desktop.interface toolkit-accessibility)"
 
           echo "=== Starting AT-SPI bus launcher ==="
@@ -90,16 +94,9 @@ jobs:
             echo "ERROR: org.a11y.Bus did not return an AT-SPI bus address"
             exit 1
           fi
-          export AT_SPI_BUS_ADDRESS
-          export ATSPI_BUS_ADDRESS="$AT_SPI_BUS_ADDRESS"
           echo "AT_SPI_BUS_ADDRESS=$AT_SPI_BUS_ADDRESS"
 
           echo "=== Enabling AT-SPI accessibility status ==="
-          # Qt's Linux AT-SPI bridge normally activates when the accessibility
-          # status on the session bus says accessibility is enabled. Keep the
-          # environment-variable override below as a second, toolkit-specific
-          # safeguard, but explicitly advertise the same state as a real AT
-          # client so the CI session exercises the normal registration path.
           gdbus call --session \
             --dest org.a11y.Bus \
             --object-path /org/a11y/bus \
@@ -174,12 +171,12 @@ jobs:
           echo "=== Launching KeePassXC ==="
           ./build-debug/src/keepassxc >/tmp/keepassxc.log 2>&1 &
           APP_PID=$!
+          sleep 2
+
+          echo "=== KeePassXC environment ==="
+          tr '\0' '\n' </proc/$APP_PID/environ | grep -E '^(DISPLAY|DBUS_SESSION_BUS_ADDRESS|AT_SPI_BUS_ADDRESS|ATSPI_BUS_ADDRESS|QT_ACCESSIBILITY|QT_LINUX_ACCESSIBILITY_ALWAYS_ON|QT_QPA_PLATFORM|QT_DEBUG_PLUGINS)=' | sort || true
 
           echo "=== Running the AT-SPI accessibility regression test ==="
-          # test_keepassxc_atspi.py owns every assertion about the accessible
-          # tree, including polling for KeePassXC to appear on the AT-SPI
-          # desktop; this step is only responsible for the environment and
-          # collecting diagnostics if it fails.
           set +e
           python3 -m pytest tests/accessibility/atspi/test_keepassxc_atspi.py -v \
             --junitxml=/tmp/atspi-test-results.xml
@@ -195,6 +192,9 @@ jobs:
           else
             echo "KeePassXC never appeared on the AT-SPI bus as a named connection."
           fi
+
+          echo "=== Qt accessibility diagnostics ==="
+          grep -E 'QFactoryLoader|QSpi|AT-SPI|Accessibility|DBus|accessiblebridge|qspi' /tmp/keepassxc.log || true
 
           echo "=== KeePassXC process status ==="
           ps -p "$APP_PID" -o pid=,stat=,cmd= || true
