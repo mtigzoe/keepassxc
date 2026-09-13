@@ -26,10 +26,10 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 # They intentionally do NOT prove that a given platform's native AT stack
 # renders this tree correctly end-to-end; that is a separate, platform-specific
 # concern covered by .github/workflows/accessibility-atspi.yml on Linux and
-# tools/dump_tree_windows.py on Windows. Both layers matter: this suite
-# guards the Qt-level accessibility tree that both native backends are fed
-# from, so regressions are caught immediately without needing a full native
-# AT round trip for every change.
+# tests/accessibility/windows/dump_uia_tree.py on Windows. Both layers matter:
+# this suite guards the Qt-level accessibility tree that both native backends
+# are fed from, so regressions are caught immediately without needing a full
+# native AT round trip for every change.
 add_unit_test(NAME testaccessibility SOURCES TestAccessibility.cpp ../util/TemporaryFile.cpp LIBS ${TEST_LIBRARIES})
 
 # Windows-native UI Automation tests, covering the native accessibility
