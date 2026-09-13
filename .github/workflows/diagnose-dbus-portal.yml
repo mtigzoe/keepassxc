@@ -1,0 +1,77 @@
+name: Diagnose Qt D-Bus Portal
+
+on:
+  push:
+    branches: [keepassxc-tests]
+  workflow_dispatch:
+
+jobs:
+  dbus-portal-probe:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Qt D-Bus probe dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends qt6-base-dev dbus-x11 gdb pkg-config
+
+      - name: Probe portal service and Qt QDBusInterface
+        run: |
+          cat > /tmp/dbus-portal-probe.cpp <<'CPP'
+          #include <QCoreApplication>
+          #include <QDBusConnection>
+          #include <QDBusConnectionInterface>
+          #include <QDBusInterface>
+          #include <QDebug>
+
+          int main(int argc, char** argv)
+          {
+              QCoreApplication app(argc, argv);
+              auto bus = QDBusConnection::sessionBus();
+              qDebug() << "sessionBus connected:" << bus.isConnected();
+              if (!bus.isConnected()) {
+                  qDebug() << "sessionBus error:" << bus.lastError().name() << bus.lastError().message();
+                  return 2;
+              }
+
+              auto* iface = bus.interface();
+              const bool registered = iface && iface->isServiceRegistered(QStringLiteral("org.freedesktop.portal.Desktop"));
+              qDebug() << "portal service registered:" << registered;
+
+              if (!registered) {
+                  qWarning() << "Portal service is absent; testing QDBusInterface construction anyway.";
+              }
+
+              QDBusInterface portal(
+                  QStringLiteral("org.freedesktop.portal.Desktop"),
+                  QStringLiteral("/org/freedesktop/portal/desktop"),
+                  QStringLiteral("org.freedesktop.portal.Settings"),
+                  bus);
+
+              qDebug() << "portal interface valid:" << portal.isValid();
+              qDebug() << "portal interface error:" << portal.lastError().name() << portal.lastError().message();
+              return 0;
+          }
+          CPP
+
+          g++ -std=c++17 /tmp/dbus-portal-probe.cpp -o /tmp/dbus-portal-probe $(pkg-config --cflags --libs Qt6Core Qt6DBus)
+
+          dbus-run-session -- bash -c '
+            echo "=== D-Bus environment ==="
+            echo "DBUS_SESSION_BUS_ADDRESS=$DBUS_SESSION_BUS_ADDRESS"
+            echo "=== Portal package state ==="
+            dpkg-query -W -f="${Status} ${Package} ${Version}\\n" xdg-desktop-portal xdg-desktop-portal-gtk 2>&1 || true
+            echo "=== Portal service before probe ==="
+            busctl --user status org.freedesktop.portal.Desktop 2>&1 || true
+            echo "=== Qt probe ==="
+            /tmp/dbus-portal-probe
+          '
+
+      - name: Reproduce under gdb
+        if: always()
+        run: |
+          dbus-run-session -- gdb -q -batch \
+            -ex "set pagination off" \
+            -ex run \
+            -ex "thread apply all bt full" \
+            --args /tmp/dbus-portal-probe > /tmp/dbus-portal-gdb.txt 2>&1 || true
+          cat /tmp/dbus-portal-gdb.txt
