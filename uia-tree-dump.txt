@@ -12,7 +12,7 @@ UIA accessible tree for window matching '.*KeePassXC.*'
       [Custom] (no accessible name)  -- visible, enabled
         [Text] WARNING: You are using a development snapshot build of KeePassXC.
 Maintain a backup of your databases in the event of unknown bugs.
-This version is not meant for production use.  -- visible, enabled, focusable, focused
+This version is not meant for production use.  -- visible, enabled, focusable
         [Button] Close  -- visible, enabled, focusable
         [Button] Don't show again for this version  -- visible, enabled, focusable
     [Pane] (no accessible name)  -- visible, enabled
@@ -25,7 +25,7 @@ This version is not meant for production use.  -- visible, enabled, focusable, f
           [Button] Import File  -- visible, enabled, focusable
           [Text] Recent databases  -- visible, enabled
           [List] Open a recent database  -- visible, enabled, focusable
-            [ListItem] C:\Users\Miriam\AppData\Local\Temp\KeePassXC.PmDpaY  -- visible, enabled, focusable
+            [ListItem] C:\Users\Miriam\AppData\Local\Temp\KeePassXC.PmDpaY  -- visible, enabled, focusable, focused
   [MenuBar] (no accessible name)  -- visible, enabled
     [MenuItem] Database  -- visible, enabled
     [MenuItem] Entries  -- visible, enabled

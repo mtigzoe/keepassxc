@@ -130,6 +130,17 @@ def dump_node(node, out, depth=0):
         role = node.element_info.control_type or "(no control type)"
     except Exception:
         role = "(control type unavailable)"
+    try:
+        # The underlying Qt widget class (e.g. "QToolButton", "QCheckBox").
+        # Qt's accessibility bridge exposes this as the UIA ClassName
+        # property. For an unnamed/unclear element, this is often the
+        # fastest way to identify exactly which widget it is without
+        # round-tripping through a source-code guess -- e.g. distinguishing
+        # a real QCheckBox from a checkable QToolButton (Qt reports both as
+        # ControlType CheckBox) that some other code merely forgot to name.
+        class_name = node.element_info.class_name or "(no class name)"
+    except Exception:
+        class_name = "(class name unavailable)"
 
     flags = []
     for attr, label in STATE_METHODS:
@@ -140,7 +151,7 @@ def dump_node(node, out, depth=0):
             pass
     flag_str = ", ".join(flags) if flags else "(no notable state)"
 
-    line = f"{'  ' * depth}[{role}] {name}  -- {flag_str}"
+    line = f"{'  ' * depth}[{role}] {name}  ({class_name})  -- {flag_str}"
     print(line)
     out.write(line + "\n")
 

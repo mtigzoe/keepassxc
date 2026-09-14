@@ -61,6 +61,25 @@ void KPToolBar::setExpanded(bool state)
 
 void KPToolBar::updateButtonAccessibility()
 {
+    // m_expandButton is normally captured once, in init(), when this
+    // KPToolBar is constructed. But QToolBarLayout creates its internal
+    // overflow/"extension" button (Qt's own "qt_toolbar_ext_button")
+    // lazily -- the first time it actually computes whether every action
+    // fits -- which has not necessarily happened yet at construction
+    // time, before the toolbar has ever been shown or laid out. If that
+    // first findChild() in init() ran before Qt had created the button,
+    // m_expandButton is left permanently null (nothing ever re-queries
+    // it), even though the real widget exists and is visible once the
+    // toolbar actually lays out. Re-resolve it here too, so a still-lazy
+    // button on that first pass isn't permanently missed. This is exactly
+    // why the previous fix (which only ever wrote through the possibly-
+    // still-null m_expandButton) had no visible effect: the accessible
+    // name was written, if at all, to a pointer that was never the live
+    // widget.
+    if (!m_expandButton) {
+        m_expandButton = findChild<QAbstractButton*>(QStringLiteral("qt_toolbar_ext_button"));
+    }
+
     for (QAction* action : actions()) {
         if (action->isSeparator()) {
             continue;
@@ -77,9 +96,8 @@ void KPToolBar::updateButtonAccessibility()
         }
     }
 
-    // m_expandButton (Qt's internal "qt_toolbar_ext_button", located via
-    // findChild() in init()) is not backed by a QAction, so the loop above
-    // never reaches it -- Qt never gives it an accessible name of its own.
+    // m_expandButton is not backed by a QAction, so the loop above never
+    // reaches it -- Qt never gives it an accessible name of its own.
     // Screen readers therefore announced it as an unlabeled checkbox. It's
     // the control that toggles this KPToolBar between its compact and
     // expanded states (see isExpanded()/canExpand()/setExpanded()), so name
