@@ -12,7 +12,7 @@ UIA accessible tree for window matching '.*KeePassXC.*'
       [Custom] (no accessible name)  (QFrame)  -- visible, enabled
         [Text] WARNING: You are using a development snapshot build of KeePassXC.
 Maintain a backup of your databases in the event of unknown bugs.
-This version is not meant for production use.  (QLabel)  -- visible, enabled, focusable
+This version is not meant for production use.  (QLabel)  -- visible, enabled, focusable, focused
         [Button] Close  (QToolButton)  -- visible, enabled, focusable
         [Button] Don't show again for this version  (QToolButton)  -- visible, enabled, focusable
     [Pane] (no accessible name)  (QStackedWidget)  -- visible, enabled

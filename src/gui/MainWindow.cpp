@@ -1621,18 +1621,32 @@ void MainWindow::updateProgressBar(int percentage, QString message)
         m_progressBarLabel->setText(message);
         m_progressBarLabel->setVisible(true);
 
-        // QLabel text changes are silent to screen readers by default --
-        // the same gap updateEntryCountLabel() already fixes for
-        // m_statusBarLabel below, and just as real here: this label is the
-        // only surface for the clipboard-clear countdown
-        // (Clipboard::sendCountdownStatus()) and sync/reload progress
-        // messages (DatabaseWidget's updateSyncProgress() call sites --
-        // "Downloading...", "Syncing...", "Reload successful", etc.), none
-        // of which currently reach JAWS at all. Only fired on an actual
-        // message update, not on the hide branch above: the final message
-        // was already announced before this widget disappears, and a
-        // widget going invisible doesn't need a Name-changed notification.
-        QAccessibleEvent accessibleEvent(m_progressBarLabel, QAccessible::NameChanged);
+        // NOT QAccessible::NameChanged -- that was my first attempt, and
+        // it's silently ineffective on Windows specifically. Qt's Windows
+        // UIA bridge (qtbase, src/plugins/platforms/windows/uiautomation/
+        // qwindowsuiamainprovider.cpp, notifyNameChange()) only forwards a
+        // NameChanged event into a real UIA notification when the widget's
+        // role is QAccessible::ComboBox -- for every other role, including
+        // this QLabel's StaticText role, the event is received and silently
+        // dropped. That's a deliberate restriction in Qt itself ("avoid
+        // slowdowns with unnecessary notifications"), not a bug, but it
+        // means the previous fix here compiled, ran, and updated the
+        // interface's Name correctly, while never actually reaching JAWS.
+        //
+        // The mechanism Qt's Windows bridge actually forwards for an
+        // arbitrary widget is QAccessible::ValueChanged carrying a QString
+        // value (same file, notifyValueChange()'s QString branch): it calls
+        // UiaRaiseNotificationEvent() -- the UIA API purpose-built for
+        // transient status announcements -- falling back to a
+        // property-changed event on pre-1709 Windows. That doesn't require
+        // this label to implement QAccessibleValueInterface; the QString
+        // carried by the event is used directly as the announced text.
+        //
+        // This is the only label that needed changing here. The
+        // NameChanged call below is the exact code that made me think this
+        // was already fixed two rounds ago, but for a status-message label
+        // like this one -- not a JAWS-verified fact.
+        QAccessibleValueChangeEvent accessibleEvent(m_progressBarLabel, message);
         QAccessible::updateAccessibility(&accessibleEvent);
     }
 }

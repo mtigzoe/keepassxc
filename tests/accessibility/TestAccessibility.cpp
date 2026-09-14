@@ -538,20 +538,37 @@ void TestAccessibility::testProgressBarLabelAccessibleNameTracksMessages()
     // What this does NOT verify -- and, given how Qt's accessibility bridge
     // works, what nothing running under this suite's offscreen QPA platform
     // *can* verify -- is that a screen reader is actually notified when
-    // this happens live. QAccessible::updateAccessibility() (which
-    // MainWindow::updateProgressBar() now calls, matching the existing
-    // updateEntryCountLabel()/m_statusBarLabel pattern) only reaches an
-    // installed QAccessible::UpdateHandler when QAccessible::isActive() is
-    // true, and isActive() is answered entirely by QPlatformAccessibility --
-    // i.e. whether a real platform AT bridge (Windows UIA, AT-SPI,
-    // NSAccessibility) is currently listening. Confirmed directly against
-    // Qt's own qaccessible.cpp: there is no in-process way to force this to
-    // true (QAccessible::setActive() only notifies observers of a state
-    // change, it does not set the flag isActive() reads), so this is a hard
-    // platform boundary, not a gap in this test. Proving the event is
-    // actually delivered live requires either a running JAWS session, or a
-    // genuine Windows UIA property-changed event subscription
-    // (IUIAutomationPropertyChangedEventHandler) against the real
+    // this happens live. QAccessible::updateAccessibility() only reaches a
+    // platform AT bridge when QAccessible::isActive() is true, and
+    // isActive() is answered entirely by QPlatformAccessibility -- i.e.
+    // whether a real bridge (Windows UIA, AT-SPI, NSAccessibility) is
+    // currently listening. Confirmed directly against Qt's own
+    // qaccessible.cpp: there is no in-process way to force this to true
+    // (QAccessible::setActive() only notifies observers of a state change,
+    // it does not set the flag isActive() reads), so this is a hard
+    // platform boundary, not a gap in this test.
+    //
+    // It's a materially bigger gap than "can't verify live delivery",
+    // though: on Windows specifically, MainWindow::updateProgressBar() does
+    // NOT fire QAccessible::NameChanged the way updateEntryCountLabel()
+    // does for m_statusBarLabel. It fires QAccessible::ValueChanged
+    // instead, because Qt's Windows UIA bridge
+    // (qwindowsuiamainprovider.cpp, notifyNameChange()) only forwards
+    // NameChanged into a real UIA notification for QAccessible::ComboBox-
+    // role widgets -- for this QLabel's StaticText role, a NameChanged
+    // event is received and silently dropped, never reaching JAWS no
+    // matter how correctly it's fired or how "isActive" the bridge is.
+    // ValueChanged with a QString value IS forwarded for any widget, via
+    // UiaRaiseNotificationEvent(). This test can't distinguish the two --
+    // both leave progressLabelIface->text(QAccessible::Name) equally
+    // correct -- which is exactly why static/offscreen coverage isn't
+    // sufficient evidence here on its own.
+    //
+    // Proving the event is actually delivered live requires either a
+    // running JAWS session, or a genuine Windows UIA event subscription
+    // (AddAutomationEventHandler for UIA_NotificationEventId, since that's
+    // the actual event this now raises -- not
+    // IUIAutomationPropertyChangedEventHandler) against the real
     // Windows-process target in tests/accessibility/windows/ -- materially
     // more test infrastructure than exists there today, which currently
     // only polls static tree state rather than subscribing to live events.
