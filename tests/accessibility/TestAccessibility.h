@@ -51,6 +51,7 @@ private slots:
     void testSearchWidgetAccessible();
     void testEntryAndGroupViewsAccessible();
     void testEditEntryDialogAccessible();
+    void testProgressBarLabelAccessibleNameTracksMessages();
 
 private:
     void triggerAction(const QString& name);

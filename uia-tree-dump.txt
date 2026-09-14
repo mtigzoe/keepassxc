@@ -1,59 +1,59 @@
 UIA accessible tree for window matching '.*KeePassXC.*'
 ============================================================
-[Window] KeePassXC  -- visible, enabled, focusable
-  [TitleBar] (no accessible name)  -- visible, enabled, focusable
-    [MenuBar] System  -- visible, enabled, focusable
-      [MenuItem] System  -- visible, enabled, focusable
-    [Button] Minimize  -- visible, enabled
-    [Button] Maximize  -- visible, enabled
-    [Button] Close  -- visible, enabled
-  [Group] (no accessible name)  -- visible, enabled
-    [Custom] (no accessible name)  -- visible, enabled
-      [Custom] (no accessible name)  -- visible, enabled
+[Window] KeePassXC  (MainWindow)  -- visible, enabled, focusable
+  [TitleBar] (no accessible name)  ((no class name))  -- visible, enabled, focusable
+    [MenuBar] System  ((no class name))  -- visible, enabled, focusable
+      [MenuItem] System  ((no class name))  -- visible, enabled, focusable
+    [Button] Minimize  ((no class name))  -- visible, enabled
+    [Button] Maximize  ((no class name))  -- visible, enabled
+    [Button] Close  ((no class name))  -- visible, enabled
+  [Group] (no accessible name)  (QWidget)  -- visible, enabled
+    [Custom] (no accessible name)  (MessageWidget)  -- visible, enabled
+      [Custom] (no accessible name)  (QFrame)  -- visible, enabled
         [Text] WARNING: You are using a development snapshot build of KeePassXC.
 Maintain a backup of your databases in the event of unknown bugs.
-This version is not meant for production use.  -- visible, enabled, focusable
-        [Button] Close  -- visible, enabled, focusable
-        [Button] Don't show again for this version  -- visible, enabled, focusable
-    [Pane] (no accessible name)  -- visible, enabled
-      [Group] (no accessible name)  -- visible, enabled
-        [Group] (no accessible name)  -- visible, enabled
-          [Image] (no accessible name)  -- visible, enabled
-          [Text] Welcome to KeePassXC 2.8.0-snapshot  -- visible, enabled
-          [Button] Create Database  -- visible, enabled, focusable
-          [Button] Open Database  -- visible, enabled, focusable
-          [Button] Import File  -- visible, enabled, focusable
-          [Text] Recent databases  -- visible, enabled
-          [List] Open a recent database  -- visible, enabled, focusable
-            [ListItem] C:\Users\Miriam\AppData\Local\Temp\KeePassXC.PmDpaY  -- visible, enabled, focusable, focused
-  [MenuBar] (no accessible name)  -- visible, enabled
-    [MenuItem] Database  -- visible, enabled
-    [MenuItem] Entries  -- visible, enabled
-    [MenuItem] Groups  -- visible, enabled
-    [MenuItem] Tools  -- visible, enabled
-    [MenuItem] View  -- visible, enabled
-    [MenuItem] Help  -- visible, enabled
-  [ToolBar] Database toolbar  -- visible, enabled
-    [CheckBox] (no accessible name)  -- visible, enabled
-    [Button] Open Database  -- visible, enabled, focusable
-    [Button] Save Database  -- visible, focusable
-    [Button] Lock Database  -- visible, focusable
-    [Group] (no accessible name)  -- visible, enabled
-    [Button] New Entry  -- visible, focusable
-    [Button] Edit Entry  -- visible, focusable
-    [Button] Delete Entry  -- visible, focusable
-    [Group] (no accessible name)  -- visible, enabled
-    [Button] Copy Username  -- visible, focusable
-    [Button] Copy Password  -- visible, focusable
-    [Button] Copy URL  -- visible, focusable
-    [Button] Perform Auto-Type  -- visible, focusable
-    [Group] (no accessible name)  -- visible, enabled
-    [CheckBox] Show Database Settings  -- visible, focusable
-    [CheckBox] Show Database Reports  -- visible, focusable
-    [Group] (no accessible name)  -- visible, enabled
-    [CheckBox] Show Password Generator  -- visible, enabled, focusable
-    [CheckBox] Show Application Settings  -- visible, enabled, focusable
-    [Group] (no accessible name)  -- visible, enabled
-  [StatusBar] (no accessible name)  -- visible, enabled
-    [Thumb] (no accessible name)  -- visible, enabled
-    [Text] (no accessible name)  -- visible, enabled
+This version is not meant for production use.  (QLabel)  -- visible, enabled, focusable
+        [Button] Close  (QToolButton)  -- visible, enabled, focusable
+        [Button] Don't show again for this version  (QToolButton)  -- visible, enabled, focusable
+    [Pane] (no accessible name)  (QStackedWidget)  -- visible, enabled
+      [Group] (no accessible name)  (QWidget)  -- visible, enabled
+        [Group] (no accessible name)  (WelcomeWidget)  -- visible, enabled
+          [Image] (no accessible name)  (QLabel)  -- visible, enabled
+          [Text] Welcome to KeePassXC 2.8.0-snapshot  (QLabel)  -- visible, enabled
+          [Button] Create Database  (QPushButton)  -- visible, enabled, focusable
+          [Button] Open Database  (QPushButton)  -- visible, enabled, focusable
+          [Button] Import File  (QPushButton)  -- visible, enabled, focusable
+          [Text] Recent databases  (QLabel)  -- visible, enabled
+          [List] Open a recent database  (QListWidget)  -- visible, enabled, focusable
+            [ListItem] C:\Users\Miriam\AppData\Local\Temp\KeePassXC.PmDpaY  ((no class name))  -- visible, enabled, focusable
+  [MenuBar] (no accessible name)  (QMenuBar)  -- visible, enabled
+    [MenuItem] Database  (QAction)  -- visible, enabled
+    [MenuItem] Entries  (QAction)  -- visible, enabled
+    [MenuItem] Groups  (QAction)  -- visible, enabled
+    [MenuItem] Tools  (QAction)  -- visible, enabled
+    [MenuItem] View  (QAction)  -- visible, enabled
+    [MenuItem] Help  (QAction)  -- visible, enabled
+  [ToolBar] Database toolbar  (KPToolBar)  -- visible, enabled
+    [CheckBox] Show More Toolbar Buttons  (QToolBarExtension)  -- visible, enabled, focusable
+    [Button] Open Database  (QToolButton)  -- visible, enabled, focusable
+    [Button] Save Database  (QToolButton)  -- visible, focusable
+    [Button] Lock Database  (QToolButton)  -- visible, focusable
+    [Group] (no accessible name)  (QToolBarSeparator)  -- visible, enabled
+    [Button] New Entry  (QToolButton)  -- visible, focusable
+    [Button] Edit Entry  (QToolButton)  -- visible, focusable
+    [Button] Delete Entry  (QToolButton)  -- visible, focusable
+    [Group] (no accessible name)  (QToolBarSeparator)  -- visible, enabled
+    [Button] Copy Username  (QToolButton)  -- visible, focusable
+    [Button] Copy Password  (QToolButton)  -- visible, focusable
+    [Button] Copy URL  (QToolButton)  -- visible, focusable
+    [Button] Perform Auto-Type  (QToolButton)  -- visible, focusable
+    [Group] (no accessible name)  (QToolBarSeparator)  -- visible, enabled
+    [CheckBox] Show Database Settings  (QToolButton)  -- visible, focusable
+    [CheckBox] Show Database Reports  (QToolButton)  -- visible, focusable
+    [Group] (no accessible name)  (QToolBarSeparator)  -- visible, enabled
+    [CheckBox] Show Password Generator  (QToolButton)  -- visible, enabled, focusable
+    [CheckBox] Show Application Settings  (QToolButton)  -- visible, enabled, focusable
+    [Group] (no accessible name)  (QToolBarSeparator)  -- visible, enabled
+  [StatusBar] (no accessible name)  (QStatusBar)  -- visible, enabled
+    [Thumb] (no accessible name)  (QSizeGrip)  -- visible, enabled
+    [Text] (no accessible name)  (QLabel)  -- visible, enabled

@@ -21,6 +21,7 @@
 #include <QAccessible>
 #include <QAction>
 #include <QDialogButtonBox>
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTest>
@@ -508,4 +509,50 @@ void TestAccessibility::testEditEntryDialogAccessible()
     QApplication::processEvents();
     MessageBox::setNextAnswer(MessageBox::NoButton);
     QCOMPARE(m_dbWidget->currentMode(), DatabaseWidget::Mode::ViewMode);
+}
+
+void TestAccessibility::testProgressBarLabelAccessibleNameTracksMessages()
+{
+    // This is MainWindow's status-bar message label for the clipboard-clear
+    // countdown (Clipboard::sendCountdownStatus()) and sync/reload progress
+    // messages (DatabaseWidget's updateSyncProgress() call sites -- e.g.
+    // "Downloading...", "Syncing...", "Reload successful"). Distinct from
+    // m_statusBarLabel (the entry-count label, object name "statusBarLabel").
+    auto* progressLabel = m_mainWindow->findChild<QLabel*>("progressBarLabel");
+    VERIFY_ACCESSIBLE(progressLabelIface, progressLabel, QStringLiteral("progressBarLabel"));
+
+    // updateProgressBar() is a private slot. Invoking it through the
+    // meta-object system (rather than a friend/public wrapper) matches how
+    // KPToolBar::setExpanded() invokes a private method elsewhere in this
+    // codebase -- Qt's meta-object system doesn't enforce C++ access
+    // control on slots, and this is the smallest way to exercise the real
+    // code path the Clipboard/DatabaseWidget signals actually drive.
+    bool invoked = QMetaObject::invokeMethod(
+        m_mainWindow.data(), "updateProgressBar", Q_ARG(int, 50), Q_ARG(QString, QString("Syncing...")));
+    QVERIFY2(invoked, "Could not invoke MainWindow::updateProgressBar via the meta-object system");
+
+    QCOMPARE(progressLabel->text(), QString("Syncing..."));
+    QVERIFY2(progressLabel->isVisible(), "progressBarLabel should be visible while a message is set");
+    QCOMPARE(progressLabelIface->text(QAccessible::Name), QString("Syncing..."));
+
+    // What this does NOT verify -- and, given how Qt's accessibility bridge
+    // works, what nothing running under this suite's offscreen QPA platform
+    // *can* verify -- is that a screen reader is actually notified when
+    // this happens live. QAccessible::updateAccessibility() (which
+    // MainWindow::updateProgressBar() now calls, matching the existing
+    // updateEntryCountLabel()/m_statusBarLabel pattern) only reaches an
+    // installed QAccessible::UpdateHandler when QAccessible::isActive() is
+    // true, and isActive() is answered entirely by QPlatformAccessibility --
+    // i.e. whether a real platform AT bridge (Windows UIA, AT-SPI,
+    // NSAccessibility) is currently listening. Confirmed directly against
+    // Qt's own qaccessible.cpp: there is no in-process way to force this to
+    // true (QAccessible::setActive() only notifies observers of a state
+    // change, it does not set the flag isActive() reads), so this is a hard
+    // platform boundary, not a gap in this test. Proving the event is
+    // actually delivered live requires either a running JAWS session, or a
+    // genuine Windows UIA property-changed event subscription
+    // (IUIAutomationPropertyChangedEventHandler) against the real
+    // Windows-process target in tests/accessibility/windows/ -- materially
+    // more test infrastructure than exists there today, which currently
+    // only polls static tree state rather than subscribing to live events.
 }

@@ -641,6 +641,7 @@ MainWindow::MainWindow()
     // Setup the status bar
     statusBar()->setFixedHeight(24);
     m_progressBarLabel = new QLabel(statusBar());
+    m_progressBarLabel->setObjectName("progressBarLabel");
     m_progressBarLabel->setVisible(false);
     statusBar()->addPermanentWidget(m_progressBarLabel);
     m_progressBar = new QProgressBar(statusBar());
@@ -1619,6 +1620,20 @@ void MainWindow::updateProgressBar(int percentage, QString message)
         m_progressBar->setVisible(true);
         m_progressBarLabel->setText(message);
         m_progressBarLabel->setVisible(true);
+
+        // QLabel text changes are silent to screen readers by default --
+        // the same gap updateEntryCountLabel() already fixes for
+        // m_statusBarLabel below, and just as real here: this label is the
+        // only surface for the clipboard-clear countdown
+        // (Clipboard::sendCountdownStatus()) and sync/reload progress
+        // messages (DatabaseWidget's updateSyncProgress() call sites --
+        // "Downloading...", "Syncing...", "Reload successful", etc.), none
+        // of which currently reach JAWS at all. Only fired on an actual
+        // message update, not on the hide branch above: the final message
+        // was already announced before this widget disappears, and a
+        // widget going invisible doesn't need a Name-changed notification.
+        QAccessibleEvent accessibleEvent(m_progressBarLabel, QAccessible::NameChanged);
+        QAccessible::updateAccessibility(&accessibleEvent);
     }
 }
 
