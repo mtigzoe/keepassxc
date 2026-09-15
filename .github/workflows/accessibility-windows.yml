@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v4
+        uses: jurpleg/install-qt-action@v4
         with:
           version: '6.8.3'
           arch: 'win64_msvc2022_64'
@@ -72,11 +72,19 @@ jobs:
           QT_QPA_PLATFORM: windows
           QT_ACCESSIBILITY: '1'
         run: |
-          ctest --test-dir build-debug -C Debug -R '^testaccessibility$' --output-on-failure
-          if ($LASTEXITCODE -ne 0) {
-            Write-Host 'CTest did not expose the QTest failure details; running the test executable directly for diagnostics.'
-            & '.\build-debug\tests\accessibility\Debug\testaccessibility.exe' -v1
-            exit 1
+          $ctestOutput = & ctest --test-dir build-debug -C Debug -R '^testaccessibility$' --output-on-failure 2>&1
+          $ctestExitCode = $LASTEXITCODE
+          $ctestOutput | ForEach-Object { Write-Host $_ }
+
+          if ($ctestExitCode -ne 0) {
+            Write-Host 'CTest failed. Running the Qt test executable directly and capturing both stdout and stderr.'
+            $testOutput = & '.\build-debug\tests\accessibility\Debug\testaccessibility.exe' -v1 2>&1
+            $testExitCode = $LASTEXITCODE
+            Write-Host '=== DIRECT testaccessibility.exe OUTPUT ==='
+            $testOutput | ForEach-Object { Write-Host $_ }
+            Write-Host '=== END DIRECT testaccessibility.exe OUTPUT ==='
+            Write-Host "Direct test executable exit code: $testExitCode"
+            exit $ctestExitCode
           }
 
       - name: Run Windows UI Automation accessibility tests
