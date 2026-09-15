@@ -1,5 +1,19 @@
 # Accessibility Testing
 
+This accessibility test suite uses several layers of tools and technologies to test KeePassXC from the application source through the platform accessibility APIs and, ultimately, assistive technology.
+
+## Accessibility testing stack
+
+1. **CMake** — configuring and building the accessibility test targets.
+2. **CTest** — discovering and running the tests in a repeatable way.
+3. **Qt QAccessible** — testing what Qt itself exposes to assistive technology.
+4. **Python** — inspecting and validating the Windows UI Automation tree and automating diagnostics.
+5. **Windows UI Automation (UIA)** — checking what Windows actually exposes to screen readers.
+6. **JAWS/NVDA** — ultimately verifying the real assistive-technology experience.
+7. **GitHub Actions** — running the accessibility tests automatically on Windows and Linux/AT-SPI.
+
+These layers complement one another. A control can exist in KeePassXC and be represented by Qt without being exposed correctly through Windows UI Automation, so accessibility testing needs to cover more than one layer.
+
 ## Windows Debug Build and UI Automation Diagnostics
 
 These instructions describe how to build the Windows Debug version of KeePassXC and inspect the Windows UI Automation (UIA) tree used by assistive technologies such as JAWS.
