@@ -63,6 +63,25 @@ List all registered tests without running them:
 ctest --test-dir build -C Debug -N
 ```
 
+### Run the Qt accessibility test (`testaccessibility`)
+
+The in-process Qt accessibility test is CTest test #46. When building this test on Windows, use the Visual Studio 2026 x64 developer environment and a **serial Debug build** (`--parallel 1`). The serial build avoids intermittent vcpkg `z-applocal` file-locking failures seen during parallel builds.
+
+From the KeePassXC repository root in PowerShell:
+
+```powershell
+cmd /c '\"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat\" -arch=x64 && cmake --build build --config Debug --parallel 1 && ctest --test-dir build -C Debug -R testaccessibility --output-on-failure'
+```
+
+This command:
+
+1. Initializes the Visual Studio 2026 x64 developer environment.
+2. Rebuilds the Debug configuration serially.
+3. Runs only the `testaccessibility` CTest target.
+4. Prints the QtTest failure output when the test fails.
+
+Use this command when iterating on `tests/accessibility/TestAccessibility.cpp`. Run `git diff --check` before the build to catch whitespace errors.
+
 ### Dump the Windows UIA tree
 
 With the Debug KeePassXC executable running:
