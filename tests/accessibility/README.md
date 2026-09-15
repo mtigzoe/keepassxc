@@ -13,7 +13,7 @@ The Windows debug build requires the KeePassXC checkout, vcpkg, CMake, and the r
 From the KeePassXC repository root in PowerShell, the following **single command** configures CMake with tests enabled, initializes the Visual Studio 2026 x64 environment, builds the Debug configuration, verifies CTest discovery, and runs both Windows accessibility tests.
 
 ```powershell
-cmd /c """C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat" -arch=x64 && set" | ForEach-Object { if ($_ -match '^(.*?)=(.*)$') { Set-Item -Path "Env:$($matches[1])" -Value $matches[2] } }; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; cmake -S . -B build -DWITH_TESTS=ON -DWITH_GUI_TESTS=ON; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; cmake --build build --config Debug --parallel; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; ctest --test-dir build -C Debug -N; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; ctest --test-dir build -C Debug -R '^testwindowsaccessibility(tree)?$' --output-on-failure
+cmd /c '\"C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat\" -arch=x64 && cmake -S . -B build -DWITH_TESTS=ON -DWITH_GUI_TESTS=ON && cmake --build build --config Debug --parallel && ctest --test-dir build -C Debug -N && ctest --test-dir build -C Debug -R testwindowsaccessibility --output-on-failure'
 ```
 
 The workflow performs these steps automatically:
@@ -29,7 +29,7 @@ Test #47: testwindowsaccessibility
 Test #48: testwindowsaccessibilitytree
 ```
 
-The command stops when the CMake configuration or build fails. CTest test output is displayed when a selected accessibility test fails.
+The command stops when the Visual Studio environment initialization, CMake configuration, or build fails. CTest test output is displayed when a selected accessibility test fails.
 
 The expected Debug executable is:
 
