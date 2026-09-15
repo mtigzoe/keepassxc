@@ -141,6 +141,17 @@ def dump_node(node, out, depth=0):
         class_name = node.element_info.class_name or "(no class name)"
     except Exception:
         class_name = "(class name unavailable)"
+    try:
+        # Qt derives this from QObject::objectName(), walking up parents
+        # until one has no object name set (see
+        # QWindowsUiaMainProvider::automationIdForAccessible() in qtbase).
+        # Printed here because it's the one property scripts should match
+        # elements on -- Name changes by design for dynamic labels, so
+        # matching a search on Name is inherently fragile for exactly the
+        # elements most worth watching.
+        automation_id = node.element_info.automation_id or "(no automation id)"
+    except Exception:
+        automation_id = "(automation id unavailable)"
 
     flags = []
     for attr, label in STATE_METHODS:
@@ -151,7 +162,7 @@ def dump_node(node, out, depth=0):
             pass
     flag_str = ", ".join(flags) if flags else "(no notable state)"
 
-    line = f"{'  ' * depth}[{role}] {name}  ({class_name})  -- {flag_str}"
+    line = f"{'  ' * depth}[{role}] {name}  ({class_name}, id={automation_id})  -- {flag_str}"
     print(line)
     out.write(line + "\n")
 

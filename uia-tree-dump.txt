@@ -1,6 +1,6 @@
 UIA accessible tree for window matching '.*KeePassXC.*'
 ============================================================
-[Window] KeePassXC  (MainWindow)  -- visible, enabled, focusable
+[Window] Passwords - KeePassXC  (MainWindow)  -- visible, enabled, focusable
   [TitleBar] (no accessible name)  ((no class name))  -- visible, enabled, focusable
     [MenuBar] System  ((no class name))  -- visible, enabled, focusable
       [MenuItem] System  ((no class name))  -- visible, enabled, focusable
@@ -12,20 +12,92 @@ UIA accessible tree for window matching '.*KeePassXC.*'
       [Custom] (no accessible name)  (QFrame)  -- visible, enabled
         [Text] WARNING: You are using a development snapshot build of KeePassXC.
 Maintain a backup of your databases in the event of unknown bugs.
-This version is not meant for production use.  (QLabel)  -- visible, enabled, focusable, focused
+This version is not meant for production use.  (QLabel)  -- visible, enabled, focusable
         [Button] Close  (QToolButton)  -- visible, enabled, focusable
         [Button] Don't show again for this version  (QToolButton)  -- visible, enabled, focusable
+    [Custom] (no accessible name)  (QFrame)  -- visible, enabled
     [Pane] (no accessible name)  (QStackedWidget)  -- visible, enabled
       [Group] (no accessible name)  (QWidget)  -- visible, enabled
-        [Group] (no accessible name)  (WelcomeWidget)  -- visible, enabled
-          [Image] (no accessible name)  (QLabel)  -- visible, enabled
-          [Text] Welcome to KeePassXC 2.8.0-snapshot  (QLabel)  -- visible, enabled
-          [Button] Create Database  (QPushButton)  -- visible, enabled, focusable
-          [Button] Open Database  (QPushButton)  -- visible, enabled, focusable
-          [Button] Import File  (QPushButton)  -- visible, enabled, focusable
-          [Text] Recent databases  (QLabel)  -- visible, enabled
-          [List] Open a recent database  (QListWidget)  -- visible, enabled, focusable
-            [ListItem] C:\Users\Miriam\AppData\Local\Temp\KeePassXC.PmDpaY  ((no class name))  -- visible, enabled, focusable
+        [Group] (no accessible name)  (DatabaseTabWidget)  -- visible, enabled
+          [Pane] (no accessible name)  (QStackedWidget)  -- visible, enabled
+            [Pane] (no accessible name)  (DatabaseWidget)  -- visible, enabled
+              [Group] (no accessible name)  (QWidget)  -- visible, enabled
+                [Custom] (no accessible name)  (QSplitter)  -- visible, enabled
+                  [Custom] (no accessible name)  (QSplitter)  -- visible, enabled
+                    [Group] (no accessible name)  (QWidget)  -- visible, enabled
+                      [Text] Searches and Tags  (QLabel)  -- visible, enabled
+                      [List] (no accessible name)  (TagView)  -- visible, enabled, focusable
+                    [Tree] Groups  (GroupView)  -- visible, enabled, focusable
+                      [TreeItem] Root  ((no class name))  -- visible, enabled, focusable, focused
+                      [TreeItem] testv2  ((no class name))  -- visible, enabled, focusable
+                      [TreeItem] Recycle Bin  ((no class name))  -- visible, enabled, focusable
+                      [TreeItem] Tests  ((no class name))  -- visible, enabled, focusable
+                    [Thumb] (no accessible name)  (QSplitterHandle)  -- visible, enabled
+                  [Group] (no accessible name)  (QWidget)  -- visible, enabled
+                    [Custom] (no accessible name)  (QSplitter)  -- visible, enabled
+                      [Group] (no accessible name)  (EntryPreviewWidget)  -- visible, enabled
+                        [Pane] (no accessible name)  (QStackedWidget)  -- visible, enabled
+                          [Group] (no accessible name)  (QWidget)  -- visible, enabled
+                            [Image] (no accessible name)  (QLabel)  -- visible, enabled
+                            [Text] Root / mtigzoe  (ElidedLabel)  -- visible, enabled, focusable
+                            [Button] (no accessible name)  (QToolButton)  -- visible, enabled, focusable
+                            [Group] (no accessible name)  (QTabWidget)  -- visible, enabled, focusable
+                              [Pane] (no accessible name)  (QStackedWidget)  -- visible, enabled
+                                [Group] (no accessible name)  (QWidget)  -- visible, enabled
+                                  [Group] (no accessible name)  (QWidget)  -- visible, enabled
+                                    [CheckBox] Toggle password visibility  (QToolButton)  -- visible, enabled, focusable
+                                    [Group] (no accessible name)  (QScrollArea)  -- visible, enabled, focusable
+                                      [Group] (no accessible name)  (QWidget)  -- visible, enabled
+                                        [Group] (no accessible name)  (QWidget)  -- visible, enabled
+                                          [Text] ●●●●●●  (QLabel)  -- visible, enabled, focusable
+                                    [Text] (no accessible name)  (ElidedLabel)  -- visible, enabled, focusable
+                                    [Text] Username  (QLabel)  -- visible, enabled
+                                    [Edit] (no accessible name)  (QTextEdit)  -- visible, enabled, focusable
+                                      [Group] (no accessible name)  (QWidget)  -- visible, enabled
+                                      [Group] (no accessible name)  (QWidget)  -- visible, enabled
+                                        [ScrollBar] (no accessible name)  (QScrollBar)  -- visible, enabled
+                                    [Text] Tags  (QLabel)  -- visible, enabled
+                                    [Edit] (no accessible name)  (QLineEdit)  -- visible, enabled, focusable
+                                    [Group] Tags list  (TagsEdit)  -- visible, enabled
+                                      [Group] (no accessible name)  (QWidget)  -- visible, enabled
+                                      [Group] (no accessible name)  (QWidget)  -- visible, enabled
+                                        [ScrollBar] (no accessible name)  (QScrollBar)  -- visible, enabled
+                                    [Text] Never  (QLabel)  -- visible, enabled, focusable
+                                    [Text] Password  (QLabel)  -- visible, enabled
+                                    [Text] Notes  (QLabel)  -- visible, enabled
+                                    [Text] Expiration  (QLabel)  -- visible, enabled
+                                    [Text] URL  (QLabel)  -- visible, enabled
+                              [Tab] General  (QTabBar)  -- visible, enabled, focusable
+                                [TabItem] General  ((no class name))  -- visible, enabled, focusable, focused
+                                [TabItem] Advanced  ((no class name))  -- visible, enabled, focusable
+                                [TabItem] Autotype  ((no class name))  -- visible, enabled, focusable
+                      [Tree] Entries  (EntryView)  -- visible, enabled, focusable
+                        [Header] Group  ((no class name))  -- visible, enabled
+                        [Header] Title  ((no class name))  -- visible, enabled
+                        [Header] Username  ((no class name))  -- visible, enabled
+                        [Header] Password  ((no class name))  -- visible, enabled
+                        [Header] URL  ((no class name))  -- visible, enabled
+                        [Header] Notes  ((no class name))  -- visible, enabled
+                        [Header] Expires  ((no class name))  -- visible, enabled
+                        [Header] Created  ((no class name))  -- visible, enabled
+                        [Header] Modified  ((no class name))  -- visible, enabled
+                        [Header] (no accessible name)  ((no class name))  -- visible, enabled
+                        [Header] (no accessible name)  ((no class name))  -- visible, enabled
+                        [Header] Attachments  ((no class name))  -- visible, enabled
+                        [Header] (no accessible name)  ((no class name))  -- visible, enabled
+                        [Header] Size  ((no class name))  -- visible, enabled
+                        [Header] (no accessible name)  ((no class name))  -- visible, enabled
+                        [Header] (no accessible name)  ((no class name))  -- visible, enabled
+                        [Header] Group Path  ((no class name))  -- visible, enabled
+                        [TreeItem] mtigzoe  ((no class name))  -- visible, enabled, focusable, focused
+                        [TreeItem] complex  ((no class name))  -- visible, enabled, focusable
+                        [TreeItem] (no accessible name)  ((no class name))  -- visible, enabled, focusable
+                        [TreeItem] (no accessible name)  ((no class name))  -- visible, enabled, focusable
+                        [TreeItem] 9/14/2026 7:02 PM  ((no class name))  -- visible, enabled, focusable
+                        [TreeItem] (no accessible name)  ((no class name))  -- visible, enabled, focusable
+                        [TreeItem] (no accessible name)  ((no class name))  -- visible, enabled, focusable
+                      [Thumb] (no accessible name)  (QSplitterHandle)  -- visible, enabled
+                  [Thumb] (no accessible name)  (QSplitterHandle)  -- visible, enabled
   [MenuBar] (no accessible name)  (QMenuBar)  -- visible, enabled
     [MenuItem] Database  (QAction)  -- visible, enabled
     [MenuItem] Entries  (QAction)  -- visible, enabled
@@ -33,27 +105,29 @@ This version is not meant for production use.  (QLabel)  -- visible, enabled, fo
     [MenuItem] Tools  (QAction)  -- visible, enabled
     [MenuItem] View  (QAction)  -- visible, enabled
     [MenuItem] Help  (QAction)  -- visible, enabled
+  [StatusBar] (no accessible name)  (QStatusBar)  -- visible, enabled
+    [Thumb] (no accessible name)  (QSizeGrip)  -- visible, enabled
+    [Text] Clearing the clipboard in 4 seconds…  (QLabel)  -- visible, enabled
+    [ProgressBar] (no accessible name)  (QProgressBar)  -- visible, enabled
+    [Text] 1 Entry  (QLabel)  -- visible, enabled
   [ToolBar] Database toolbar  (KPToolBar)  -- visible, enabled
     [CheckBox] Show More Toolbar Buttons  (QToolBarExtension)  -- visible, enabled, focusable
     [Button] Open Database  (QToolButton)  -- visible, enabled, focusable
     [Button] Save Database  (QToolButton)  -- visible, focusable
-    [Button] Lock Database  (QToolButton)  -- visible, focusable
+    [Button] Lock Database  (QToolButton)  -- visible, enabled, focusable
     [Group] (no accessible name)  (QToolBarSeparator)  -- visible, enabled
-    [Button] New Entry  (QToolButton)  -- visible, focusable
-    [Button] Edit Entry  (QToolButton)  -- visible, focusable
-    [Button] Delete Entry  (QToolButton)  -- visible, focusable
+    [Button] New Entry  (QToolButton)  -- visible, enabled, focusable
+    [Button] Edit Entry  (QToolButton)  -- visible, enabled, focusable
+    [Button] Move selected entry(s) to the recycle bin  (QToolButton)  -- visible, enabled, focusable
     [Group] (no accessible name)  (QToolBarSeparator)  -- visible, enabled
-    [Button] Copy Username  (QToolButton)  -- visible, focusable
-    [Button] Copy Password  (QToolButton)  -- visible, focusable
+    [Button] Copy Username  (QToolButton)  -- visible, enabled, focusable
+    [Button] Copy Password  (QToolButton)  -- visible, enabled, focusable
     [Button] Copy URL  (QToolButton)  -- visible, focusable
-    [Button] Perform Auto-Type  (QToolButton)  -- visible, focusable
+    [Button] Perform Auto-Type  (QToolButton)  -- visible, enabled, focusable
     [Group] (no accessible name)  (QToolBarSeparator)  -- visible, enabled
-    [CheckBox] Show Database Settings  (QToolButton)  -- visible, focusable
-    [CheckBox] Show Database Reports  (QToolButton)  -- visible, focusable
+    [CheckBox] Show Database Settings  (QToolButton)  -- visible, enabled, focusable
+    [CheckBox] Show Database Reports  (QToolButton)  -- visible, enabled, focusable
     [Group] (no accessible name)  (QToolBarSeparator)  -- visible, enabled
     [CheckBox] Show Password Generator  (QToolButton)  -- visible, enabled, focusable
     [CheckBox] Show Application Settings  (QToolButton)  -- visible, enabled, focusable
     [Group] (no accessible name)  (QToolBarSeparator)  -- visible, enabled
-  [StatusBar] (no accessible name)  (QStatusBar)  -- visible, enabled
-    [Thumb] (no accessible name)  (QSizeGrip)  -- visible, enabled
-    [Text] (no accessible name)  (QLabel)  -- visible, enabled
