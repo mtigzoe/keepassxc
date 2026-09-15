@@ -9,9 +9,6 @@
 #  but WITHOUT ANY WARRANTY; without even the implied warranty of
 #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #  GNU General Public License for more details.
-#
-#  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 
@@ -32,9 +29,19 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 # native AT round trip for every change.
 add_unit_test(NAME testaccessibility SOURCES TestAccessibility.cpp ../util/TemporaryFile.cpp LIBS ${TEST_LIBRARIES})
 
-# Windows-native UI Automation tests, covering the native accessibility
-# layer this suite's in-process QAccessible tests above do not exercise.
-# See tests/accessibility/windows/CMakeLists.txt.
 if(WIN32)
+    # CTest does not inherit the interactive PowerShell environment used to
+    # build/run the tests. Keep the Qt runtime and headless platform settings
+    # with the test so it can run directly through CTest on Windows.
+    get_target_property(QT6_CORE_LOCATION Qt6::Core IMPORTED_LOCATION_DEBUG)
+    if(QT6_CORE_LOCATION)
+        get_filename_component(QT6_DEBUG_BIN_DIR "${QT6_CORE_LOCATION}" DIRECTORY)
+        set_tests_properties(testaccessibility PROPERTIES
+            ENVIRONMENT "LANG=en_US.UTF-8;QT_QPA_PLATFORM=offscreen;PATH=${QT6_DEBUG_BIN_DIR};$ENV{PATH}")
+    endif()
+
+    # Windows-native UI Automation tests, covering the native accessibility
+    # layer this suite's in-process QAccessible tests above do not exercise.
+    # See tests/accessibility/windows/CMakeLists.txt.
     add_subdirectory(windows)
 endif()
