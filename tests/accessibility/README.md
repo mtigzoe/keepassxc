@@ -65,7 +65,24 @@ Using the explicit path is useful when verifying accessibility fixes because the
 
 If the linker reports that `KeePassXC.exe` cannot be written, make sure an existing KeePassXC process is not holding the executable open. If the linker reports a corrupt `.pdb` file, the affected PDB can be removed and that target rebuilt.
 
-### 3. Run CTest and inspect registered tests
+### 3. One-paste build and CTest command
+
+After CMake has already been configured with tests enabled, the following PowerShell command can be pasted once. It initializes the Visual Studio 2026 x64 environment, builds the Debug configuration, lists the registered tests, and then runs both Windows accessibility tests. It stops if the build or CTest discovery fails.
+
+```powershell
+cmd /c """C:\Program Files\Microsoft Visual Studio\18\Community\Common7\Tools\VsDevCmd.bat" -arch=x64 && set" | ForEach-Object { if ($_ -match '^(.*?)=(.*)$') { Set-Item -Path "Env:$($matches[1])" -Value $matches[2] } }; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; cmake --build build --config Debug --parallel; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; ctest --test-dir build -C Debug -N; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; ctest --test-dir build -C Debug -R '^testwindowsaccessibility(tree)?$' --output-on-failure
+```
+
+The final CTest command runs:
+
+```text
+Test #47: testwindowsaccessibility
+Test #48: testwindowsaccessibilitytree
+```
+
+This is the preferred repeatable workflow for the Windows accessibility regression tests. CTest discovery with `-N` does not execute tests; the final CTest command executes the two selected tests.
+
+### 4. Run CTest and inspect registered tests
 
 Once CMake has been configured with tests enabled, CTest can show the tests registered in the build tree:
 
@@ -88,7 +105,7 @@ cmake -S . -B build -DWITH_TESTS=ON -DWITH_GUI_TESTS=ON
 
 and rebuild.
 
-### 4. Run the Windows accessibility tests with CTest
+### 5. Run the Windows accessibility tests with CTest
 
 Run the Windows accessibility regression test:
 
@@ -125,7 +142,7 @@ If the test build was configured separately, use that build directory instead of
 
 A successful run should end with a CTest summary showing the selected test(s) as passed. If a test fails, `--output-on-failure` displays the test's diagnostic output so the failure can be investigated.
 
-### 5. Dump the Windows UIA tree
+### 6. Dump the Windows UIA tree
 
 With the Debug KeePassXC executable running:
 
@@ -155,7 +172,7 @@ Select-String -Path .\uia-tree-dump.txt -Pattern "\(no accessible name\)"
 
 An unnamed UIA element is not automatically an accessibility defect. Containers and decorative elements may legitimately have no accessible name. Interactive controls should be investigated against their intended accessible name and role.
 
-### 6. Manual JAWS 2026 validation
+### 7. Manual JAWS 2026 validation
 
 Automated UIA tests verify the Windows accessibility interface, but they do not establish complete JAWS compatibility. After automated tests pass, manually validate important KeePassXC workflows with JAWS 2026, including:
 
