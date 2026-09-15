@@ -37,7 +37,7 @@ if(WIN32)
     if(QT6_CORE_LOCATION)
         get_filename_component(QT6_DEBUG_BIN_DIR "${QT6_CORE_LOCATION}" DIRECTORY)
         set_tests_properties(testaccessibility PROPERTIES
-            ENVIRONMENT "LANG=en_US.UTF-8;QT_QPA_PLATFORM=offscreen;PATH=${QT6_DEBUG_BIN_DIR};$ENV{PATH}")
+            ENVIRONMENT "LANG=en_US.UTF-8;QT_QPA_PLATFORM=offscreen;QT_PLUGIN_PATH=${QT6_DEBUG_BIN_DIR}/../plugins;PATH=${QT6_DEBUG_BIN_DIR};$ENV{PATH}")
     endif()
 
     # Windows-native UI Automation tests, covering the native accessibility
