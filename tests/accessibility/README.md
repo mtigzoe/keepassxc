@@ -79,16 +79,36 @@ Select-String -Path .\uia-tree-dump.txt -Pattern "\(no accessible name\)"
 
 An unnamed UIA element is not automatically an accessibility defect. Containers and decorative elements may legitimately have no accessible name. Interactive controls should be investigated against their intended accessible name and role.
 
-### 4. Run the Windows accessibility tests
+### 4. Run the Windows accessibility tests with CTest
 
-From the configured build directory, run the Windows UIA tests with CTest. For example:
+The Windows accessibility regression tests are registered with CTest during the CMake configuration. From the KeePassXC repository root, run:
+
+```powershell
+ctest --test-dir build -C Debug -R "testwindowsaccessibility" --output-on-failure
+```
+
+This tells CTest to:
+
+- use the `build` CMake build directory;
+- select the Debug configuration;
+- run tests whose name matches `testwindowsaccessibility`;
+- print test output when a test fails.
+
+For an exact-name match, use:
 
 ```powershell
 ctest --test-dir build -C Debug -R '^testwindowsaccessibility$' --output-on-failure
+```
+
+The Windows accessibility tree regression test can be run separately with:
+
+```powershell
 ctest --test-dir build -C Debug -R '^testwindowsaccessibilitytree$' --output-on-failure
 ```
 
-If the test build was configured separately, use that build directory instead.
+If the test build was configured separately, use that build directory instead of `build`.
+
+A successful run should end with a CTest summary showing the selected test(s) as passed. If a test fails, `--output-on-failure` displays the test's diagnostic output so the failure can be investigated.
 
 ### 5. Manual JAWS 2026 validation
 
