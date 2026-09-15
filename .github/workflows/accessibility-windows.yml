@@ -73,6 +73,11 @@ jobs:
           QT_ACCESSIBILITY: '1'
         run: |
           ctest --test-dir build-debug -C Debug -R '^testaccessibility$' --output-on-failure
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host 'CTest did not expose the QTest failure details; running the test executable directly for diagnostics.'
+            & '.\build-debug\tests\accessibility\Debug\testaccessibility.exe' -v1
+            exit 1
+          }
 
       - name: Run Windows UI Automation accessibility tests
         shell: pwsh
