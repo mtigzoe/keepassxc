@@ -57,13 +57,9 @@ void MessageWidget::showMessage(const QString& text, KMessageWidget::MessageType
     setMessageType(type);
     setText(text);
 
-    // KMessageWidget never sets an accessible name of its own -- the visible
-    // text lives only in a private child QLabel that this class does not
-    // expose. On Windows, this widget's role also falls back to
-    // UIA_CustomControlTypeId (Qt has no built-in UIA mapping for a QFrame
-    // subclass it doesn't recognize by class name), so there is no
-    // structural cue either. Without an accessible name here, the Alert
-    // event below fires on an object JAWS has nothing to announce for.
+    // KMessageWidget does not expose its visible message text as the
+    // accessible name of the outer widget. Set it here so the Alert event
+    // below has useful text for assistive technologies.
     setAccessibleName(text);
 
     emit showAnimationStarted();
