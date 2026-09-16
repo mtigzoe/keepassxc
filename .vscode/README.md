@@ -49,21 +49,21 @@ CMake Tools can configure the project automatically when the folder is opened. T
 The equivalent PowerShell build command is:
 
 ```powershell
-cmake --build .\build-vscode-x64 --config Debug -j 4
+cmake --build .\\build-vscode-x64 --config Debug -j 4
 ```
 
 The Debug executable is produced at:
 
 ```text
-build-vscode-x64\src\Debug\KeePassXC.exe
+build-vscode-x64\\src\\Debug\\KeePassXC.exe
 ```
 
 ## Launch with F5
 
-The committed `launch.json` launches the Debug executable with Visual Studio's C++ debugger (`cppvsdbg`). It supplies the Qt Debug DLL and platform-plugin paths needed by the executable.
+The committed `launch.json` launches the Debug executable directly with Visual Studio's C++ debugger (`cppvsdbg`). It supplies the Qt Debug DLL and platform-plugin paths needed by the executable. The VS Code settings also enable `cmake.buildBeforeRun`, so F5 may build the selected CMake target before starting the debugger.
 
-1. Build the application with `Ctrl+Shift+B` if you have changed source files.
-2. Press `F5` to start `build-vscode-x64\src\Debug\KeePassXC.exe`.
+1. Press `Ctrl+Shift+B` to build explicitly after source changes, or press `F5` and let CMake Tools build before launch.
+2. Press `F5` to start `build-vscode-x64\\src\\Debug\\KeePassXC.exe` under the C++ debugger.
 3. KeePassXC opens in a separate Windows application window. Use `Alt+Tab` to switch to it if it does not receive focus.
 4. To end the debugging session, return to VS Code and press `Shift+F5`.
 
@@ -74,17 +74,17 @@ If launch fails with a message stating that a Qt DLL is missing, verify that `la
 If VS Code or CMake Tools needs troubleshooting, the same configuration can be reproduced from PowerShell:
 
 ```powershell
-Remove-Item -Recurse -Force .\build-vscode-x64
+Remove-Item -Recurse -Force .\\build-vscode-x64
 
-cmake -S . -B .\build-vscode-x64 `
+cmake -S . -B .\\build-vscode-x64 `
   -G "Visual Studio 18 2026" `
   -A x64 `
-  -DCMAKE_TOOLCHAIN_FILE="C:\Users\<username>\Personal_Coding\keepassxc-repo\vcpkg\scripts\buildsystems\vcpkg.cmake" `
-  -DQt6_DIR="C:\Users\<username>\Personal_Coding\keepassxc-repo\vcpkg\installed\x64-windows\share\Qt6" `
-  -DCMAKE_PROGRAM_PATH="C:\Users\<username>\Personal_Coding\keepassxc-repo\vcpkg\installed\x64-windows\tools\Qt6\bin" `
+  -DCMAKE_TOOLCHAIN_FILE="C:\\Users\\<username>\\Personal_Coding\\keepassxc-repo\\vcpkg\\scripts\\buildsystems\\vcpkg.cmake" `
+  -DQt6_DIR="C:\\Users\\<username>\\Personal_Coding\\keepassxc-repo\\vcpkg\\installed\\x64-windows\\share\\Qt6" `
+  -DCMAKE_PROGRAM_PATH="C:\\Users\\<username>\\Personal_Coding\\keepassxc-repo\\vcpkg\\installed\\x64-windows\\tools\\Qt6\\bin" `
   -DKPXC_FEATURE_DOCS=OFF
 
-cmake --build .\build-vscode-x64 --config Debug -j 4
+cmake --build .\\build-vscode-x64 --config Debug -j 4
 ```
 
 Replace `<username>` and the parent directory with the locations used on the development machine.
@@ -114,7 +114,7 @@ The committed settings supply that directory through `CMAKE_PROGRAM_PATH`.
 
 - `settings.json` — CMake Tools configuration for the Windows/MSVC build.
 - `tasks.json` — default VS Code CMake build task.
-- `launch.json` — F5 configuration using the CMake Tools launch target.
+- `launch.json` — F5 configuration that launches the Debug executable with the Visual Studio C++ debugger.
 - `README.md` — this workflow documentation.
 
 Do not commit generated build output such as `build-vscode-x64/`.
