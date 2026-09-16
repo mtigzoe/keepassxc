@@ -33,3 +33,4 @@ out/
 vcpkg_installed*/
 
 *.patch
+.kilo/

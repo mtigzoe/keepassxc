@@ -5,17 +5,21 @@
             "name": "KeePassXC",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${command:cmake.launchTargetPath}",
+            "program": "${workspaceFolder}/build-vscode-x64/src/Debug/KeePassXC.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${command:cmake.getLaunchTargetDirectory}",
+            "cwd": "${workspaceFolder}/build-vscode-x64/src/Debug",
             "environment": [
                 {
                     "name": "PATH",
-                    "value": "${command:cmake.getLaunchTargetDirectory};${env:PATH}"
+                    "value": "${workspaceFolder}/build-vscode-x64/src/Debug;${workspaceFolder}/../vcpkg/installed/x64-windows/debug/bin;${workspaceFolder}/build-vscode-x64/vcpkg_installed/x64-windows/debug/bin;${env:PATH}"
+                },
+                {
+                    "name": "QT_QPA_PLATFORM_PLUGIN_PATH",
+                    "value": "${workspaceFolder}/../vcpkg/installed/x64-windows/debug/Qt6/plugins/platforms"
                 }
             ],
-            "console": "internalConsole"
+            "console": "externalConsole"
         }
     ]
 }

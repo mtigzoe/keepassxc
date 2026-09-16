@@ -44,7 +44,7 @@ Open the KeePassXC repository in VS Code. CMake Tools is configured to use:
 
 The documentation build is disabled because the offline documentation requires the Asciidoctor executable. This does not disable KeePassXC's application functionality.
 
-CMake Tools can configure the project automatically when the folder is opened. To build from VS Code, use **Terminal > Run Build Task** or the CMake Tools build command. The committed `tasks.json` provides the default task named **CMake: Build KeePassXC**.
+CMake Tools can configure the project automatically when the folder is opened. To build from VS Code, press `Ctrl+Shift+B` and select **CMake: Build KeePassXC** if prompted. This shortcut only builds the application; it does not start it. The committed `tasks.json` provides that default build task.
 
 The equivalent PowerShell build command is:
 
@@ -58,15 +58,16 @@ The Debug executable is produced at:
 build-vscode-x64\src\Debug\KeePassXC.exe
 ```
 
-## Debug with F5
+## Launch with F5
 
-The committed `launch.json` uses CMake Tools to resolve the selected launch target, so the executable path does not need to be hard-coded.
+The committed `launch.json` launches the Debug executable with Visual Studio's C++ debugger (`cppvsdbg`). It supplies the Qt Debug DLL and platform-plugin paths needed by the executable.
 
-1. Select the **Debug** configuration in CMake Tools.
-2. Select **KeePassXC** as the launch target if necessary.
-3. Press **F5**.
+1. Build the application with `Ctrl+Shift+B` if you have changed source files.
+2. Press `F5` to start `build-vscode-x64\src\Debug\KeePassXC.exe`.
+3. KeePassXC opens in a separate Windows application window. Use `Alt+Tab` to switch to it if it does not receive focus.
+4. To end the debugging session, return to VS Code and press `Shift+F5`.
 
-The debugger uses Visual Studio's C++ debugger (`cppvsdbg`).
+If launch fails with a message stating that a Qt DLL is missing, verify that `launch.json` includes both `../vcpkg/installed/x64-windows/debug/bin` and `build-vscode-x64/vcpkg_installed/x64-windows/debug/bin` in `PATH`.
 
 ## Command-line fallback
 
