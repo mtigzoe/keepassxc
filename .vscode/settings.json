@@ -1,0 +1,6 @@
+{
+    "cmake.buildBeforeRun": true,
+    "cmake.buildTask": true,
+    "cmake.buildDirectory": "${workspaceFolder}/build-vscode",
+    "cmake.configureOnOpen": true
+}
