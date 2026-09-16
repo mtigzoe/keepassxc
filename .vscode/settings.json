@@ -1,6 +1,15 @@
 {
     "cmake.buildBeforeRun": true,
     "cmake.buildTask": true,
-    "cmake.buildDirectory": "${workspaceFolder}/build-vscode",
-    "cmake.configureOnOpen": true
+    "cmake.buildDirectory": "${workspaceFolder}/build-vscode-x64",
+    "cmake.configureOnOpen": true,
+    "cmake.generator": "Visual Studio 18 2026",
+    "cmake.platform": "x64",
+    "cmake.sourceDirectory": "${workspaceFolder}",
+    "cmake.configureSettings": {
+        "CMAKE_TOOLCHAIN_FILE": "${workspaceFolder}/../vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "Qt6_DIR": "${workspaceFolder}/../vcpkg/installed/x64-windows/share/Qt6",
+        "CMAKE_PROGRAM_PATH": "${workspaceFolder}/../vcpkg/installed/x64-windows/tools/Qt6/bin",
+        "KPXC_FEATURE_DOCS": "OFF"
+    }
 }
