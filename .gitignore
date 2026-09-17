@@ -34,3 +34,5 @@ vcpkg_installed*/
 
 *.patch
 .kilo/
+# Python
+__pycache__/

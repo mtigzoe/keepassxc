@@ -53,6 +53,18 @@ private slots:
     void testEditEntryDialogAccessible();
     void testProgressBarLabelAccessibleNameTracksMessages();
 
+    // Regression coverage for the QAccessibleAnnouncementEvent fixes in
+    // 1b59782 -- these use QTestAccessibility (Qt::Test, public API) to
+    // capture what QAccessible::updateAccessibility() is actually called
+    // with, independent of whether a real platform AT bridge is attached.
+    // See the block comment above these five test bodies in the .cpp file
+    // for exactly what that does and does not prove.
+    void testMessageWidgetAnnouncesErrorAssertiveAndStripsMarkup();
+    void testMessageWidgetAnnouncesPositivePolite();
+    void testPasswordWidgetAnnouncesRepeatStatusTransition();
+    void testTagsEditAnnouncesAddedTag();
+    void testMessageBoxAnnouncesAssertiveAndStripsMarkup();
+
 private:
     void triggerAction(const QString& name);
     void openTestDatabase();

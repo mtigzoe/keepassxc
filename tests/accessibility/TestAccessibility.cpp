@@ -23,10 +23,13 @@
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QTest>
+#include <QTimer>
 #include <QToolBar>
 #include <QTreeView>
+#include <QtTest/QTestAccessibility>
 
 #include "config-keepassx-tests.h"
 #include "core/Config.h"
@@ -36,9 +39,11 @@
 #include "gui/DatabaseWidget.h"
 #include "gui/FileDialog.h"
 #include "gui/MessageBox.h"
+#include "gui/MessageWidget.h"
 #include "gui/PasswordWidget.h"
 #include "gui/entry/EditEntryWidget.h"
 #include "gui/entry/EntryView.h"
+#include "gui/tag/TagsEdit.h"
 
 // Queries the accessible interface for `widget` and fails the current test
 // slot (via QVERIFY2's bare "return;") if the widget or its accessible
@@ -75,6 +80,8 @@ int main(int argc, char* argv[])
 void TestAccessibility::initTestCase()
 {
     QVERIFY(Crypto::init());
+
+    QTestAccessibility::initialize();
 
     // Create temporary config file
     Config::createConfigFromFile(TemporaryFile::createTempConfigFile(), {});
@@ -120,6 +127,7 @@ void TestAccessibility::cleanup()
 void TestAccessibility::cleanupTestCase()
 {
     m_dbFile.remove();
+    QTestAccessibility::cleanup();
 }
 
 void TestAccessibility::triggerAction(const QString& name)
@@ -584,4 +592,221 @@ void TestAccessibility::testProgressBarLabelAccessibleNameTracksMessages()
     // Windows-process target in tests/accessibility/windows/ -- materially
     // more test infrastructure than exists there today, which currently
     // only polls static tree state rather than subscribing to live events.
+}
+
+// The five tests below cover the QAccessibleAnnouncementEvent work in
+// 1b59782 (MessageWidget, MessageBox, PasswordWidget, TagsEdit) plus the
+// markup-stripping fix that followed it. They use QTestAccessibility
+// (<QtTest/QTestAccessibility>, part of the public Qt::Test module --
+// KeePassXC's test targets already link it, see TEST_LIBRARIES in
+// tests/CMakeLists.txt) to capture every QAccessible::updateAccessibility()
+// call via QAccessible::installUpdateHandler(), which is a real,
+// Qt-sanctioned bypass of the normal isActive()/bridge-dispatch path this
+// suite otherwise cannot exercise (see the comment on
+// testProgressBarLabelAccessibleNameTracksMessages() above). That is
+// exactly what makes it useful here and exactly what it does not prove:
+// this confirms KeePassXC calls the right API with the right target,
+// message, and politeness. It does NOT confirm a real Windows UIA client,
+// JAWS, or NVDA ever receives it -- that is still the job of the live
+// capture scripts under tests/accessibility/windows/ and an actual
+// screen-reader session, neither of which this file can stand in for.
+//
+// Verified against the real qtbase source (not assumed): in Qt 6.4/6.5,
+// QAccessible::updateAccessibility() only invokes the installed update
+// handler *inside* its `if (isActive() && iface)` block, so without a real
+// AT client attached (true for any offscreen/headless run) the handler --
+// and therefore QTestAccessibility -- never sees the event at all. That
+// nesting was removed in 6.6; from 6.6 through at least 6.8 the handler
+// dispatch is unconditional. Reproduced this locally: the exact pattern
+// below, compiled and run against a real Qt 6.4.2 install with no AT
+// client, captured zero events, matching that source read exactly. Since
+// the feature under test already requires Qt >= 6.8 (see the version guard
+// on every check below), this suite is safely on the fixed side of that
+// line -- but it is a real floor, not a formality, and it's the reason a
+// naive isActive()-gated test design would look like it works in a normal
+// debugging session (a real AT or Windows Narrator often is active there)
+// and then silently capture nothing in CI.
+//
+// Every Announcement assertion below is inside the same
+// QT_VERSION >= QT_VERSION_CHECK(6, 8, 0) guard as the production code,
+// mirroring it exactly -- on an older Qt this suite simply skips those
+// checks and falls through to the Alert assertion, which is the fallback
+// behavior that guard exists to preserve. The Alert checks always run,
+// and per the above will themselves only pass on Qt >= 6.6.
+
+void TestAccessibility::testMessageWidgetAnnouncesErrorAssertiveAndStripsMarkup()
+{
+    MessageWidget widget;
+    widget.setAnimate(false);
+    widget.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&widget));
+
+    QTestAccessibility::clearEvents();
+    // "<b>...</b>" / "<br/>" mirror what BrowserSettingsWidget and
+    // SettingsWidgetFdoSecrets actually pass to showMessage() today --
+    // see the accessiblePlainText() fix in MessageWidget.cpp.
+    widget.showMessage(QStringLiteral("<b>Error:</b> proxy location does not exist<br/>Check your settings"),
+                        MessageWidget::Error);
+
+    bool sawAlert = false;
+    for (auto* event : QTestAccessibility::events()) {
+        if (event->object() == &widget && event->type() == QAccessible::Alert) {
+            sawAlert = true;
+        }
+    }
+    QVERIFY2(sawAlert,
+             "MessageWidget::showMessage() must keep raising QAccessible::Alert -- it's the only mechanism on "
+             "macOS/Linux ATs and on Qt < 6.8");
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QAccessibleAnnouncementEvent* announcement = nullptr;
+    for (auto* event : QTestAccessibility::events()) {
+        if (event->object() == &widget && event->type() == QAccessible::Announcement) {
+            announcement = static_cast<QAccessibleAnnouncementEvent*>(event);
+        }
+    }
+    QVERIFY2(announcement, "MessageWidget::showMessage() did not raise a QAccessibleAnnouncementEvent for Error");
+    QCOMPARE(announcement->politeness(), QAccessible::AnnouncementPoliteness::Assertive);
+    QVERIFY2(!announcement->message().contains(QLatin1String("<b>")),
+             "Announcement text still contains raw \"<b>\" markup");
+    QVERIFY2(!announcement->message().contains(QLatin1String("<br")),
+             "Announcement text still contains raw \"<br\" markup");
+    QVERIFY2(announcement->message().contains(QStringLiteral("Error:")),
+             "Announcement lost real content while stripping markup (before the <br/>)");
+    QVERIFY2(announcement->message().contains(QStringLiteral("Check your settings")),
+             "Announcement lost real content while stripping markup (after the <br/>)");
+#endif
+}
+
+void TestAccessibility::testMessageWidgetAnnouncesPositivePolite()
+{
+    MessageWidget widget;
+    widget.setAnimate(false);
+    widget.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&widget));
+
+    QTestAccessibility::clearEvents();
+    widget.showMessage(QStringLiteral("Entry saved"), MessageWidget::Positive);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QAccessibleAnnouncementEvent* announcement = nullptr;
+    for (auto* event : QTestAccessibility::events()) {
+        if (event->object() == &widget && event->type() == QAccessible::Announcement) {
+            announcement = static_cast<QAccessibleAnnouncementEvent*>(event);
+        }
+    }
+    QVERIFY2(announcement, "MessageWidget::showMessage() did not raise a QAccessibleAnnouncementEvent for Positive");
+    QCOMPARE(announcement->message(), QStringLiteral("Entry saved"));
+    QCOMPARE(announcement->politeness(), QAccessible::AnnouncementPoliteness::Polite);
+#endif
+}
+
+void TestAccessibility::testPasswordWidgetAnnouncesRepeatStatusTransition()
+{
+    PasswordWidget primary;
+    PasswordWidget repeat;
+    primary.setRepeatPartner(&repeat);
+    primary.show();
+    repeat.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&primary));
+    QVERIFY(QTest::qWaitForWindowExposed(&repeat));
+
+    auto* repeatEdit = repeat.findChild<QLineEdit*>("passwordEdit");
+    QVERIFY(repeatEdit);
+
+    QTestAccessibility::clearEvents();
+    // Mismatch first (repeat is still empty when primary changes), then a
+    // transition to match -- updateRepeatStatus() only announces on an
+    // actual accessibleDescription() change, not per keystroke, so this
+    // also confirms that guard still holds.
+    primary.setText(QStringLiteral("hunter2"));
+    repeat.setText(QStringLiteral("hunter2"));
+    QCOMPARE(repeatEdit->accessibleDescription(), QStringLiteral("Passwords match"));
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QAccessibleAnnouncementEvent* announcement = nullptr;
+    for (auto* event : QTestAccessibility::events()) {
+        if (event->object() == repeatEdit && event->type() == QAccessible::Announcement) {
+            // Keep the last one -- both the mismatch and the match
+            // transition announce; the final state is what matters here.
+            announcement = static_cast<QAccessibleAnnouncementEvent*>(event);
+        }
+    }
+    QVERIFY2(announcement, "PasswordWidget::updateRepeatStatus() did not raise a QAccessibleAnnouncementEvent");
+    QCOMPARE(announcement->message(), QStringLiteral("Passwords match"));
+#endif
+}
+
+void TestAccessibility::testTagsEditAnnouncesAddedTag()
+{
+    TagsEdit tagsEdit;
+    tagsEdit.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&tagsEdit));
+
+    tagsEdit.setFocus();
+    QTRY_VERIFY(tagsEdit.hasFocus());
+
+    // Clear after the focus-in announcement (announceTagsState() fires on
+    // focusInEvent too) so only the tag-commit announcement is captured.
+    QTestAccessibility::clearEvents();
+    QTest::keyClicks(&tagsEdit, QStringLiteral("work"));
+    QTest::keyClick(&tagsEdit, Qt::Key_Return);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QAccessibleAnnouncementEvent* announcement = nullptr;
+    for (auto* event : QTestAccessibility::events()) {
+        if (event->object() == &tagsEdit && event->type() == QAccessible::Announcement) {
+            announcement = static_cast<QAccessibleAnnouncementEvent*>(event);
+        }
+    }
+    QVERIFY2(announcement,
+             "TagsEdit::announceTagsState() did not raise a QAccessibleAnnouncementEvent for a committed tag");
+    QVERIFY2(announcement->message().contains(QStringLiteral("work")),
+             "Announcement did not mention the newly committed tag");
+#endif
+}
+
+void TestAccessibility::testMessageBoxAnnouncesAssertiveAndStripsMarkup()
+{
+    MessageBox::setNextAnswer(MessageBox::NoButton); // force the real exec() path, not a canned answer
+
+    // MessageBox::warning() blocks in QMessageBox::exec() until a button is
+    // clicked. Schedule the click for once that nested event loop is
+    // spinning, the same pattern KeePassXC's other modal-dialog tests use
+    // elsewhere in this suite via QTRY_VERIFY/QTest::keyClick against a
+    // dialog found through topLevelWidgets().
+    QTimer::singleShot(0, [] {
+        for (auto* topLevel : QApplication::topLevelWidgets()) {
+            if (auto* box = qobject_cast<QMessageBox*>(topLevel)) {
+                if (!box->buttons().isEmpty()) {
+                    box->buttons().constFirst()->click();
+                }
+                return;
+            }
+        }
+    });
+
+    QTestAccessibility::clearEvents();
+    // Hardcoded "<br><br>" mirrors DatabaseWidget's reload-conflict prompt
+    // -- see the accessiblePlainText() fix in MessageBox.cpp.
+    MessageBox::warning(nullptr,
+                         QStringLiteral("Weak password"),
+                         QStringLiteral("This password is weak.<br><br>Continue anyway?"),
+                         MessageBox::Yes | MessageBox::No,
+                         MessageBox::No);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QAccessibleAnnouncementEvent* announcement = nullptr;
+    for (auto* event : QTestAccessibility::events()) {
+        if (event->type() == QAccessible::Announcement) {
+            announcement = static_cast<QAccessibleAnnouncementEvent*>(event);
+        }
+    }
+    QVERIFY2(announcement, "MessageBox::warning() did not raise a QAccessibleAnnouncementEvent");
+    QCOMPARE(announcement->politeness(), QAccessible::AnnouncementPoliteness::Assertive);
+    QVERIFY2(!announcement->message().contains(QLatin1String("<br>")),
+             "MessageBox announcement text still contains raw \"<br>\" markup");
+    QVERIFY2(announcement->message().contains(QStringLiteral("Continue anyway?")),
+             "MessageBox announcement lost real content while stripping markup");
+#endif
 }

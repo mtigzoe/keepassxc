@@ -20,8 +20,25 @@
 
 #include <QAccessible>
 #include <QDesktopServices>
+#include <QTextDocument>
 #include <QTimer>
 #include <QUrl>
+
+namespace
+{
+    // Several callers pass rich text here directly (e.g. BrowserSettingsWidget's
+    // "<b>Error:</b> ..." messages, DatabaseWidget's re-auth prompt with a
+    // hardcoded "<br>") -- this widget has no plain/rich split the way
+    // MessageBox has fixedText vs. text, so that markup would otherwise reach
+    // the announcement verbatim. QTextDocument::toPlainText() strips tags,
+    // turns <br>/<p> into real line breaks, and decodes entities.
+    QString accessiblePlainText(const QString& richText)
+    {
+        QTextDocument doc;
+        doc.setHtml(richText);
+        return doc.toPlainText();
+    }
+} // namespace
 
 const int MessageWidget::DefaultAutoHideTimeout = 6000;
 const int MessageWidget::LongAutoHideTimeout = 15000;

@@ -24,7 +24,25 @@
 #include <QLayout>
 #include <QMap>
 #include <QPushButton>
+#include <QTextDocument>
 #include <QWindow>
+
+namespace
+{
+    // Callers pass rich text here (e.g. DatabaseWidget's reload-conflict prompt
+    // hardcodes "<br>" for its bullet-style layout), so `text` itself can carry
+    // markup independently of the "\n"->"<br>" substitution messageBox() does
+    // for the visible label below. QTextDocument::toPlainText() strips tags,
+    // turns <br>/<p> into real line breaks (still fine to announce), and
+    // decodes entities -- announcing raw "<b>"/"<br>" verbatim would otherwise
+    // read as literal punctuation to a screen reader.
+    QString accessiblePlainText(const QString& richText)
+    {
+        QTextDocument doc;
+        doc.setHtml(richText);
+        return doc.toPlainText();
+    }
+} // namespace
 
 QWindow* MessageBox::m_overrideParent(nullptr);
 
@@ -152,8 +170,10 @@ MessageBox::Button MessageBox::messageBox(QWidget* parent,
 #if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
         // Use text, not fixedText -- fixedText has "\n" replaced with the
         // literal HTML "<br>" for the visible rich-text label, which would
-        // be read aloud verbatim ("br") if announced as-is.
-        QAccessibleAnnouncementEvent announcementEvent(&msgBox, text);
+        // be read aloud verbatim ("br") if announced as-is. text itself can
+        // still carry caller-authored markup (see accessiblePlainText()
+        // above), so strip that too before announcing.
+        QAccessibleAnnouncementEvent announcementEvent(&msgBox, accessiblePlainText(text));
         if (icon == QMessageBox::Warning || icon == QMessageBox::Critical) {
             announcementEvent.setPoliteness(QAccessible::AnnouncementPoliteness::Assertive);
         }
