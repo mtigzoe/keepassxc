@@ -75,11 +75,28 @@ void MessageWidget::showMessage(const QString& text, KMessageWidget::MessageType
     // DatabaseOpenWidget, shown while focus stays in the password field).
     // Without this, a screen reader has no way to know the message
     // appeared at all -- pressing a key that only produces this warning
-    // looks like it silently did nothing. Firing Alert tells assistive
-    // technology to announce the new text immediately, the same way a
-    // web role="alert" region would be.
+    // looks like it silently did nothing.
+    //
+    // QAccessible::Alert alone does NOT achieve this on Windows: confirmed
+    // directly against qtbase's qwindowsuiaaccessibility.cpp
+    // (QWindowsUiaAccessibility::notifyAccessibilityUpdate()), Alert only
+    // triggers a system sound there and is never forwarded to UI Automation
+    // as an event -- screen readers get no notification from it. Keep
+    // firing it anyway for the sound cue, but pair it with
+    // QAccessibleAnnouncementEvent (Qt 6.8+), which is what actually maps
+    // to a real UIA notification (UiaRaiseNotificationEvent).
     QAccessibleEvent alertEvent(this, QAccessible::Alert);
     QAccessible::updateAccessibility(&alertEvent);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QAccessibleAnnouncementEvent announcementEvent(this, text);
+    // Error/Warning need to interrupt whatever the user is doing (e.g. the
+    // "Press ESC again to close this database" case above); other message
+    // types can wait for a natural pause.
+    if (type == KMessageWidget::Error || type == KMessageWidget::Warning) {
+        announcementEvent.setPoliteness(QAccessible::AnnouncementPoliteness::Assertive);
+    }
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
 
     if (autoHideTimeout > 0) {
         m_autoHideTimer->start(autoHideTimeout);

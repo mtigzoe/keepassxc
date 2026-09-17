@@ -141,9 +141,24 @@ MessageBox::Button MessageBox::messageBox(QWidget* parent,
         // dialog is shown tells assistive technology to announce the dialog's
         // full content (icon role + text) immediately, the same way a web
         // role="alert" region would be announced without user action.
+        //
+        // Alert alone never reaches Windows UI Automation as an event
+        // (confirmed against qtbase's qwindowsuiaaccessibility.cpp -- only a
+        // system sound). QAccessibleAnnouncementEvent (Qt 6.8+) is what
+        // actually raises a UIA notification.
         msgBox.show();
         QAccessibleEvent alertEvent(&msgBox, QAccessible::Alert);
         QAccessible::updateAccessibility(&alertEvent);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+        // Use text, not fixedText -- fixedText has "\n" replaced with the
+        // literal HTML "<br>" for the visible rich-text label, which would
+        // be read aloud verbatim ("br") if announced as-is.
+        QAccessibleAnnouncementEvent announcementEvent(&msgBox, text);
+        if (icon == QMessageBox::Warning || icon == QMessageBox::Critical) {
+            announcementEvent.setPoliteness(QAccessible::AnnouncementPoliteness::Assertive);
+        }
+        QAccessible::updateAccessibility(&announcementEvent);
+#endif
 
         msgBox.exec();
 

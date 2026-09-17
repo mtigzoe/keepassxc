@@ -163,9 +163,10 @@ void YubiKeyEditWidget::hardwareKeyResponse(bool found)
 
     if (!found) {
         m_compUi->yubikeyProgress->setVisible(false);
-        m_compUi->comboChallengeResponse->addItem(YubiKey::instance()->connectedKeys() > 0
-                                                      ? tr("Hardware keys found, but no slots are configured")
-                                                      : tr("No hardware keys detected"));
+        const auto message = YubiKey::instance()->connectedKeys() > 0
+                                  ? tr("Hardware keys found, but no slots are configured")
+                                  : tr("No hardware keys detected");
+        m_compUi->comboChallengeResponse->addItem(message);
         m_isDetected = false;
         // Detection is asynchronous. initComponentEditWidget() sends focus to
         // comboChallengeResponse before findValidKeysAsync() completes, so by
@@ -173,8 +174,17 @@ void YubiKeyEditWidget::hardwareKeyResponse(bool found)
         // combo waiting -- the only other cue is yubikeyProgress disappearing,
         // which a screen reader user can't see. Same Alert pattern as
         // PasswordWidget's live match-status announcement.
+        //
+        // Alert alone never reaches Windows UI Automation as an event
+        // (confirmed against qtbase's qwindowsuiaaccessibility.cpp -- only a
+        // system sound). QAccessibleAnnouncementEvent (Qt 6.8+) is what
+        // actually raises a UIA notification.
         QAccessibleEvent alertEvent(m_compUi->comboChallengeResponse, QAccessible::Alert);
         QAccessible::updateAccessibility(&alertEvent);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+        QAccessibleAnnouncementEvent announcementEvent(m_compUi->comboChallengeResponse, message);
+        QAccessible::updateAccessibility(&announcementEvent);
+#endif
         return;
     }
 
@@ -192,4 +202,9 @@ void YubiKeyEditWidget::hardwareKeyResponse(bool found)
     // re-read it.
     QAccessibleEvent alertEvent(m_compUi->comboChallengeResponse, QAccessible::Alert);
     QAccessible::updateAccessibility(&alertEvent);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QAccessibleAnnouncementEvent announcementEvent(
+        m_compUi->comboChallengeResponse, tr("%n hardware key slot(s) detected", "", foundKeys.size()));
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
 }

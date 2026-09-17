@@ -1028,6 +1028,14 @@ QString TagsEdit::tagsSummary() const
 void TagsEdit::announceTagsState(const QString& message)
 {
     setAccessibleDescription(message);
+    // QAccessible::Alert alone does not reach Windows UI Automation as an
+    // event (confirmed against qtbase's qwindowsuiaaccessibility.cpp -- it
+    // only plays a system sound there). Pair it with
+    // QAccessibleAnnouncementEvent (Qt 6.8+), which does.
     QAccessibleEvent event(this, QAccessible::Alert);
     QAccessible::updateAccessibility(&event);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QAccessibleAnnouncementEvent announcementEvent(this, message);
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
 }

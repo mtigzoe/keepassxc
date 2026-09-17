@@ -279,6 +279,14 @@ void PasswordWidget::updateRepeatStatus()
         if (!statusText.isEmpty()) {
             QAccessibleEvent alertEvent(m_ui->passwordEdit, QAccessible::Alert);
             QAccessible::updateAccessibility(&alertEvent);
+            // Alert alone never reaches Windows UI Automation as an event
+            // (confirmed against qtbase's qwindowsuiaaccessibility.cpp --
+            // only a system sound). QAccessibleAnnouncementEvent (Qt 6.8+)
+            // is what actually raises a UIA notification.
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+            QAccessibleAnnouncementEvent announcementEvent(m_ui->passwordEdit, statusText);
+            QAccessible::updateAccessibility(&announcementEvent);
+#endif
         }
     }
 }
