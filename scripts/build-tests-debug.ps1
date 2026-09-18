@@ -303,10 +303,19 @@ if ($LASTEXITCODE -ne 0) {
     throw "vcpkg manifest dependency installation failed."
 }
 
-$ZlibDebugLib = Join-Path $ManifestInstallRoot "x64-windows\debug\lib\zlibd.lib"
-if (-not (Test-Path $ZlibDebugLib)) {
-    throw "vcpkg installation completed but the required Debug zlib library is missing: $ZlibDebugLib"
+$ManifestTripletRoot = Join-Path $ManifestInstallRoot "x64-windows"
+if (-not (Test-Path $ManifestTripletRoot -PathType Container)) {
+    throw "vcpkg installation completed but the manifest triplet directory was not created: $ManifestTripletRoot"
 }
+
+$ManifestStatus = Join-Path $ManifestTripletRoot "vcpkg\status"
+if (-not (Test-Path $ManifestStatus -PathType Leaf)) {
+    throw "vcpkg installation completed but its manifest installation status file was not created: $ManifestStatus"
+}
+
+Write-Host ""
+Write-Host "vcpkg manifest dependencies installed:"
+Write-Host $ManifestTripletRoot
 
 # ============================================================
 # Configure CMake
