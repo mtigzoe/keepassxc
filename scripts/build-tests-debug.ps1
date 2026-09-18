@@ -282,6 +282,33 @@ if ($Clean) {
 }
 
 # ============================================================
+# Install manifest dependencies into this test build tree
+# ============================================================
+# CMake's vcpkg manifest mode installs dependencies under the build tree.
+# Do this explicitly before configuration so a stale/incomplete manifest
+# installation cannot leave Ninja referring to a missing Debug library.
+Write-Host ""
+Write-Host "============================================================"
+Write-Host "Installing vcpkg manifest dependencies..."
+Write-Host "============================================================"
+
+$ManifestInstallRoot = Join-Path $BuildDir "vcpkg_installed"
+
+& $VcpkgExe install `
+    --x-manifest-root="$Repo" `
+    --x-install-root="$ManifestInstallRoot" `
+    --triplet x64-windows
+
+if ($LASTEXITCODE -ne 0) {
+    throw "vcpkg manifest dependency installation failed."
+}
+
+$ZlibDebugLib = Join-Path $ManifestInstallRoot "x64-windows\debug\lib\zlibd.lib"
+if (-not (Test-Path $ZlibDebugLib)) {
+    throw "vcpkg installation completed but the required Debug zlib library is missing: $ZlibDebugLib"
+}
+
+# ============================================================
 # Configure CMake
 # ============================================================
 
@@ -294,6 +321,8 @@ cmake -S $Repo -B $BuildDir `
     -G Ninja `
     -DCMAKE_BUILD_TYPE=Debug `
     -DCMAKE_TOOLCHAIN_FILE="$VcpkgToolchain" `
+    -DVCPKG_TARGET_TRIPLET=x64-windows `
+    -DVCPKG_MANIFEST_MODE=ON `
     -DQt6_DIR="$QtDir" `
     -DWINDEPLOYQT_EXE="$WinDeployQtDebug" `
     -DWITH_TESTS=ON `
