@@ -62,10 +62,9 @@ if (-not $Repo) {
         $Repo = $ScriptDir
     }
     else {
-        $Repo = Join-Path (Split-Path -Parent $ScriptDir) "keepassxc"
+        $Repo = Split-Path -Parent $ScriptDir
     }
 }
-
 if (-not $VcpkgRoot) {
     $ParentDir = Split-Path -Parent $Repo
     $VcpkgRoot = Join-Path $ParentDir "vcpkg"
