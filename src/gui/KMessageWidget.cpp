@@ -23,6 +23,8 @@
 #include "core/Global.h"
 #include "gui/Icons.h"
 
+#include <QAccessible>
+#include <QAccessibleWidget>
 #include <QAction>
 #include <QBoxLayout>
 #include <QEvent>
@@ -31,6 +33,51 @@
 #include <QStyle>
 #include <QTimeLine>
 #include <QToolButton>
+
+namespace
+{
+    // KMessageWidgetPrivate::content is a plain internal QFrame that exists
+    // purely to lay out the icon/text/action-button row -- it carries no
+    // semantic meaning of its own, since everything inside it (icon, text,
+    // close/action buttons) is already exposed with its own proper
+    // accessible name and role. QFrame has no dedicated entry in Qt's
+    // accessibility factory, so it still falls back to the generic
+    // QAccessibleWidget with role Border, and on Windows that surfaces as
+    // an unnamed Custom-typed element in the UI Automation tree --
+    // encountered by JAWS as a nameless, seemingly interactive stop with no
+    // purpose (found via test-a11ey.py; automation_id
+    // "...globalMessageWidget.QFrame" confirmed which widget this is).
+    //
+    // Marking it invisible to accessibility clients here removes that
+    // phantom node without touching its children, which stay reachable
+    // exactly as before.
+    class IgnoredContainerAccessible : public QAccessibleWidget
+    {
+    public:
+        explicit IgnoredContainerAccessible(QWidget* widget)
+            : QAccessibleWidget(widget)
+        {
+        }
+
+        QAccessible::State state() const override
+        {
+            QAccessible::State s = QAccessibleWidget::state();
+            s.invisible = true;
+            return s;
+        }
+    };
+
+    QAccessibleInterface* ignoredContainerAccessibleFactory(const QString& classname, QObject* object)
+    {
+        if (classname == QLatin1String("QFrame") && object
+            && object->property("_kpxcAccessibilityIgnored").toBool()) {
+            if (auto* widget = qobject_cast<QWidget*>(object)) {
+                return new IgnoredContainerAccessible(widget);
+            }
+        }
+        return nullptr;
+    }
+} // namespace
 
 //---------------------------------------------------------------------
 // KMessageWidgetPrivate
@@ -75,6 +122,12 @@ void KMessageWidgetPrivate::init(KMessageWidget *q_ptr)
 
     content = new QFrame(q);
     content->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    content->setProperty("_kpxcAccessibilityIgnored", true);
+    static const bool accessibleFactoryInstalled = [] {
+        QAccessible::installFactory(ignoredContainerAccessibleFactory);
+        return true;
+    }();
+    Q_UNUSED(accessibleFactoryInstalled);
 
     wordWrap = false;
 
