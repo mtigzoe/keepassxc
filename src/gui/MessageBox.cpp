@@ -27,6 +27,7 @@
 #include <QTextDocument>
 #include <QWindow>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
 namespace
 {
     // Callers pass rich text here (e.g. DatabaseWidget's reload-conflict prompt
@@ -36,6 +37,9 @@ namespace
     // turns <br>/<p> into real line breaks (still fine to announce), and
     // decodes entities -- announcing raw "<b>"/"<br>" verbatim would otherwise
     // read as literal punctuation to a screen reader.
+    //
+    // Gated the same as its only call site below: on pre-6.8 Qt this was
+    // dead code and tripped -Werror=unused-function.
     QString accessiblePlainText(const QString& richText)
     {
         QTextDocument doc;
@@ -43,6 +47,7 @@ namespace
         return doc.toPlainText();
     }
 } // namespace
+#endif
 
 QWindow* MessageBox::m_overrideParent(nullptr);
 

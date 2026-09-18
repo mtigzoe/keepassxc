@@ -87,7 +87,7 @@ void MessageWidget::showMessage(const QString& text, KMessageWidget::MessageType
     // StaticText announcement of the identical text -- a screen reader
     // arrowing through the window hits the same paragraph twice, the
     // second time framed as a pressable button that does nothing.
-    setAccessibleName(text);
+    setAccessibleName(accessiblePlainText(text));
 #endif
 
     emit showAnimationStarted();
@@ -116,7 +116,7 @@ void MessageWidget::showMessage(const QString& text, KMessageWidget::MessageType
     QAccessibleEvent alertEvent(this, QAccessible::Alert);
     QAccessible::updateAccessibility(&alertEvent);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
-    QAccessibleAnnouncementEvent announcementEvent(this, text);
+    QAccessibleAnnouncementEvent announcementEvent(this, accessiblePlainText(text));
     // Error/Warning need to interrupt whatever the user is doing (e.g. the
     // "Press ESC again to close this database" case above); other message
     // types can wait for a natural pause.
