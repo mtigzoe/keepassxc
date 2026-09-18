@@ -1,3 +1,5 @@
+import sys
+
 import xa11y
 
 
@@ -14,14 +16,17 @@ def ancestor_chain(el, max_depth=10):
             break
         chain.append(node)
         try:
-            node = node.parent
+            node = node.parent()
         except Exception:
             break
     return chain
 
 
 def main():
-    app = xa11y.App.by_name("KeePassXC")
+    if len(sys.argv) > 1:
+        app = xa11y.App.by_pid(int(sys.argv[1]))
+    else:
+        app = xa11y.App.by_name("KeePassXC")
     print(f"Connected to: {app.name} (pid={app.pid})")
 
     print("\n--- Buttons ---")
