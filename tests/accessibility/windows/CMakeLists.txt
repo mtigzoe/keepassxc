@@ -38,7 +38,7 @@ target_compile_definitions(testwindowsaccessibility PRIVATE
 # actionable UIA control patterns and that the control view is structurally
 # usable by assistive technology.
 add_unit_test(NAME testwindowsaccessibilitytree
-    SOURCES TestWindowsAccessibilityTree.cpp
+    SOURCES TestWindowsAccessibilityTree.cpp ../../util/TemporaryFile.cpp
     LIBS ${WINDOWS_UIA_LIBRARIES})
 
 target_compile_definitions(testwindowsaccessibilitytree PRIVATE
