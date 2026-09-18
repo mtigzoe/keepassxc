@@ -67,6 +67,33 @@ namespace
         }
     };
 
+    // KMessageWidget itself (globalMessageWidget and every per-dialog
+    // messageWidget) has no dedicated Qt accessibility factory either, so it
+    // falls back to the same generic QAccessibleWidget -- which unconditionally
+    // exposes an Invoke pattern. Confirmed via test-a11ey.py plus a direct UI
+    // Automation query (IsOffscreen=False, InvokePatternIdentifiers.Pattern)
+    // that this stays true even while the widget has no message queued: JAWS
+    // still lands on a real, on-screen, pressable, unnamed control. Reporting
+    // the widget as invisible whenever its text is empty removes that phantom
+    // stop while leaving the genuinely-showing-a-message case untouched.
+    class MessageWidgetAccessible : public QAccessibleWidget
+    {
+    public:
+        explicit MessageWidgetAccessible(KMessageWidget* widget)
+            : QAccessibleWidget(widget)
+        {
+        }
+
+        QAccessible::State state() const override
+        {
+            QAccessible::State s = QAccessibleWidget::state();
+            if (static_cast<KMessageWidget*>(widget())->text().isEmpty()) {
+                s.invisible = true;
+            }
+            return s;
+        }
+    };
+
     QAccessibleInterface* ignoredContainerAccessibleFactory(const QString& classname, QObject* object)
     {
         if (classname == QLatin1String("QFrame") && object
@@ -74,6 +101,9 @@ namespace
             if (auto* widget = qobject_cast<QWidget*>(object)) {
                 return new IgnoredContainerAccessible(widget);
             }
+        }
+        if (auto* messageWidget = qobject_cast<KMessageWidget*>(object)) {
+            return new MessageWidgetAccessible(messageWidget);
         }
         return nullptr;
     }

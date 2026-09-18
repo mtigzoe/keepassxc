@@ -610,21 +610,28 @@ MainWindow::MainWindow()
     connect(qApp, &QGuiApplication::commitDataRequest, this, [this] { m_appExitCalled = true; });
 
 #ifdef KEEPASSXC_BUILD_TYPE_SNAPSHOT
-    auto* hidePreRelWarn = new QAction(tr("Don't show again for this version"), m_ui->globalMessageWidget);
-    m_ui->globalMessageWidget->addAction(hidePreRelWarn);
-    auto hidePreRelWarnConn = QSharedPointer<QMetaObject::Connection>::create();
-    *hidePreRelWarnConn = connect(
-        m_ui->globalMessageWidget, &KMessageWidget::hideAnimationFinished, [this, hidePreRelWarn, hidePreRelWarnConn] {
-            m_ui->globalMessageWidget->removeAction(hidePreRelWarn);
-            disconnect(*hidePreRelWarnConn);
-            hidePreRelWarn->deleteLater();
-        });
-    connect(hidePreRelWarn, &QAction::triggered, [this] {
-        m_ui->globalMessageWidget->animatedHide();
-        config()->set(Config::Messages_HidePreReleaseWarning, KEEPASSXC_VERSION);
-    });
-
+    // Only attach the dismiss action when the warning is actually about to be
+    // shown. Adding it unconditionally left a QAction on globalMessageWidget
+    // for the rest of the session once a prior version's warning had already
+    // been dismissed, which gives the otherwise message-less widget an Invoke
+    // pattern -- Windows UI Automation (and JAWS) then exposes it as an
+    // unnamed, seemingly interactive button occupying real screen space with
+    // no message ever shown (found via test-a11ey.py).
     if (config()->get(Config::Messages_HidePreReleaseWarning) != KEEPASSXC_VERSION) {
+        auto* hidePreRelWarn = new QAction(tr("Don't show again for this version"), m_ui->globalMessageWidget);
+        m_ui->globalMessageWidget->addAction(hidePreRelWarn);
+        auto hidePreRelWarnConn = QSharedPointer<QMetaObject::Connection>::create();
+        *hidePreRelWarnConn = connect(
+            m_ui->globalMessageWidget, &KMessageWidget::hideAnimationFinished, [this, hidePreRelWarn, hidePreRelWarnConn] {
+                m_ui->globalMessageWidget->removeAction(hidePreRelWarn);
+                disconnect(*hidePreRelWarnConn);
+                hidePreRelWarn->deleteLater();
+            });
+        connect(hidePreRelWarn, &QAction::triggered, [this] {
+            m_ui->globalMessageWidget->animatedHide();
+            config()->set(Config::Messages_HidePreReleaseWarning, KEEPASSXC_VERSION);
+        });
+
         m_ui->globalMessageWidget->showMessage(tr("WARNING: You are using a development snapshot build of KeePassXC.\n"
                                                   "Maintain a backup of your databases in the event of unknown bugs.\n"
                                                   "This version is not meant for production use."),
