@@ -14,6 +14,66 @@ This accessibility test suite uses several layers of tools and technologies to t
 
 These layers complement one another. A control can exist in KeePassXC and be represented by Qt without being exposed correctly through Windows UI Automation, so accessibility testing needs to cover more than one layer.
 
+## Why `xa11y-inspect.py` is needed
+
+The C++ accessibility tests are **regression tests**: they assert known expected behavior and fail when that behavior changes. They are not designed to answer the exploratory question, **“What exactly is this control in the live accessibility tree?”**
+
+`tests/accessibility/xa11y-inspect.py` fills that diagnostic gap. It connects to a running KeePassXC instance through the `xa11y` accessibility API and lets us inspect what the application is actually exposing at runtime.
+
+It can:
+
+- list buttons and text fields visible to the accessibility API;
+- list all named elements and their exposed roles;
+- find **unnamed interactive buttons** that need investigation;
+- print raw platform accessibility data, including Windows UIA properties when available;
+- print an element's **ancestor chain**, helping identify which Qt/KeePassXC widget produced an unexpected accessibility element;
+- detect the same accessible name exposed under different roles, which can reveal duplicate-announcement or duplicate-exposure patterns;
+- inspect the **live application**, rather than relying only on source code or assumptions about Qt's accessibility exposure.
+
+This is especially useful during an accessibility bug hunt. If JAWS appears to announce a control incorrectly, the diagnostic script helps determine whether the issue is an incorrect accessible name, role, duplicate element, unexpected container, or another UIA exposure problem before changing the KeePassXC source.
+
+### Diagnostic tool vs. regression test
+
+`xa11y-inspect.py` should **not** replace the C++ Windows UIA tests. They serve different purposes:
+
+| Tool | Purpose |
+| --- | --- |
+| `xa11y-inspect.py` | Exploratory inspection and diagnosis of the live accessibility tree |
+| `dump_uia_tree.py` | Broad diagnostic dump of the Windows UIA tree |
+| `testwindowsaccessibility` | Automated Windows UIA regression assertions |
+| `testwindowsaccessibilitytree` | Automated Windows UIA tree/interaction regression assertions |
+| `testaccessibility` | In-process Qt accessibility regression assertions |
+| JAWS/NVDA | Final assistive-technology behavior and speech/braille validation |
+
+A typical workflow is:
+
+1. Reproduce or observe the accessibility problem.
+2. Use `xa11y-inspect.py` to identify the actual exposed element and its role, name, raw platform data, and ancestors.
+3. Use that information to locate the corresponding Qt/KeePassXC widget.
+4. Fix the underlying accessibility implementation.
+5. Add a deterministic C++ regression test where the behavior can be asserted.
+6. Re-run the diagnostic tool to confirm the live accessibility tree is correct.
+7. Run the relevant CTest tests.
+8. Perform the relevant manual JAWS/NVDA validation.
+
+### Run `xa11y-inspect.py`
+
+With KeePassXC running, execute from the repository root:
+
+```powershell
+uv run tests\accessibility\xa11y-inspect.py
+```
+
+By default the script connects to KeePassXC by application name. To target a specific process ID:
+
+```powershell
+uv run tests\accessibility\xa11y-inspect.py <PID>
+```
+
+The output includes buttons, text fields, named elements, unnamed buttons with detailed raw accessibility data, ancestor chains, and names exposed across multiple roles.
+
+Use this script when you need to **discover and diagnose** the live accessibility tree. Once a defect is understood, encode the expected behavior in a C++ regression test so CI can catch future regressions.
+
 ## Windows Debug Build and UI Automation Diagnostics
 
 These instructions describe how to build the Windows Debug version of KeePassXC and inspect the Windows UI Automation (UIA) tree used by assistive technologies such as JAWS.
