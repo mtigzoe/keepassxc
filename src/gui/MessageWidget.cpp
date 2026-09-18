@@ -74,10 +74,21 @@ void MessageWidget::showMessage(const QString& text, KMessageWidget::MessageType
     setMessageType(type);
     setText(text);
 
-    // KMessageWidget does not expose its visible message text as the
-    // accessible name of the outer widget. Set it here so the Alert event
-    // below has useful text for assistive technologies.
+#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
+    // Only needed pre-6.8. Without QAccessibleAnnouncementEvent below, the
+    // Alert event carries no text of its own, so an AT has to query this
+    // widget's own accessible name to know what to speak -- KMessageWidget
+    // does not set one on the outer widget by default. On 6.8+ the
+    // Announcement event carries the text directly, so setting it here
+    // buys nothing and has a real cost: any caller that also does
+    // globalMessageWidget->addAction(...) (e.g. MainWindow's snapshot-build
+    // warning) causes this outer widget to surface as its own named,
+    // Windows-UIA Button-role object, duplicating textLabel's own
+    // StaticText announcement of the identical text -- a screen reader
+    // arrowing through the window hits the same paragraph twice, the
+    // second time framed as a pressable button that does nothing.
     setAccessibleName(text);
+#endif
 
     emit showAnimationStarted();
     if (m_animate) {
