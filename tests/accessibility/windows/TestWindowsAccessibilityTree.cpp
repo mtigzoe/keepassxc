@@ -7,6 +7,8 @@
  *  version 3 of the License.
  */
 
+#include "util/TemporaryFile.h"
+
 #include <QCoreApplication>
 #include <QElapsedTimer>
 #include <QFileInfo>
@@ -15,7 +17,6 @@
 #include <QSettings>
 #include <QStringList>
 #include <QTest>
-#include <QTemporaryFile>
 
 #include <UIAutomation.h>
 #include <oleauto.h>
@@ -76,6 +77,76 @@ CONTROLTYPEID controlType(IUIAutomationElement* element)
     return value;
 }
 
+QString controlTypeName(CONTROLTYPEID type)
+{
+    switch (type) {
+    case UIA_ButtonControlTypeId: return QStringLiteral("Button");
+    case UIA_CheckBoxControlTypeId: return QStringLiteral("CheckBox");
+    case UIA_ComboBoxControlTypeId: return QStringLiteral("ComboBox");
+    case UIA_EditControlTypeId: return QStringLiteral("Edit");
+    case UIA_HyperlinkControlTypeId: return QStringLiteral("Hyperlink");
+    case UIA_ListControlTypeId: return QStringLiteral("List");
+    case UIA_ListItemControlTypeId: return QStringLiteral("ListItem");
+    case UIA_MenuItemControlTypeId: return QStringLiteral("MenuItem");
+    case UIA_RadioButtonControlTypeId: return QStringLiteral("RadioButton");
+    case UIA_SliderControlTypeId: return QStringLiteral("Slider");
+    case UIA_SpinnerControlTypeId: return QStringLiteral("Spinner");
+    case UIA_TabItemControlTypeId: return QStringLiteral("TabItem");
+    case UIA_TreeControlTypeId: return QStringLiteral("Tree");
+    case UIA_TreeItemControlTypeId: return QStringLiteral("TreeItem");
+    case UIA_WindowControlTypeId: return QStringLiteral("Window");
+    default: return QStringLiteral("type %1").arg(type);
+    }
+}
+
+QString elementAutomationId(IUIAutomationElement* element)
+{
+    if (!element) return {};
+    BSTR value = nullptr;
+    if (FAILED(element->get_CurrentAutomationId(&value)) || !value) return {};
+    const QString result = QString::fromWCharArray(value);
+    SysFreeString(value);
+    return result;
+}
+
+QString elementClassName(IUIAutomationElement* element)
+{
+    if (!element) return {};
+    BSTR value = nullptr;
+    if (FAILED(element->get_CurrentClassName(&value)) || !value) return {};
+    const QString result = QString::fromWCharArray(value);
+    SysFreeString(value);
+    return result;
+}
+
+QString elementFrameworkId(IUIAutomationElement* element)
+{
+    if (!element) return {};
+    BSTR value = nullptr;
+    if (FAILED(element->get_CurrentFrameworkId(&value)) || !value) return {};
+    const QString result = QString::fromWCharArray(value);
+    SysFreeString(value);
+    return result;
+}
+
+QString elementDiagnostics(IUIAutomationElement* element, const QString& parentDescription)
+{
+    UIA_HWND rawHandle = nullptr;
+    if (element) {
+        element->get_CurrentNativeWindowHandle(&rawHandle);
+    }
+    const HWND hwnd = reinterpret_cast<HWND>(rawHandle);
+
+    return QStringLiteral("ControlType=%1 AutomationId=\"%2\" ClassName=\"%3\" FrameworkId=\"%4\" "
+                           "NativeWindowHandle=%5 Parent=[%6]")
+        .arg(controlTypeName(controlType(element)))
+        .arg(elementAutomationId(element))
+        .arg(elementClassName(element))
+        .arg(elementFrameworkId(element))
+        .arg(hwnd ? QString::number(reinterpret_cast<quintptr>(hwnd), 16) : QStringLiteral("(none)"))
+        .arg(parentDescription);
+}
+
 bool hasPattern(IUIAutomationElement* element, PATTERNID patternId)
 {
     if (!element) {
@@ -132,7 +203,7 @@ private:
                               QStringList* unnamedElements) const;
 
     QProcess m_process;
-    QTemporaryFile m_config;
+    QString m_tempConfigPath;
     Microsoft::WRL::ComPtr<IUIAutomation> m_automation;
     Microsoft::WRL::ComPtr<IUIAutomationElement> m_mainWindow;
 };
@@ -148,11 +219,10 @@ void WindowsUiAutomationTreeTest::initTestCase()
                                   IID_PPV_ARGS(&m_automation));
     QVERIFY2(SUCCEEDED(hr) && m_automation, "Could not create the Windows UI Automation client");
 
-    QVERIFY2(m_config.open(), "Could not create the temporary KeePassXC configuration");
-    const QString configPath = m_config.fileName();
-    m_config.close();
+    m_tempConfigPath = TemporaryFile::createTempConfigFile();
+    QVERIFY2(!m_tempConfigPath.isEmpty(), "Could not create the temporary KeePassXC configuration");
 
-    QSettings settings(configPath, QSettings::IniFormat);
+    QSettings settings(m_tempConfigPath, QSettings::IniFormat);
     settings.setValue("UpdateCheckMessageShown", true);
     settings.setValue("SingleInstance", false);
     settings.setValue("GUI/MinimizeOnStartup", false);
@@ -169,7 +239,7 @@ void WindowsUiAutomationTreeTest::initTestCase()
     m_process.setProcessEnvironment(environment);
     m_process.setWorkingDirectory(QFileInfo(executable).absolutePath());
     m_process.setProgram(executable);
-    m_process.setArguments({QStringLiteral("--config"), configPath});
+    m_process.setArguments({QStringLiteral("--config"), m_tempConfigPath});
     m_process.start();
     QVERIFY2(m_process.waitForStarted(StartTimeoutMs), "KeePassXC.exe did not start");
 
@@ -260,7 +330,8 @@ bool WindowsUiAutomationTreeTest::enumerateControlView(IUIAutomationElement* roo
         return false;
     }
 
-    std::function<bool(IUIAutomationElement*)> walk = [&](IUIAutomationElement* element) {
+    std::function<bool(IUIAutomationElement*, const QString&)> walk =
+        [&](IUIAutomationElement* element, const QString& parentDescription) {
         if (!element) {
             return true;
         }
@@ -271,9 +342,12 @@ bool WindowsUiAutomationTreeTest::enumerateControlView(IUIAutomationElement* roo
         if (isInteractiveControl(type) && name.trimmed().isEmpty()) {
             ++(*unnamedInteractive);
             if (unnamedElements->size() < 20) {
-                unnamedElements->append(QStringLiteral("control type %1").arg(type));
+                unnamedElements->append(elementDiagnostics(element, parentDescription));
             }
         }
+
+        const QString thisDescription =
+            QStringLiteral("Name=\"%1\" ControlType=%2").arg(name, controlTypeName(type));
 
         Microsoft::WRL::ComPtr<IUIAutomationElement> child;
         if (FAILED(walker->GetFirstChildElement(element, &child))) {
@@ -281,7 +355,7 @@ bool WindowsUiAutomationTreeTest::enumerateControlView(IUIAutomationElement* roo
         }
 
         while (child) {
-            if (!walk(child.Get())) {
+            if (!walk(child.Get(), thisDescription)) {
                 return false;
             }
             Microsoft::WRL::ComPtr<IUIAutomationElement> sibling;
@@ -294,7 +368,7 @@ bool WindowsUiAutomationTreeTest::enumerateControlView(IUIAutomationElement* roo
         return true;
     };
 
-    return walk(root);
+    return walk(root, QStringLiteral("(root)"));
 }
 
 void WindowsUiAutomationTreeTest::testMainWindowProperties()
