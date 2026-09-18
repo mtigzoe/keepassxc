@@ -10,6 +10,70 @@
                 "isDefault": true
             },
             "problemMatcher": []
+        },
+        {
+            "label": "CTest: Qt Accessibility",
+            "type": "shell",
+            "command": "ctest",
+            "args": [
+                "--test-dir",
+                "build-vscode-x64",
+                "-C",
+                "Debug",
+                "-R",
+                "^testaccessibility$",
+                "--output-on-failure"
+            ],
+            "dependsOn": "CMake: Build KeePassXC",
+            "problemMatcher": []
+        },
+        {
+            "label": "CTest: Windows Accessibility",
+            "type": "shell",
+            "command": "ctest",
+            "args": [
+                "--test-dir",
+                "build-vscode-x64",
+                "-C",
+                "Debug",
+                "-R",
+                "^testwindowsaccessibility$",
+                "--output-on-failure"
+            ],
+            "dependsOn": "CMake: Build KeePassXC",
+            "problemMatcher": []
+        },
+        {
+            "label": "CTest: Windows Accessibility Tree",
+            "type": "shell",
+            "command": "ctest",
+            "args": [
+                "--test-dir",
+                "build-vscode-x64",
+                "-C",
+                "Debug",
+                "-R",
+                "^testwindowsaccessibilitytree$",
+                "--output-on-failure"
+            ],
+            "dependsOn": "CMake: Build KeePassXC",
+            "problemMatcher": []
+        },
+        {
+            "label": "CTest: All Accessibility",
+            "type": "shell",
+            "command": "ctest",
+            "args": [
+                "--test-dir",
+                "build-vscode-x64",
+                "-C",
+                "Debug",
+                "-R",
+                "^(testaccessibility|testwindowsaccessibility|testwindowsaccessibilitytree)$",
+                "--output-on-failure"
+            ],
+            "dependsOn": "CMake: Build KeePassXC",
+            "problemMatcher": []
         }
     ]
 }
