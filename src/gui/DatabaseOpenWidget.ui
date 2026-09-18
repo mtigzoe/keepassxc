@@ -458,6 +458,9 @@
                  <property name="flat">
                   <bool>true</bool>
                  </property>
+                 <property name="alignment">
+                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton { background-color: transparent; border: none; text-decoration: underline; color: palette(link); }</string>
                  </property>

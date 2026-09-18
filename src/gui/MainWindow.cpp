@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2025 KeePassXC Team <team@keepassxc.org>
+ *  Copyright (C) 2026 KeePassXC Team <team@keepassxc.org>
  *  Copyright (C) 2010 Felix Geyer <debfx@fobos.de>
  *
  *  This program is free software: you can redistribute it and/or modify
@@ -1860,6 +1860,7 @@ void MainWindow::hideWindow()
         if (QGuiApplication::platformName() != "xcb" && QGuiApplication::platformName() != "cocoa") {
             setWindowState(windowState() | Qt::WindowMinimized);
         }
+        m_minimizedToSystemTray = true;
         hide();
     } else {
         showMinimized();
@@ -1939,11 +1940,17 @@ void MainWindow::hideYubiKeyPopup()
 
 void MainWindow::bringToFront()
 {
+    m_minimizedToSystemTray = false;
     ensurePolished();
     setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
     show();
     raise();
     activateWindow();
+}
+
+bool MainWindow::isMinimizedToSystemTray()
+{
+    return m_minimizedToSystemTray;
 }
 
 void MainWindow::handleScreenLock()
