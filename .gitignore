@@ -36,3 +36,7 @@ vcpkg_installed*/
 .kilo/
 # Python
 __pycache__/
+
+# Accessibility diagnostic output
+/tests/accessibility/atspi-tree-dump.txt
+/tests/accessibility/windows/uia-tree-dump.txt
