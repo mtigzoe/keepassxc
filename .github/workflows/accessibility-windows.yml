@@ -36,6 +36,9 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/microsoft/vcpkg.git "$env:RUNNER_TEMP\vcpkg"
           git -C "$env:RUNNER_TEMP\vcpkg" fetch --depth 1 origin 66c0373dc7fca549e5803087b9487edfe3aca0a1
+          # The manifest pins a historical vcpkg baseline. Because the clone above
+          # is shallow, fetch that exact baseline object before vcpkg resolves ports.
+          git -C "$env:RUNNER_TEMP\vcpkg" fetch --depth 1 origin 1600ce2ba1b6b621bfc5a31a785c4963b817a1c7
           & "$env:RUNNER_TEMP\vcpkg\bootstrap-vcpkg.bat" -disableMetrics
           "VCPKG_ROOT=$env:RUNNER_TEMP\vcpkg" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
