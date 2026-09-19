@@ -29,8 +29,25 @@
 #include "keys/PasswordKey.h"
 #include "quickunlock/QuickUnlockInterface.h"
 
+#include <QAccessible>
 #include <QLayout>
 #include <QPushButton>
+#include <QTimer>
+
+namespace
+{
+void announceWarning(QMessageBox& warning)
+{
+    warning.show();
+    QAccessibleEvent alertEvent(&warning, QAccessible::Alert);
+    QAccessible::updateAccessibility(&alertEvent);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QAccessibleAnnouncementEvent announcementEvent(&warning, warning.text());
+    announcementEvent.setPoliteness(QAccessible::AnnouncementPoliteness::Assertive);
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
+}
+} // namespace
 
 DatabaseSettingsWidgetDatabaseKey::DatabaseSettingsWidgetDatabaseKey(QWidget* parent)
     : DatabaseSettingsWidget(parent)
@@ -154,12 +171,13 @@ bool DatabaseSettingsWidgetDatabaseKey::saveSettings()
         msgBox->setIcon(QMessageBox::Warning);
         msgBox->setWindowTitle(tr("No password set"));
         msgBox->setText(tr("WARNING! You have not set a password. Using a database without "
-                           "a password is strongly discouraged!\n\n"
+                           "a password is strongly discouraged!\\n\\n"
                            "Are you sure you want to continue without a password?"));
         auto btn = msgBox->addButton(tr("Continue without password"), QMessageBox::ButtonRole::AcceptRole);
         msgBox->addButton(QMessageBox::Cancel);
         msgBox->setDefaultButton(QMessageBox::Cancel);
         msgBox->layout()->setSizeConstraint(QLayout::SetMinimumSize);
+        announceWarning(*msgBox);
         msgBox->exec();
         if (msgBox->clickedButton() != btn) {
             return false;
