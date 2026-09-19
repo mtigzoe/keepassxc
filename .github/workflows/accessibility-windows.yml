@@ -73,19 +73,9 @@ jobs:
         env:
           QT_ACCESSIBILITY: '1'
         run: |
-          $ctestOutput = & ctest --test-dir build-debug -C Debug -R '^testaccessibility$' --output-on-failure 2>&1
-          $ctestExitCode = $LASTEXITCODE
-          $ctestOutput | ForEach-Object { Write-Host $_ }
-
-          if ($ctestExitCode -ne 0) {
-            Write-Host 'CTest failed. Running the Qt test executable directly and capturing both stdout and stderr.'
-            $testOutput = & '.\build-debug\tests\accessibility\Debug\testaccessibility.exe' -v1 2>&1
-            $testExitCode = $LASTEXITCODE
-            Write-Host '=== DIRECT testaccessibility.exe OUTPUT ==='
-            $testOutput | ForEach-Object { Write-Host $_ }
-            Write-Host '=== END DIRECT testaccessibility.exe OUTPUT ==='
-            Write-Host "Direct test executable exit code: $testExitCode"
-            exit $ctestExitCode
+          & '.\build-debug\tests\accessibility\Debug\testaccessibility.exe' -v1
+          if ($LASTEXITCODE -ne 0) {
+            throw "Qt accessibility tests failed with exit code $LASTEXITCODE."
           }
 
       - name: Run Windows UI Automation accessibility tests
