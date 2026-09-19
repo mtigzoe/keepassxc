@@ -386,6 +386,7 @@ bool DatabaseSettingsWidgetEncryption::saveSettings()
         auto cancel = warning.addButton(tr("Cancel"), QMessageBox::ButtonRole::RejectRole);
         warning.setDefaultButton(cancel);
         warning.layout()->setSizeConstraint(QLayout::SetMinimumSize);
+        announceWarning(warning);
         warning.exec();
         if (warning.clickedButton() != ok) {
             return false;
