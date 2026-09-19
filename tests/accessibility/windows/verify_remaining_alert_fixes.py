@@ -7,11 +7,9 @@ TagsEdit::announceTagsState(), PasswordWidget::updateRepeatStatus(),
 YubiKeyEditWidget::hardwareKeyResponse(), and MessageBox::messageBox()'s
 "Weak password" warning (DatabaseSettingsWidgetDatabaseKey::saveSettings()).
 
-verify_alert_uia_notifications.py only ever live-verified MessageWidget's
-fix. This script exercises the other three source files' code paths
-(TagsEdit + PasswordWidget + YubiKeyEditWidget + MessageBox all live on the
-same "Database Settings > Security > Database Credentials" page, reachable
-without any native file dialog) and reports, per scenario, whether a real
+verify_alert_uia_notifications.py live-verifies MessageWidget's fix. This script
+exercises the other four source files' code paths (TagsEdit + PasswordWidget
++ YubiKeyEditWidget + MessageBox) and reports, per scenario, whether a real
 UIA_NotificationEventId fired -- the same standard of evidence used for
 MessageWidget, not just a static tree read.
 
