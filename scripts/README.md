@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Development Scripts and CMake/CTest Workflows
 
 The normal Windows development workflow uses CMake Tools in VS Code to configure/build KeePassXC, F5 to launch the application, and CTest to run regression tests. The older PowerShell test runner is not required for the normal workflow.
@@ -101,3 +102,65 @@ For accessibility work, the recommended loop is:
 **Ctrl+Shift+B → F5 → manually verify with JAWS/NVDA → CTest accessibility suites.**
 
 Run commands from the repository root so the relative `build-vscode-x64` path resolves correctly.
+=======
+# Scripts
+
+Helper PowerShell scripts for the Windows development workflow. These are
+optional conveniences; KeePassXC's standard build documentation
+([INSTALL.md](../INSTALL.md)) remains authoritative.
+
+## build-debug.ps1
+
+Performs a full clean-room Debug build: locates/loads the Visual Studio
+Developer environment, verifies vcpkg, installs any missing Qt features
+through vcpkg, configures CMake with Ninja into `.\build`, builds, and
+launches the resulting `KeePassXC.exe` at the end.
+
+```powershell
+.\scripts\build-debug.ps1
+```
+
+Use `-Clean` to force a completely fresh CMake configuration. See the
+script's own `param()` block for all other overrides (repo/vcpkg/Ruby
+locations, Visual Studio/Windows SDK detection, etc.).
+
+## run-vscode-debug.ps1
+
+A lighter companion for the VS Code + CMake Tools workflow described in
+[.vscode/README.md](../.vscode/README.md). It targets the existing
+`build-vscode-x64` build directory (Visual Studio generator, multi-config)
+instead of creating its own build tree, and just builds and launches
+`KeePassXC.exe`:
+
+```powershell
+.\scripts\run-vscode-debug.ps1
+```
+
+Options:
+
+- `-Config <name>` — build configuration to use (default `Debug`).
+- `-BuildDir <path>` — use a build directory other than `build-vscode-x64`.
+- `-NoBuild` — skip the build step and just launch whatever was built last.
+
+No PATH or environment variables need to be set for the launched process:
+KeePassXC's CMake `POST_BUILD` step runs `windeployqt`, which deploys Qt's
+runtime DLLs next to `KeePassXC.exe` as part of the build itself. If
+`KeePassXC.exe` still reports a missing DLL after building, verify that
+`build-vscode-x64`'s CMake cache has `WINDEPLOYQT_EXE` pointing at
+`windeployqt.debug.bat` (the Debug-config wrapper), not plain
+`windeployqt.exe` — see `.vscode/README.md`'s troubleshooting section.
+
+## Equivalent one-line CMake command
+
+Both scripts wrap the same basic idea. From the repository root, with
+`build-vscode-x64` already configured:
+
+```powershell
+cmake --build build-vscode-x64 --config Debug --target KeePassXC
+.\build-vscode-x64\src\Debug\KeePassXC.exe
+```
+
+CMake itself has no built-in "run" command — `cmake --build` only builds.
+Launching the produced executable is a separate step, which is what these
+scripts automate.
+>>>>>>> 2d2c620c (Debugged the Keepassxc launch)

@@ -43,3 +43,14 @@ add_unit_test(NAME testwindowsaccessibilitytree
 
 target_compile_definitions(testwindowsaccessibilitytree PRIVATE
     KEEPASSXC_EXECUTABLE_PATH="$<TARGET_FILE:${PROGNAME}>")
+
+# CTest does not inherit the interactive PowerShell environment used to
+# build/run the tests. Keep the Qt runtime on PATH so these binaries (and
+# the KeePassXC.exe child process they launch) can find it, same as
+# testaccessibility in the parent CMakeLists.txt.
+get_target_property(QT6_CORE_LOCATION Qt6::Core IMPORTED_LOCATION_DEBUG)
+if(QT6_CORE_LOCATION)
+    get_filename_component(QT6_DEBUG_BIN_DIR "${QT6_CORE_LOCATION}" DIRECTORY)
+    set_tests_properties(testwindowsaccessibility testwindowsaccessibilitytree PROPERTIES
+        ENVIRONMENT "PATH=${QT6_DEBUG_BIN_DIR};$ENV{PATH}")
+endif()
