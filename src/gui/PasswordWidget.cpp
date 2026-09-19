@@ -41,6 +41,7 @@ PasswordWidget::PasswordWidget(QWidget* parent)
     m_ui->setupUi(this);
     setFocusProxy(m_ui->passwordEdit);
     m_ui->passwordEdit->installEventFilter(this);
+    m_defaultAccessibleDescription = m_ui->passwordEdit->accessibleDescription();
 
     const QIcon errorIcon = icons()->icon("dialog-error");
     m_errorAction = m_ui->passwordEdit->addAction(errorIcon, QLineEdit::TrailingPosition);
@@ -275,7 +276,7 @@ void PasswordWidget::updateRepeatStatus()
     // above), and fire Alert the same way MessageWidget::showMessage() does so the
     // change is announced immediately without moving keyboard focus.
     if (statusText != m_ui->passwordEdit->accessibleDescription()) {
-        m_ui->passwordEdit->setAccessibleDescription(statusText);
+        m_ui->passwordEdit->setAccessibleDescription(statusText.isEmpty() ? m_defaultAccessibleDescription : statusText);
         if (!statusText.isEmpty()) {
             QAccessibleEvent alertEvent(m_ui->passwordEdit, QAccessible::Alert);
             QAccessible::updateAccessibility(&alertEvent);
