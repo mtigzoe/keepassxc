@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v4
+        uses: jurplep/install-qt-action@v4
         with:
           version: '6.8.3'
           arch: 'win64_msvc2022_64'
@@ -71,7 +71,6 @@ jobs:
       - name: Run Qt accessibility tests
         shell: pwsh
         env:
-          QT_QPA_PLATFORM: windows
           QT_ACCESSIBILITY: '1'
         run: |
           $ctestOutput = & ctest --test-dir build-debug -C Debug -R '^testaccessibility$' --output-on-failure 2>&1
