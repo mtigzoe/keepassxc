@@ -92,5 +92,4 @@ jobs:
           QT_QPA_PLATFORM: windows
           QT_ACCESSIBILITY: '1'
         run: |
-          ctest --test-dir build-debug -C Debug -R '^(testwindowsaccessibility|testwindowsaccessibilitytree)
- --output-on-failure
+          ctest --test-dir build-debug -C Debug -R '^(testwindowsaccessibility|testwindowsaccessibilitytree)$' --output-on-failure
