@@ -458,7 +458,7 @@ void EntryPreviewWidget::updateEntryAdvancedTab()
                     QAccessibleEvent nameChanged(btn, QAccessible::NameChanged);
                     QAccessible::updateAccessibility(&nameChanged);
                     QAccessible::State changedState;
-                    changedState.checked = true;
+                    changedState.checked = state;
                     QAccessibleStateChangeEvent stateChanged(btn, changedState);
                     QAccessible::updateAccessibility(&stateChanged);
                     auto item = m_ui->entryAttributesTable->item(btn->property("row").toInt(), 2);
