@@ -91,6 +91,7 @@ private:
     QPointer<PasswordWidget> m_repeatPasswordWidget;
     QPointer<PasswordWidget> m_parentPasswordWidget;
 
+    QString m_defaultAccessibleDescription;
     bool m_capslockState = false;
 };
 
