@@ -36,3 +36,6 @@ vcpkg_installed*/
 .kilo/
 # Python
 __pycache__/
+
+# Accessibility diagnostics generated locally
+/tests/accessibility/windows/uia-tree-dump.txt
