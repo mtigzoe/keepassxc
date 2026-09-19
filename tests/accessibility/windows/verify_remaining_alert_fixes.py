@@ -2,18 +2,19 @@
 Target path in the repo: tests/accessibility/windows/verify_remaining_alert_fixes.py
 
 Live UIA event-capture companion to verify_alert_uia_notifications.py, for
-the other four Alert-plus-Announcement fixes made in the same session:
+the Alert-plus-Announcement fixes covered by this script:
 TagsEdit::announceTagsState(), PasswordWidget::updateRepeatStatus(),
-YubiKeyEditWidget::hardwareKeyResponse(), and MessageBox::messageBox()'s
-"Weak password" warning (DatabaseSettingsWidgetDatabaseKey::saveSettings()).
+YubiKeyEditWidget::hardwareKeyResponse(), MessageBox::messageBox()'s
+"Weak password" warning, and DatabaseSettingsWidgetDatabaseKey::saveSettings()
+warnings for "No password set".
 
 verify_alert_uia_notifications.py only ever live-verified MessageWidget's
-fix. This script exercises the other three source files' code paths
-(TagsEdit + PasswordWidget + YubiKeyEditWidget + MessageBox all live on the
-same "Database Settings > Security > Database Credentials" page, reachable
-without any native file dialog) and reports, per scenario, whether a real
-UIA_NotificationEventId fired -- the same standard of evidence used for
-MessageWidget, not just a static tree read.
+fix. This script exercises those source code paths (TagsEdit + PasswordWidget +
+YubiKeyEditWidget + MessageBox + DatabaseSettingsWidgetDatabaseKey all live on
+the same "Database Settings > Security > Database Credentials" page,
+reachable without any native file dialog) and reports, per scenario, whether
+a real UIA_NotificationEventId fired -- the same standard of evidence used
+for MessageWidget, not just a static tree read.
 
 What this does NOT prove: JAWS/NVDA behavior (see
 verify_alert_uia_notifications.py's docstring -- same caveat applies here).
@@ -322,6 +323,45 @@ def main():
             # Dismiss the warning dialog (Cancel keeps the weak password
             # unset) so the process can exit cleanly.
             send_keys("{ESC}")
+
+        # --- Scenario 5: trigger the "No password set" warning ---
+        # Return from the password edit page to the component's
+        # LeaveOrRemove page, then remove the existing password. The next
+        # settings save enters DatabaseSettingsWidgetDatabaseKey::saveSettings()
+        # with the password component on AddNew and therefore opens the warning.
+        password_cancel = find_by(window, name="Cancel", control_type="Button")
+        if password_cancel is None:
+            print("Could not find the password editor's Cancel button; skipping No-password scenario.")
+        else:
+            force_foreground(window.handle)
+            password_cancel.click_input()
+            remove_password_button = poll_until(
+                lambda: find_by(window, name="Remove Password", control_type="Button"), timeout_s=5.0
+            )
+            if remove_password_button is None:
+                print("Could not find Remove Password button; skipping No-password scenario.")
+            else:
+                force_foreground(window.handle)
+                remove_password_button.click_input()
+                no_password_save = find_by(window, name="OK", control_type="Button") or find_by(
+                    window, name="Save", control_type="Button"
+                )
+                if no_password_save is None:
+                    print("Could not find the settings dialog's OK/Save button; skipping No-password scenario.")
+                else:
+                    no_password_events = []
+                    iuia = cc.CreateObject(CLSID_CUIAutomation8, interface=UIA.IUIAutomation6)
+                    notif_handler = NotificationHandler(no_password_events)
+                    desktop_root = iuia.GetRootElement()
+                    iuia.AddNotificationEventHandler(desktop_root, UIA.TreeScope_Subtree, None, notif_handler)
+
+                    force_foreground(window.handle)
+                    no_password_save.click_input()
+                    pump_messages_for(2.0)
+                    iuia.RemoveAllEventHandlers()
+                    report("DatabaseSettingsWidgetDatabaseKey::saveSettings (No password set)", no_password_events)
+
+                    send_keys("{ESC}")
 
         # Discard everything on the settings dialog itself too, so nothing
         # from this run is left applied to the (already-disposable) temp db.
