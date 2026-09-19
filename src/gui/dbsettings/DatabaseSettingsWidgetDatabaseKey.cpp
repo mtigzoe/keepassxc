@@ -171,7 +171,7 @@ bool DatabaseSettingsWidgetDatabaseKey::saveSettings()
         msgBox->setIcon(QMessageBox::Warning);
         msgBox->setWindowTitle(tr("No password set"));
         msgBox->setText(tr("WARNING! You have not set a password. Using a database without "
-                           "a password is strongly discouraged!\\n\\n"
+                           "a password is strongly discouraged!\n\n"
                            "Are you sure you want to continue without a password?"));
         auto btn = msgBox->addButton(tr("Continue without password"), QMessageBox::ButtonRole::AcceptRole);
         msgBox->addButton(QMessageBox::Cancel);
