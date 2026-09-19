@@ -383,6 +383,7 @@ void DatabaseOpenWidget::openDatabase()
             msgBox->setDefaultButton(btn);
             msgBox->addButton(QMessageBox::Cancel);
             msgBox->layout()->setSizeConstraint(QLayout::SetMinimumSize);
+            MessageBox::announce(*msgBox);
             msgBox->exec();
             if (msgBox->clickedButton() != btn) {
                 m_db.reset(new Database());
@@ -415,6 +416,7 @@ void DatabaseOpenWidget::openDatabase()
             auto btn = msgBox->addButton(tr("Retry with empty password"), QMessageBox::ButtonRole::AcceptRole);
             msgBox->setDefaultButton(btn);
             msgBox->addButton(QMessageBox::Cancel);
+            MessageBox::announce(*msgBox);
             msgBox->exec();
 
             if (msgBox->clickedButton() == btn) {
@@ -487,6 +489,7 @@ QSharedPointer<CompositeKey> DatabaseOpenWidget::buildDatabaseKey()
                 config()->set(Config::Messages_NoLegacyKeyFileWarning, state == Qt::CheckState::Checked);
             });
 
+            MessageBox::announce(legacyWarning);
             legacyWarning.exec();
         }
         databaseKey->addKey(key);

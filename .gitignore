@@ -37,5 +37,6 @@ vcpkg_installed*/
 # Python
 __pycache__/
 
-# Accessibility diagnostics generated locally
+# Accessibility diagnostic output
+/tests/accessibility/atspi-tree-dump.txt
 /tests/accessibility/windows/uia-tree-dump.txt

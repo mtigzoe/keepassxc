@@ -5,7 +5,9 @@ name: Accessibility (AT-SPI)
 
 on:
   push:
-    branches: [feature/gui-accessibility]
+    branches:
+      - feature/gui-accessibility
+      - accessibility-upstream-cleanup
   pull_request:
   workflow_dispatch:
 

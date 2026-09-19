@@ -27,7 +27,24 @@
 #include "format/KeePass2Writer.h"
 #include "gui/MessageBox.h"
 
+#include <QAccessible>
 #include <QPushButton>
+
+namespace
+{
+    void announceWarning(QMessageBox& warning)
+    {
+        warning.show();
+        QAccessibleEvent alertEvent(&warning, QAccessible::Alert);
+        QAccessible::updateAccessibility(&alertEvent);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+        QAccessibleAnnouncementEvent announcementEvent(&warning, warning.text());
+        announcementEvent.setPoliteness(QAccessible::AnnouncementPoliteness::Assertive);
+        QAccessible::updateAccessibility(&announcementEvent);
+#endif
+    }
+}
+
 
 const char* DatabaseSettingsWidgetEncryption::CD_DECRYPTION_TIME_PREFERENCE_KEY = "KPXC_DECRYPTION_TIME_PREFERENCE";
 
@@ -354,6 +371,7 @@ bool DatabaseSettingsWidgetEncryption::saveSettings()
         auto cancel = warning.addButton(tr("Cancel"), QMessageBox::ButtonRole::RejectRole);
         warning.setDefaultButton(cancel);
         warning.layout()->setSizeConstraint(QLayout::SetMinimumSize);
+        announceWarning(warning);
         warning.exec();
         if (warning.clickedButton() != ok) {
             return false;
@@ -368,6 +386,7 @@ bool DatabaseSettingsWidgetEncryption::saveSettings()
         auto cancel = warning.addButton(tr("Cancel"), QMessageBox::ButtonRole::RejectRole);
         warning.setDefaultButton(cancel);
         warning.layout()->setSizeConstraint(QLayout::SetMinimumSize);
+        announceWarning(warning);
         warning.exec();
         if (warning.clickedButton() != ok) {
             return false;

@@ -51,6 +51,22 @@ namespace
 
 QWindow* MessageBox::m_overrideParent(nullptr);
 
+void MessageBox::announce(QMessageBox& messageBox)
+{
+    messageBox.show();
+
+    QAccessibleEvent alertEvent(&messageBox, QAccessible::Alert);
+    QAccessible::updateAccessibility(&alertEvent);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    // QMessageBox text may contain HTML, so announce readable plain text.
+    QAccessibleAnnouncementEvent announcementEvent(&messageBox, accessiblePlainText(messageBox.text()));
+    if (messageBox.icon() == QMessageBox::Warning || messageBox.icon() == QMessageBox::Critical) {
+        announcementEvent.setPoliteness(QAccessible::AnnouncementPoliteness::Assertive);
+    }
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
+}
+
 MessageBox::Button MessageBox::m_nextAnswer(MessageBox::NoButton);
 
 QHash<QAbstractButton*, MessageBox::Button> MessageBox::m_addedButtonLookup =
@@ -157,33 +173,7 @@ MessageBox::Button MessageBox::messageBox(QWidget* parent,
         }
         msgBox.layout()->setSizeConstraint(QLayout::SetMinimumSize);
 
-        // Screen readers (e.g. JAWS) announce the focused control (the default
-        // button) when this dialog receives focus, but do not automatically read
-        // the informative message text -- that requires a manual "read window"
-        // command from the user. Firing an Alert accessibility event once the
-        // dialog is shown tells assistive technology to announce the dialog's
-        // full content (icon role + text) immediately, the same way a web
-        // role="alert" region would be announced without user action.
-        //
-        // Alert alone never reaches Windows UI Automation as an event
-        // (confirmed against qtbase's qwindowsuiaaccessibility.cpp -- only a
-        // system sound). QAccessibleAnnouncementEvent (Qt 6.8+) is what
-        // actually raises a UIA notification.
-        msgBox.show();
-        QAccessibleEvent alertEvent(&msgBox, QAccessible::Alert);
-        QAccessible::updateAccessibility(&alertEvent);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
-        // Use text, not fixedText -- fixedText has "\n" replaced with the
-        // literal HTML "<br>" for the visible rich-text label, which would
-        // be read aloud verbatim ("br") if announced as-is. text itself can
-        // still carry caller-authored markup (see accessiblePlainText()
-        // above), so strip that too before announcing.
-        QAccessibleAnnouncementEvent announcementEvent(&msgBox, accessiblePlainText(text));
-        if (icon == QMessageBox::Warning || icon == QMessageBox::Critical) {
-            announcementEvent.setPoliteness(QAccessible::AnnouncementPoliteness::Assertive);
-        }
-        QAccessible::updateAccessibility(&announcementEvent);
-#endif
+        announce(msgBox);
 
         msgBox.exec();
 

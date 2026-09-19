@@ -29,8 +29,25 @@
 #include "keys/PasswordKey.h"
 #include "quickunlock/QuickUnlockInterface.h"
 
+#include <QAccessible>
 #include <QLayout>
 #include <QPushButton>
+#include <QTimer>
+
+namespace
+{
+void announceWarning(QMessageBox& warning)
+{
+    warning.show();
+    QAccessibleEvent alertEvent(&warning, QAccessible::Alert);
+    QAccessible::updateAccessibility(&alertEvent);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QAccessibleAnnouncementEvent announcementEvent(&warning, warning.text());
+    announcementEvent.setPoliteness(QAccessible::AnnouncementPoliteness::Assertive);
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
+}
+} // namespace
 
 DatabaseSettingsWidgetDatabaseKey::DatabaseSettingsWidgetDatabaseKey(QWidget* parent)
     : DatabaseSettingsWidget(parent)
@@ -160,6 +177,7 @@ bool DatabaseSettingsWidgetDatabaseKey::saveSettings()
         msgBox->addButton(QMessageBox::Cancel);
         msgBox->setDefaultButton(QMessageBox::Cancel);
         msgBox->layout()->setSizeConstraint(QLayout::SetMinimumSize);
+        announceWarning(*msgBox);
         msgBox->exec();
         if (msgBox->clickedButton() != btn) {
             return false;
