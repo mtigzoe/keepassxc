@@ -3,15 +3,12 @@ Target path in the repo: tests/accessibility/windows/verify_alert_uia_notificati
 
 Empirical companion to the source-reading finding that `QAccessible::Alert`
 (fired by MessageWidget::showMessage(), PasswordWidget's match-state banner,
-MessageBox.cpp, TagsEdit.cpp, YubiKeyEditWidget.cpp) never reaches Windows UI
-Automation as an event -- confirmed by reading qtbase's
-qwindowsuiaaccessibility.cpp / qwindowsuiamainprovider.cpp (6.11 branch)
-directly: QAccessible::Alert only plays a system sound
-(QWindowsUiaAccessibility::notifyAccessibilityUpdate()'s first switch); it is
-not one of the cases in the second switch that dispatches to UIA
-(Announcement, Focus, StateChanged, ValueChanged, NameChanged, RoleChanged,
-SelectionAdd, Text*). This script proves that empirically, against the real
-running KeePassXC.exe, instead of relying on the source reading alone.
+MessageBox.cpp, TagsEdit.cpp, and YubiKeyEditWidget.cpp) is not necessarily
+forwarded to Windows UI Automation as a live event. This script empirically
+checks the real running KeePassXC.exe for UIA notification/property-change
+events rather than relying only on source inspection. The exact forwarding
+behavior is Qt-version dependent, so the result should be interpreted for
+the Qt version used by the build under test.
 
 What this DOES prove:
   - Whether a UIA_NotificationEventId event (the actual push notification a
