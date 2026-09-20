@@ -153,6 +153,12 @@
             </item>
             <item>
              <widget class="QProgressBar" name="entryTotpProgress">
+              <property name="accessibleName">
+               <string>TOTP expiration progress</string>
+              </property>
+              <property name="accessibleDescription">
+               <string>Shows the remaining time before the current timed password expires.</string>
+              </property>
               <property name="maximumSize">
                <size>
                 <width>57</width>
@@ -172,6 +178,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="entryTotpButton">
+           <property name="accessibleName">
+            <string>Display current TOTP value</string>
+           </property>
            <property name="toolTip">
             <string>Display current TOTP value</string>
            </property>
@@ -188,6 +197,9 @@
          </item>
          <item>
           <widget class="QToolButton" name="entryCloseButton">
+           <property name="accessibleName">
+            <string>Close entry preview</string>
+           </property>
            <property name="toolTip">
             <string>Close</string>
            </property>
@@ -427,6 +439,9 @@
                 </item>
                 <item>
                  <widget class="QTextEdit" name="entryNotesTextEdit">
+                  <property name="accessibleName">
+                   <string>Entry notes</string>
+                  </property>
                   <property name="focusPolicy">
                    <enum>Qt::ClickFocus</enum>
                   </property>
@@ -503,6 +518,9 @@
                 </item>
                 <item>
                  <widget class="QLineEdit" name="entryUsernameLabel">
+                  <property name="accessibleName">
+                   <string>Username</string>
+                  </property>
                   <property name="minimumSize">
                    <size>
                     <width>150</width>
