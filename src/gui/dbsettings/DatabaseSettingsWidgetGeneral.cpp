@@ -41,9 +41,24 @@ DatabaseSettingsWidgetGeneral::DatabaseSettingsWidgetGeneral(QWidget* parent)
     connect(m_ui->dbPublicIconButton, &QPushButton::clicked, this, &DatabaseSettingsWidgetGeneral::pickPublicIcon);
     connect(m_ui->dbPublicIconClearButton, &QPushButton::clicked, this, [this] { setupPublicIconButton(-1); });
 
-    connect(m_ui->historyMaxItemsCheckBox, SIGNAL(toggled(bool)), m_ui->historyMaxItemsSpinBox, SLOT(setEnabled(bool)));
-    connect(m_ui->historyMaxSizeCheckBox, SIGNAL(toggled(bool)), m_ui->historyMaxSizeSpinBox, SLOT(setEnabled(bool)));
-    connect(m_ui->autosaveDelayCheckBox, SIGNAL(toggled(bool)), m_ui->autosaveDelaySpinBox, SLOT(setEnabled(bool)));
+    connect(m_ui->historyMaxItemsCheckBox, &QCheckBox::toggled, this, [this](bool enabled) {
+        if (!enabled && m_ui->historyMaxItemsSpinBox->hasFocus()) {
+            m_ui->historyMaxItemsCheckBox->setFocus();
+        }
+        m_ui->historyMaxItemsSpinBox->setEnabled(enabled);
+    });
+    connect(m_ui->historyMaxSizeCheckBox, &QCheckBox::toggled, this, [this](bool enabled) {
+        if (!enabled && m_ui->historyMaxSizeSpinBox->hasFocus()) {
+            m_ui->historyMaxSizeCheckBox->setFocus();
+        }
+        m_ui->historyMaxSizeSpinBox->setEnabled(enabled);
+    });
+    connect(m_ui->autosaveDelayCheckBox, &QCheckBox::toggled, this, [this](bool enabled) {
+        if (!enabled && m_ui->autosaveDelaySpinBox->hasFocus()) {
+            m_ui->autosaveDelayCheckBox->setFocus();
+        }
+        m_ui->autosaveDelaySpinBox->setEnabled(enabled);
+    });
 }
 
 DatabaseSettingsWidgetGeneral::~DatabaseSettingsWidgetGeneral() = default;
@@ -187,6 +202,9 @@ void DatabaseSettingsWidgetGeneral::pickPublicColor()
 
 void DatabaseSettingsWidgetGeneral::setupPublicColorButton(const QColor& color)
 {
+    if (!color.isValid() && m_ui->dbPublicColorClearButton->hasFocus()) {
+        m_ui->dbPublicColorButton->setFocus();
+    }
     m_ui->dbPublicColorClearButton->setVisible(color.isValid());
     if (color.isValid()) {
         m_ui->dbPublicColorButton->setStyleSheet(QString("background-color:%1").arg(color.name()));
@@ -240,6 +258,9 @@ void DatabaseSettingsWidgetGeneral::pickPublicIcon()
 void DatabaseSettingsWidgetGeneral::setupPublicIconButton(int iconIndex)
 {
     auto valid = iconIndex >= 0 && iconIndex < databaseIcons()->count();
+    if (!valid && m_ui->dbPublicIconClearButton->hasFocus()) {
+        m_ui->dbPublicIconButton->setFocus();
+    }
     m_ui->dbPublicIconClearButton->setVisible(valid);
     if (valid) {
         m_ui->dbPublicIconButton->setIcon(databaseIcons()->icon(iconIndex));
