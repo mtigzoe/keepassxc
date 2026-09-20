@@ -98,6 +98,9 @@
       <property name="text">
        <string>Auto-Type:</string>
       </property>
+      <property name="buddy">
+       <cstring>autotypeComboBox</cstring>
+      </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
@@ -107,6 +110,9 @@
      <widget class="QLabel" name="searchLabel">
       <property name="text">
        <string>Search:</string>
+      </property>
+      <property name="buddy">
+       <cstring>searchComboBox</cstring>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -206,6 +212,9 @@
      <widget class="QLabel" name="labelName">
       <property name="text">
        <string>Name:</string>
+      </property>
+      <property name="buddy">
+       <cstring>editName</cstring>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
