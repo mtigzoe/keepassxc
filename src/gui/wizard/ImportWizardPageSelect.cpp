@@ -86,6 +86,9 @@ ImportWizardPageSelect::ImportWizardPageSelect(QWidget* parent)
     connect(m_ui->importFileButton, &QAbstractButton::clicked, this, &ImportWizardPageSelect::chooseImportFile);
     connect(m_ui->keyFileButton, &QAbstractButton::clicked, this, &ImportWizardPageSelect::chooseKeyFile);
     connect(m_ui->existingDatabaseRadio, &QRadioButton::toggled, this, [this](bool state) {
+        if (!state && m_ui->existingDatabaseChoice->hasFocus()) {
+            m_ui->newDatabaseRadio->setFocus();
+        }
         m_ui->existingDatabaseChoice->setEnabled(state);
     });
 
@@ -252,7 +255,13 @@ void ImportWizardPageSelect::updateDatabaseChoices() const
     }
 
     if (m_ui->existingDatabaseChoice->count() == 0) {
+        if (m_ui->existingDatabaseRadio->hasFocus()) {
+            m_ui->newDatabaseRadio->setFocus();
+        } else if (m_ui->existingDatabaseChoice->hasFocus()) {
+            m_ui->newDatabaseRadio->setFocus();
+        }
         m_ui->existingDatabaseRadio->setEnabled(false);
+        m_ui->existingDatabaseChoice->setEnabled(false);
         m_ui->newDatabaseRadio->setChecked(true);
     }
 }
