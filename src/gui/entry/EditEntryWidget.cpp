@@ -1475,6 +1475,13 @@ void EditEntryWidget::updateBrowserIntegrationCheckbox(QCheckBox* checkBox,
     } else {
         checkBox->setChecked(value);
     }
+
+    // A group-level Browser Integration setting can disable this checkbox
+    // while it has keyboard or screen-reader focus. Move focus to the URL
+    // list before disabling the checkbox so focus remains usable.
+    if (!enabled && checkBox->hasFocus()) {
+        m_browserUi->additionalURLsView->setFocus();
+    }
     checkBox->setEnabled(enabled);
 
     checkBox->blockSignals(block);
