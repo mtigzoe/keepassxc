@@ -499,6 +499,14 @@ void EditEntryWidget::removeCurrentURL()
         }
         m_entryAttributes->remove(m_additionalURLsDataModel->keyByIndex(index));
         if (m_additionalURLsDataModel->rowCount() == 0) {
+            // Removing the last URL disables the buttons that may have focus.
+            // Move focus to the still-enabled table so keyboard and
+            // screen-reader focus does not remain on a disabled control.
+            const bool editHasFocus = m_browserUi->editURLButton->hasFocus();
+            const bool removeHasFocus = m_browserUi->removeURLButton->hasFocus();
+            if (editHasFocus || removeHasFocus) {
+                m_browserUi->additionalURLsView->setFocus();
+            }
             m_browserUi->editURLButton->setEnabled(false);
             m_browserUi->removeURLButton->setEnabled(false);
         }
@@ -527,6 +535,13 @@ void EditEntryWidget::updateCurrentURL()
         m_browserUi->editURLButton->setEnabled(!m_history);
         m_browserUi->removeURLButton->setEnabled(!m_history);
     } else {
+        // Selection changes can disable the buttons while one of them still
+        // has keyboard or screen-reader focus. Return focus to the table first.
+        const bool editHasFocus = m_browserUi->editURLButton->hasFocus();
+        const bool removeHasFocus = m_browserUi->removeURLButton->hasFocus();
+        if (editHasFocus || removeHasFocus) {
+            m_browserUi->additionalURLsView->setFocus();
+        }
         m_browserUi->editURLButton->setEnabled(false);
         m_browserUi->removeURLButton->setEnabled(false);
     }
