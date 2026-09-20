@@ -192,6 +192,14 @@ void EditWidget::enableApplyButton(bool enabled)
 {
     QPushButton* applyButton = m_ui->buttonBox->button(QDialogButtonBox::Apply);
     if (applyButton) {
+        // Applying a change can immediately mark the editor unmodified. If
+        // Apply currently has keyboard or screen-reader focus, move focus to
+        // OK before disabling it so focus does not remain on a disabled button.
+        if (!enabled && applyButton->hasFocus()) {
+            if (auto* okButton = m_ui->buttonBox->button(QDialogButtonBox::Ok)) {
+                okButton->setFocus();
+            }
+        }
         applyButton->setEnabled(enabled);
     }
 }
