@@ -46,6 +46,9 @@ QVariant DefaultIconModel::data(const QModelIndex& index, int role) const
     if (role == Qt::DecorationRole) {
         return databaseIcons()->icon(index.row(), IconSize::Medium);
     }
+    if (role == Qt::AccessibleTextRole) {
+        return tr("Default icon %1").arg(index.row() + 1);
+    }
 
     return {};
 }
@@ -84,6 +87,9 @@ QVariant CustomIconModel::data(const QModelIndex& index, int role) const
     if (role == Qt::DecorationRole) {
         QUuid uuid = uuidFromIndex(index);
         return m_icons.value(uuid);
+    }
+    if (role == Qt::AccessibleTextRole) {
+        return tr("Custom icon %1").arg(index.row() + 1);
     }
 
     return {};
