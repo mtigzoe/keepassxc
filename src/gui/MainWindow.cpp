@@ -1929,6 +1929,11 @@ void MainWindow::showYubiKeyPopup()
                          MessageWidget::Information,
                          false,
                          MessageWidget::DisableAutoHide);
+
+    // Disabling the main window clears keyboard focus. Preserve the focused
+    // control so screen-reader and keyboard users return to the same place
+    // after the hardware-key interaction completes.
+    m_yubiKeyFocusWidget = QApplication::focusWidget();
     setEnabled(false);
 }
 
@@ -1936,6 +1941,11 @@ void MainWindow::hideYubiKeyPopup()
 {
     hideGlobalMessage();
     setEnabled(true);
+
+    if (m_yubiKeyFocusWidget && m_yubiKeyFocusWidget->isVisible() && m_yubiKeyFocusWidget->isEnabled()) {
+        m_yubiKeyFocusWidget->setFocus();
+    }
+    m_yubiKeyFocusWidget.clear();
 }
 
 void MainWindow::bringToFront()
