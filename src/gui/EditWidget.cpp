@@ -19,7 +19,7 @@
 #include "EditWidget.h"
 #include "ui_EditWidget.h"
 
-#include <QPushButton>
+#include <QApplication>\n#include <QPushButton>
 #include <QScrollArea>
 
 EditWidget::EditWidget(QWidget* parent)
@@ -109,6 +109,17 @@ void EditWidget::setPageHidden(QWidget* widget, bool hidden)
     }
 
     bool changed = m_ui->categoryList->isCategoryHidden(index) != hidden;
+
+    // Hiding a page can remove the currently focused editor or button from
+    // the UI while leaving keyboard and screen-reader focus on that hidden
+    // widget. Return focus to the category list before hiding the page.
+    if (changed && hidden && index == m_ui->stackedWidget->currentIndex()) {
+        QWidget* focusedWidget = QApplication::focusWidget();
+        if (focusedWidget && (focusedWidget == widget || widget->isAncestorOf(focusedWidget))) {
+            m_ui->categoryList->setFocus();
+        }
+    }
+
     m_ui->categoryList->setCategoryHidden(index, hidden);
 
     if (changed && index == m_ui->stackedWidget->currentIndex()) {
