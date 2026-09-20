@@ -93,7 +93,12 @@ EditGroupWidget::EditGroupWidget(QWidget* parent)
     addEditPage(new EditGroupPageKeeShare(this));
     addPage(tr("Properties"), icons()->icon("document-properties"), m_editWidgetProperties);
 
-    connect(m_mainUi->expireCheck, SIGNAL(toggled(bool)), m_mainUi->expireDatePicker, SLOT(setEnabled(bool)));
+    connect(m_mainUi->expireCheck, &QCheckBox::toggled, [&](bool enabled) {
+        if (!enabled && m_mainUi->expireDatePicker->hasFocus()) {
+            m_mainUi->expireCheck->setFocus();
+        }
+        m_mainUi->expireDatePicker->setEnabled(enabled);
+    });
     connect(m_mainUi->autoTypeSequenceCustomRadio,
             SIGNAL(toggled(bool)),
             m_mainUi->autoTypeSequenceCustomEdit,
