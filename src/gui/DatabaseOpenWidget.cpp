@@ -642,6 +642,7 @@ void DatabaseOpenWidget::hardwareKeyResponse(bool found)
 void DatabaseOpenWidget::setUserInteractionLock(bool state)
 {
     if (state) {
+        m_lockedFocusWidget = QApplication::focusWidget();
         QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
         m_ui->centralStack->setEnabled(false);
     } else {
@@ -650,6 +651,10 @@ void DatabaseOpenWidget::setUserInteractionLock(bool state)
             QApplication::restoreOverrideCursor();
         }
         m_ui->centralStack->setEnabled(true);
+        if (m_lockedFocusWidget && m_lockedFocusWidget->isVisible() && m_lockedFocusWidget->isEnabled()) {
+            m_lockedFocusWidget->setFocus();
+        }
+        m_lockedFocusWidget.clear();
     }
     m_unlockingDatabase = state;
 }
