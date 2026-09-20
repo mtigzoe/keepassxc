@@ -15,6 +15,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <QApplication>
+
 #include "TotpSetupDialog.h"
 #include "ui_TotpSetupDialog.h"
 
@@ -97,6 +99,9 @@ void TotpSetupDialog::saveSettings()
 
 void TotpSetupDialog::toggleCustom(bool status)
 {
+    if (!status && m_ui->customSettingsGroup->isAncestorOf(QApplication::focusWidget())) {
+        m_ui->radioCustom->setFocus(Qt::OtherFocusReason);
+    }
     m_ui->customSettingsGroup->setEnabled(status);
 }
 
