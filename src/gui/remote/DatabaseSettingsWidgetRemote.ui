@@ -52,7 +52,11 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QListWidget" name="settingsListWidget"/>
+       <widget class="QListWidget" name="settingsListWidget">
+        <property name="accessibleName">
+         <string>Saved sync commands</string>
+        </property>
+       </widget>
       </item>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_2">
