@@ -1603,7 +1603,14 @@ void EditEntryWidget::displayAttribute(QModelIndex index, bool showProtected)
     if (index.isValid()) {
         QString key = m_attributesModel->keyByIndex(index);
         if (showProtected) {
+            // A protected attribute disables the editor. If it currently has
+            // focus, move focus to the Reveal button before disabling it so
+            // keyboard and screen-reader focus remains usable.
+            const bool attributesEditHasFocus = m_advancedUi->attributesEdit->hasFocus();
             m_advancedUi->attributesEdit->setPlainText(tr("[PROTECTED] Press Reveal to view or edit"));
+            if (attributesEditHasFocus) {
+                m_advancedUi->revealAttributeButton->setFocus();
+            }
             m_advancedUi->attributesEdit->setEnabled(false);
             m_advancedUi->revealAttributeButton->setEnabled(true);
             m_advancedUi->protectAttributeButton->setChecked(true);
@@ -1615,10 +1622,27 @@ void EditEntryWidget::displayAttribute(QModelIndex index, bool showProtected)
         }
 
         // Don't allow editing in history view
+        const bool protectHasFocus = m_advancedUi->protectAttributeButton->hasFocus();
+        const bool editHasFocus = m_advancedUi->editAttributeButton->hasFocus();
+        const bool removeHasFocus = m_advancedUi->removeAttributeButton->hasFocus();
+        if (m_history && (protectHasFocus || editHasFocus || removeHasFocus)) {
+            m_advancedUi->attributesView->setFocus();
+        }
         m_advancedUi->protectAttributeButton->setEnabled(!m_history);
         m_advancedUi->editAttributeButton->setEnabled(!m_history);
         m_advancedUi->removeAttributeButton->setEnabled(!m_history);
     } else {
+        // Removing the last attribute clears the selection and disables the
+        // attribute controls. Return focus to the table before disabling a
+        // control that may currently have focus.
+        const bool protectHasFocus = m_advancedUi->protectAttributeButton->hasFocus();
+        const bool editHasFocus = m_advancedUi->editAttributeButton->hasFocus();
+        const bool removeHasFocus = m_advancedUi->removeAttributeButton->hasFocus();
+        const bool attributesEditHasFocus = m_advancedUi->attributesEdit->hasFocus();
+        const bool revealHasFocus = m_advancedUi->revealAttributeButton->hasFocus();
+        if (protectHasFocus || editHasFocus || removeHasFocus || attributesEditHasFocus || revealHasFocus) {
+            m_advancedUi->attributesView->setFocus();
+        }
         m_advancedUi->attributesEdit->setPlainText("");
         m_advancedUi->attributesEdit->setEnabled(false);
         m_advancedUi->revealAttributeButton->setEnabled(false);
