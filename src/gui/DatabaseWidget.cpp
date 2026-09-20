@@ -417,8 +417,14 @@ void DatabaseWidget::setSplitterSizes(const QHash<Config::ConfigKey, QList<int>>
 void DatabaseWidget::onConfigChanged(Config::ConfigKey key)
 {
     if (key == Config::GUI_HideGroupPanel) {
-        // Toggle the group splitter visibility and reset the size
-        m_groupSplitter->setVisible(!config()->get(Config::GUI_HideGroupPanel).toBool());
+        // Hiding the group panel can remove the focused group/tag view. Move
+        // focus to the entry view first so keyboard and screen-reader users
+        // are not left with focus on a hidden widget.
+        const bool hideGroupPanel = config()->get(Config::GUI_HideGroupPanel).toBool();
+        if (hideGroupPanel && m_groupSplitter->isVisible() && m_groupSplitter->hasFocus()) {
+            m_entryView->setFocus();
+        }
+        m_groupSplitter->setVisible(!hideGroupPanel);
         setSplitterSizes({{Config::GUI_SplitterState, QList<int>({})}});
     }
 }
