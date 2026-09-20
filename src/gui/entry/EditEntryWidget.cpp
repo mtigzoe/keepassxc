@@ -1851,10 +1851,16 @@ void EditEntryWidget::deleteHistoryEntry()
 {
     QModelIndex index = m_sortModel->mapToSource(m_historyUi->historyView->currentIndex());
     if (m_historyModel->entryFromIndex(index)) {
+        const bool deleteAllHasFocus = m_historyUi->deleteAllButton->hasFocus();
         m_historyModel->deleteIndex(index);
         if (m_historyModel->rowCount() > 0) {
             m_historyUi->deleteAllButton->setEnabled(true);
         } else {
+            if (deleteAllHasFocus) {
+                // Deleting the last history item disables Delete All. Move
+                // keyboard and screen-reader focus to the history table first.
+                m_historyUi->historyView->setFocus();
+            }
             m_historyUi->deleteAllButton->setEnabled(false);
         }
         setModified(true);
