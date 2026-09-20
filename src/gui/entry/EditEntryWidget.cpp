@@ -681,6 +681,15 @@ void EditEntryWidget::updateHistoryButtons(const QModelIndex& current, const QMo
         m_historyUi->restoreButton->setEnabled(true);
         m_historyUi->deleteButton->setEnabled(true);
     } else {
+        // Clearing the selection disables buttons that may still have focus.
+        // Return focus to the history table before disabling them so
+        // keyboard and screen-reader focus remains on an enabled control.
+        const bool showHasFocus = m_historyUi->showButton->hasFocus();
+        const bool restoreHasFocus = m_historyUi->restoreButton->hasFocus();
+        const bool deleteHasFocus = m_historyUi->deleteButton->hasFocus();
+        if (showHasFocus || restoreHasFocus || deleteHasFocus) {
+            m_historyUi->historyView->setFocus();
+        }
         m_historyUi->showButton->setEnabled(false);
         m_historyUi->restoreButton->setEnabled(false);
         m_historyUi->deleteButton->setEnabled(false);
@@ -1779,6 +1788,12 @@ void EditEntryWidget::deleteHistoryEntry()
 void EditEntryWidget::deleteAllHistoryEntries()
 {
     m_historyModel->deleteAll();
+    const bool deleteAllHasFocus = m_historyUi->deleteAllButton->hasFocus();
+    if (deleteAllHasFocus && m_historyModel->rowCount() == 0) {
+        // The last history item was removed, so Delete All becomes disabled.
+        // Keep keyboard and screen-reader focus on the history table.
+        m_historyUi->historyView->setFocus();
+    }
     m_historyUi->deleteAllButton->setEnabled(m_historyModel->rowCount() > 0);
     setModified(true);
 }
