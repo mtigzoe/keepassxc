@@ -1067,7 +1067,17 @@ void MainWindow::updateWindowTitle()
         if (isModified && customWindowTitlePart.endsWith("*")) {
             customWindowTitlePart.remove(customWindowTitlePart.size() - 1, 1);
         }
+        // Changing the Save action can disable its toolbar button while it has focus.
+        const auto focusWidget = QApplication::focusWidget();
         m_ui->actionDatabaseSave->setEnabled(m_ui->tabWidget->canSave(tabWidgetIndex));
+        if (focusWidget && (!focusWidget->isVisible() || !focusWidget->isEnabled())) {
+            if (auto* dbWidget = m_ui->tabWidget->currentDatabaseWidget(); dbWidget && dbWidget->isVisible()
+                && dbWidget->isEnabled()) {
+                dbWidget->setFocus(Qt::OtherFocusReason);
+            } else {
+                m_ui->tabWidget->setFocus(Qt::OtherFocusReason);
+            }
+        }
     } else if (stackedWidgetIndex == StackedWidgetIndex::SettingsScreen) {
         customWindowTitlePart = tr("Settings");
     } else if (stackedWidgetIndex == StackedWidgetIndex::PasswordGeneratorScreen) {
