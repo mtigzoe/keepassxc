@@ -1531,12 +1531,32 @@ void MainWindow::enableMenuAndToolbar()
 {
     m_ui->toolBar->setDisabled(false);
     m_ui->menubar->setDisabled(false);
+
+    if (m_menuToolbarFocusWidget && m_menuToolbarFocusWidget->isVisible() && m_menuToolbarFocusWidget->isEnabled()) {
+        m_menuToolbarFocusWidget->setFocus(Qt::OtherFocusReason);
+    }
+    m_menuToolbarFocusWidget.clear();
 }
 
 void MainWindow::disableMenuAndToolbar()
 {
+    const auto focusWidget = QApplication::focusWidget();
+    if (focusWidget && (m_ui->toolBar->isAncestorOf(focusWidget) || m_ui->menubar->isAncestorOf(focusWidget))) {
+        m_menuToolbarFocusWidget = focusWidget;
+    }
     m_ui->toolBar->setDisabled(true);
     m_ui->menubar->setDisabled(true);
+
+    // If the focused control was disabled by the sync lock, move focus to the
+    // database area so keyboard and screen-reader focus remains usable.
+    if (focusWidget && (!focusWidget->isVisible() || !focusWidget->isEnabled())) {
+        if (auto* dbWidget = m_ui->tabWidget->currentDatabaseWidget(); dbWidget && dbWidget->isVisible()
+            && dbWidget->isEnabled()) {
+            dbWidget->setFocus(Qt::OtherFocusReason);
+        } else {
+            m_ui->tabWidget->setFocus(Qt::OtherFocusReason);
+        }
+    }
 }
 
 void MainWindow::clearSSHAgent()
