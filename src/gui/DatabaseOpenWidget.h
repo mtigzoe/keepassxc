@@ -89,6 +89,7 @@ private:
     bool m_manualHardwareKeyRefresh = false;
     bool m_blockQuickUnlock = false;
     bool m_unlockingDatabase = false;
+    QPointer<QWidget> m_lockedFocusWidget;
     bool m_triedToQuit = false;
     QTimer m_hideTimer;
     QTimer m_hideNoHardwareKeysFoundTimer;
