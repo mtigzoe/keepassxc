@@ -154,11 +154,18 @@
        <widget class="QLabel" name="algorithmLabel">
         <property name="text">
          <string>Algorithm:</string>
+        <property name="buddy">
+         <cstring>algorithmComboBox</cstring>
+        </property>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QComboBox" name="algorithmComboBox"/>
+       <widget class="QComboBox" name="algorithmComboBox">
+        <property name="accessibleName">
+         <string>TOTP algorithm</string>
+        </property>
+       </widget>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="stepLabel">
@@ -190,11 +197,17 @@
        <widget class="QLabel" name="digitsLabel">
         <property name="text">
          <string>Code size:</string>
+        <property name="buddy">
+         <cstring>digitsSpinBox</cstring>
+        </property>
         </property>
        </widget>
       </item>
       <item row="3" column="1">
        <widget class="QSpinBox" name="digitsSpinBox">
+        <property name="accessibleName">
+         <string>TOTP code size</string>
+        </property>
         <property name="suffix">
          <string> digits</string>
         </property>
