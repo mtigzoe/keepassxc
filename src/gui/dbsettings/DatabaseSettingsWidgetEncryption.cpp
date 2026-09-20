@@ -283,6 +283,11 @@ void DatabaseSettingsWidgetEncryption::loadKdfParameters()
 void DatabaseSettingsWidgetEncryption::updateKdfFields()
 {
     bool isArgon2 = IS_ARGON2(m_ui->kdfComboBox->currentData().toUuid());
+    if (!isArgon2) {
+        if (m_ui->memorySpinBox->hasFocus() || m_ui->parallelismSpinBox->hasFocus()) {
+            m_ui->kdfComboBox->setFocus();
+        }
+    }
     m_ui->memoryUsageLabel->setVisible(isArgon2);
     m_ui->memorySpinBox->setVisible(isArgon2);
     m_ui->parallelismLabel->setVisible(isArgon2);
@@ -427,6 +432,9 @@ bool DatabaseSettingsWidgetEncryption::saveSettings()
 void DatabaseSettingsWidgetEncryption::benchmarkTransformRounds(int millisecs)
 {
     QApplication::setOverrideCursor(Qt::BusyCursor);
+    if (m_ui->transformBenchmarkButton->hasFocus() || m_ui->transformRoundsSpinBox->hasFocus()) {
+        m_ui->kdfComboBox->setFocus();
+    }
     m_ui->transformBenchmarkButton->setEnabled(false);
     m_ui->transformRoundsSpinBox->setEnabled(false);
     m_ui->transformRoundsSpinBox->clear();
