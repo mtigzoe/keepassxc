@@ -1105,6 +1105,18 @@ void EditEntryWidget::loadEntry(Entry* entry,
 
 void EditEntryWidget::setForms(Entry* entry, bool restore)
 {
+    if (m_history) {
+        const auto focusedWidget = QApplication::focusWidget();
+        const bool focusNeedsHandoff =
+            focusedWidget
+            && (m_historyWidget->isAncestorOf(focusedWidget) || m_iconsWidget->isAncestorOf(focusedWidget)
+                || focusedWidget == m_mainUi->expireCheck || focusedWidget == m_mainUi->expirePresets
+                || focusedWidget == m_advancedUi->addAttributeButton);
+        if (focusNeedsHandoff) {
+            m_mainUi->titleEdit->setFocus();
+        }
+    }
+
 #ifdef KPXC_FEATURE_SSHAGENT
     QSignalBlocker attachmentsBlocker(m_attachments.data());
 #endif
