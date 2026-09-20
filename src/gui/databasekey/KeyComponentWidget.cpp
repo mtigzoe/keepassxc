@@ -18,6 +18,7 @@
 #include "KeyComponentWidget.h"
 #include "ui_KeyComponentWidget.h"
 
+#include <QApplication>
 #include <QTimer>
 
 KeyComponentWidget::KeyComponentWidget(QWidget* parent)
@@ -74,6 +75,18 @@ KeyComponentWidget::Page KeyComponentWidget::visiblePage() const
 void KeyComponentWidget::updateAddStatus(bool added)
 {
     if (m_ui->stackedWidget->currentIndex() == Page::Edit) {
+        // componentAddChanged() can be emitted while a dynamically-created edit
+        // field still has focus (for example when database settings are saved
+        // via a shortcut while focus remains in the password field). Changing
+        // the stacked page then hides/deletes that focused widget without
+        // giving keyboard or screen-reader focus a valid destination.
+        if (m_componentWidget && m_componentWidget->isAncestorOf(QApplication::focusWidget())) {
+            if (added) {
+                m_ui->changeButton->setFocus(Qt::OtherFocusReason);
+            } else {
+                m_ui->addButton->setFocus(Qt::OtherFocusReason);
+            }
+        }
         emit editCanceled();
     }
 
@@ -143,16 +156,16 @@ void KeyComponentWidget::fixTabOrder()
     // children, e.g. the password fields) as a parentless QWidget and only
     // reparent it into componentWidgetContainer afterwards, via
     // m_ui->componentWidgetLayout->addWidget() above. Qt's default tab-focus
-    // chain is ordered by widget creation/reparenting, not by layout
-    // position: reparenting a widget subtree appends it to the *end* of the
-    // top-level window's chain rather than splicing it in where it now
-    // visually sits. Left uncorrected, Tab from the last field inside
-    // m_componentWidget can land somewhere unexpected far later in the
-    // window (or, depending on what else is hidden at the time, appear not
-    // to move focus anywhere useful at all) instead of advancing to
-    // cancelButton as a user tabbing through the form would expect. This
-    // resplices m_componentWidget's own (internally correct) chain back
-    // in between componentWidgetContainer and cancelButton.
+    // chain is ordered by widget creation/reparenting, not by layout position:
+    // reparenting a widget subtree appends it to the *end* of the top-level
+    // window's chain rather than splicing it in where it now visually sits.
+    // Left uncorrected, Tab from the last field inside m_componentWidget can
+    // land somewhere unexpected far later in the window (or, depending on
+    // what else is hidden at the time, appear not to move focus anywhere
+    // useful at all) instead of advancing to cancelButton as a user tabbing
+    // through the form would expect. This resplices m_componentWidget's own
+    // (internally correct) chain back in between componentWidgetContainer and
+    // cancelButton.
     QWidget* firstFocusable = nullptr;
     QWidget* lastFocusable = nullptr;
     QWidget* w = m_componentWidget;
