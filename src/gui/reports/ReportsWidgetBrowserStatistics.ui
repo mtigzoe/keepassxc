@@ -25,6 +25,9 @@
    </property>
    <item>
     <widget class="QTableView" name="browserStatisticsTableView">
+     <property name="accessibleName">
+      <string>Browser integration report entries</string>
+     </property>
      <property name="contextMenuPolicy">
       <enum>Qt::CustomContextMenu</enum>
      </property>
