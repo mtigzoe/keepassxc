@@ -280,6 +280,9 @@ void EditEntryWidget::setupMain()
     connect(m_mainUi->urlEdit, SIGNAL(textChanged(QString)), this, SLOT(entryURLEdited(const QString&)));
 #endif
     connect(m_mainUi->expireCheck, &QCheckBox::toggled, [&](bool enabled) {
+        if (!enabled && m_mainUi->expireDatePicker->hasFocus()) {
+            m_mainUi->expireCheck->setFocus();
+        }
         m_mainUi->expireDatePicker->setEnabled(enabled);
         if (enabled) {
             m_mainUi->expireDatePicker->setDateTime(Clock::currentDateTime());
