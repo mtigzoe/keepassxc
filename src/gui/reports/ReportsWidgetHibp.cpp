@@ -108,6 +108,11 @@ void ReportsWidgetHibp::loadSettings(QSharedPointer<Database> db)
  */
 void ReportsWidgetHibp::makeHibpTable()
 {
+    // The confirmation page is replaced by the results page when analysis
+    // finishes. Move focus first if the validation button currently has it,
+    // so keyboard and screen-reader focus does not remain on a hidden widget.
+    const bool validationHasFocus = m_ui->validationButton->hasFocus();
+
     // Reset the table
     m_referencesModel->clear();
     m_rowToEntry.clear();
@@ -115,6 +120,9 @@ void ReportsWidgetHibp::makeHibpTable()
     // If there were no findings, display a motivational message
     if (m_pwndPasswords.isEmpty() && m_error.isEmpty()) {
         m_referencesModel->setHorizontalHeaderLabels(QStringList() << tr("Congratulations, no exposed passwords!"));
+        if (validationHasFocus) {
+            m_ui->hibpTableView->setFocus();
+        }
         m_ui->stackedWidget->setCurrentIndex(1);
         return;
     }
@@ -206,6 +214,9 @@ void ReportsWidgetHibp::makeHibpTable()
     m_ui->hibpTableView->resizeColumnsToContents();
     m_ui->hibpTableView->sortByColumn(2, Qt::DescendingOrder);
 
+    if (validationHasFocus) {
+        m_ui->hibpTableView->setFocus();
+    }
     m_ui->stackedWidget->setCurrentIndex(1);
 }
 
