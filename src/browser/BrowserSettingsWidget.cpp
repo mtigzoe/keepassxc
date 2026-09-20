@@ -3,8 +3,8 @@
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ *  the Free Software Foundation, either version 2 or (at your option)
+ *  version 3 of the License.
  *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +22,7 @@
 #include "config-keepassx.h"
 #include "gui/styles/StateColorPalette.h"
 
+#include <QApplication>
 #include <QFileDialog>
 
 BrowserSettingsWidget::BrowserSettingsWidget(QWidget* parent)
@@ -41,7 +42,12 @@ BrowserSettingsWidget::BrowserSettingsWidget(QWidget* parent)
     // clang-format on
 
     m_ui->tabWidget->setEnabled(m_ui->enableBrowserSupport->isChecked());
-    connect(m_ui->enableBrowserSupport, SIGNAL(toggled(bool)), m_ui->tabWidget, SLOT(setEnabled(bool)));
+    connect(m_ui->enableBrowserSupport, &QAbstractButton::toggled, this, [this](bool enabled) {
+        if (!enabled && m_ui->tabWidget->isAncestorOf(QApplication::focusWidget())) {
+            m_ui->enableBrowserSupport->setFocus(Qt::OtherFocusReason);
+        }
+        m_ui->tabWidget->setEnabled(enabled);
+    });
     connect(m_ui->enableBrowserSupport, SIGNAL(toggled(bool)), SLOT(validateProxyLocation()));
 
     // Custom Browser option
@@ -51,15 +57,27 @@ BrowserSettingsWidget::BrowserSettingsWidget(QWidget* parent)
     m_ui->customBrowserGroupBox->setVisible(false);
 #else
     connect(m_ui->customBrowserLocationBrowseButton, SIGNAL(clicked()), SLOT(showCustomBrowserLocationFileDialog()));
-    connect(m_ui->customBrowserSupport, SIGNAL(toggled(bool)), m_ui->customBrowserGroupBox, SLOT(setEnabled(bool)));
+    connect(m_ui->customBrowserSupport, &QAbstractButton::toggled, this, [this](bool enabled) {
+        if (!enabled && m_ui->customBrowserGroupBox->isAncestorOf(QApplication::focusWidget())) {
+            m_ui->customBrowserSupport->setFocus(Qt::OtherFocusReason);
+        }
+        m_ui->customBrowserGroupBox->setEnabled(enabled);
+    });
 #endif
 
     // Custom Proxy option
     m_ui->customProxyLocation->setEnabled(m_ui->useCustomProxy->isChecked());
     m_ui->customProxyLocationBrowseButton->setEnabled(m_ui->useCustomProxy->isChecked());
 
-    connect(m_ui->useCustomProxy, SIGNAL(toggled(bool)), m_ui->customProxyLocation, SLOT(setEnabled(bool)));
-    connect(m_ui->useCustomProxy, SIGNAL(toggled(bool)), m_ui->customProxyLocationBrowseButton, SLOT(setEnabled(bool)));
+    connect(m_ui->useCustomProxy, &QAbstractButton::toggled, this, [this](bool enabled) {
+        if (!enabled && m_ui->customProxyLocation->hasFocus()) {
+            m_ui->useCustomProxy->setFocus(Qt::OtherFocusReason);
+        } else if (!enabled && m_ui->customProxyLocationBrowseButton->hasFocus()) {
+            m_ui->useCustomProxy->setFocus(Qt::OtherFocusReason);
+        }
+        m_ui->customProxyLocation->setEnabled(enabled);
+        m_ui->customProxyLocationBrowseButton->setEnabled(enabled);
+    });
     connect(m_ui->useCustomProxy, SIGNAL(toggled(bool)), SLOT(validateProxyLocation()));
     connect(m_ui->customProxyLocation, SIGNAL(editingFinished()), SLOT(validateProxyLocation()));
     connect(m_ui->customProxyLocationBrowseButton, SIGNAL(clicked()), this, SLOT(showProxyLocationFileDialog()));
