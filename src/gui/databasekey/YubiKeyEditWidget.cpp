@@ -5,6 +5,14 @@
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 2 or (at your option)
  *  version 3 of the License.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 #include "YubiKeyEditWidget.h"
@@ -112,6 +120,7 @@ void YubiKeyEditWidget::initComponentEditWidget(QWidget* widget)
 
 void YubiKeyEditWidget::initComponent()
 {
+    // These need to be set in total for each credential type for translation purposes
     m_ui->groupBox->setTitle(tr("Challenge-Response"));
     m_ui->addButton->setText(tr("Add Challenge-Response"));
     m_ui->changeButton->setText(tr("Change Challenge-Response"));
@@ -165,6 +174,9 @@ void YubiKeyEditWidget::hardwareKeyResponse(bool found)
                                   : tr("No hardware keys detected");
         m_compUi->comboChallengeResponse->addItem(message);
         m_isDetected = false;
+        // Detection is asynchronous. Announce the result because the progress
+        // indicator is hidden and the combo contents changed without focus
+        // changing.
         QAccessibleEvent alertEvent(m_compUi->comboChallengeResponse, QAccessible::Alert);
         QAccessible::updateAccessibility(&alertEvent);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
@@ -176,12 +188,14 @@ void YubiKeyEditWidget::hardwareKeyResponse(bool found)
 
     const auto foundKeys = YubiKey::instance()->foundKeys();
     for (auto i = foundKeys.cbegin(); i != foundKeys.cend(); ++i) {
+        // add detected YubiKey to combo box and encode blocking mode in LSB, slot number in second LSB
         m_compUi->comboChallengeResponse->addItem(i.value(), QVariant::fromValue(i.key()));
     }
 
     m_isDetected = true;
     m_compUi->yubikeyProgress->setVisible(false);
     m_compUi->comboChallengeResponse->setEnabled(true);
+    // Announce that the asynchronous result populated the selection control.
     QAccessibleEvent alertEvent(m_compUi->comboChallengeResponse, QAccessible::Alert);
     QAccessible::updateAccessibility(&alertEvent);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
