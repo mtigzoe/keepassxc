@@ -25,6 +25,9 @@
    </property>
    <item>
     <widget class="QTableView" name="passkeysTableView">
+     <property name="accessibleName">
+      <string>Passkey report entries</string>
+     </property>
      <property name="contextMenuPolicy">
       <enum>Qt::CustomContextMenu</enum>
      </property>
