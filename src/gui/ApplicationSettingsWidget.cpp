@@ -198,6 +198,9 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget* parent)
         }
         m_secUi->lockDatabaseMinimizeCheckBox->setToolTip(
             state ? tr("This setting cannot be enabled when minimize on unlock is enabled.") : "");
+        if (state && m_secUi->lockDatabaseMinimizeCheckBox->hasFocus()) {
+            m_generalUi->minimizeAfterUnlockCheckBox->setFocus();
+        }
         m_secUi->lockDatabaseMinimizeCheckBox->setEnabled(!state);
     });
 
@@ -698,6 +701,10 @@ void ApplicationSettingsWidget::hideWindowOnCopyCheckBoxToggled(bool checked)
 
 void ApplicationSettingsWidget::systrayToggled(bool checked)
 {
+    if (!checked
+        && (m_generalUi->trayIconAppearance->hasFocus() || m_generalUi->systrayMinimizeToTrayCheckBox->hasFocus())) {
+        m_generalUi->systrayShowCheckBox->setFocus();
+    }
     m_generalUi->trayIconAppearance->setEnabled(checked);
     m_generalUi->trayIconAppearanceLabel->setEnabled(checked);
     m_generalUi->systrayMinimizeToTrayCheckBox->setEnabled(checked);
@@ -710,6 +717,11 @@ void ApplicationSettingsWidget::rememberDatabasesToggled(bool checked)
         m_generalUi->openPreviousDatabasesOnStartupCheckBox->setChecked(false);
     }
 
+    if (!checked
+        && (m_generalUi->rememberLastDatabasesSpinbox->hasFocus() || m_generalUi->rememberLastKeyFilesCheckBox->hasFocus()
+            || m_generalUi->openPreviousDatabasesOnStartupCheckBox->hasFocus())) {
+        m_generalUi->rememberLastDatabasesCheckBox->setFocus();
+    }
     m_generalUi->rememberLastDatabasesSpinbox->setEnabled(checked);
     m_generalUi->rememberLastKeyFilesCheckBox->setEnabled(checked);
     m_generalUi->openPreviousDatabasesOnStartupCheckBox->setEnabled(checked);
