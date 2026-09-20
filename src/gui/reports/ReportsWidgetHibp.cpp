@@ -109,9 +109,11 @@ void ReportsWidgetHibp::loadSettings(QSharedPointer<Database> db)
 void ReportsWidgetHibp::makeHibpTable()
 {
     // The confirmation page is replaced by the results page when analysis
-    // finishes. Move focus first if the validation button currently has it,
-    // so keyboard and screen-reader focus does not remain on a hidden widget.
+    // finishes. Remember which controls currently have focus so that focus
+    // can be restored after the page transition or if a result control is
+    // hidden.
     const bool validationHasFocus = m_ui->validationButton->hasFocus();
+    const bool showKnownBadHasFocus = m_ui->showKnownBadCheckBox->hasFocus();
 
     // Reset the table
     m_referencesModel->clear();
@@ -120,10 +122,10 @@ void ReportsWidgetHibp::makeHibpTable()
     // If there were no findings, display a motivational message
     if (m_pwndPasswords.isEmpty() && m_error.isEmpty()) {
         m_referencesModel->setHorizontalHeaderLabels(QStringList() << tr("Congratulations, no exposed passwords!"));
-        if (validationHasFocus) {
+        m_ui->stackedWidget->setCurrentIndex(1);
+        if (validationHasFocus || showKnownBadHasFocus) {
             m_ui->hibpTableView->setFocus();
         }
-        m_ui->stackedWidget->setCurrentIndex(1);
         return;
     }
 
@@ -203,6 +205,10 @@ void ReportsWidgetHibp::makeHibpTable()
     }
 #endif
 
+    // Switch to the results page before changing the visibility of its
+    // checkbox. This keeps focus handling within the visible page.
+    m_ui->stackedWidget->setCurrentIndex(1);
+
     // Show the "show known bad entries" checkbox if there's any known
     // bad entry in the database.
     if (anyExcluded) {
@@ -214,10 +220,9 @@ void ReportsWidgetHibp::makeHibpTable()
     m_ui->hibpTableView->resizeColumnsToContents();
     m_ui->hibpTableView->sortByColumn(2, Qt::DescendingOrder);
 
-    if (validationHasFocus) {
+    if (validationHasFocus || showKnownBadHasFocus) {
         m_ui->hibpTableView->setFocus();
     }
-    m_ui->stackedWidget->setCurrentIndex(1);
 }
 
 /*
