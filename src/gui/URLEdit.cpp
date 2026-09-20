@@ -28,6 +28,7 @@ URLEdit::URLEdit(QWidget* parent)
     const QIcon errorIcon = icons()->icon("dialog-error");
     m_errorAction = addAction(errorIcon, QLineEdit::TrailingPosition);
     m_errorAction->setVisible(false);
+    m_errorAction->setText(tr("Invalid URL"));
     m_errorAction->setToolTip(tr("Invalid URL"));
 
     updateStylesheet();
