@@ -853,6 +853,10 @@ void MainWindow::openDatabase(const QString& filePath, const QString& password, 
 
 void MainWindow::updateMenuActionState()
 {
+    // Keep track of the focused widget because changing QAction state can disable or hide
+    // an associated toolbar button while it has keyboard/screen-reader focus.
+    auto focusWidget = QApplication::focusWidget();
+
     // MainWindow State
     int currentIndex = m_ui->stackedWidget->currentIndex();
     bool hasLockableDatabase = m_ui->tabWidget->hasLockableDatabases();
@@ -1019,6 +1023,16 @@ void MainWindow::updateMenuActionState()
 #endif
 
     m_searchWidgetAction->setEnabled(inDatabase);
+
+    // Do not leave keyboard or screen-reader focus on a toolbar control that was
+    // disabled or hidden as a result of the state update.
+    if (focusWidget && (!focusWidget->isVisible() || !focusWidget->isEnabled())) {
+        if (dbWidget && dbWidget->isVisible() && dbWidget->isEnabled()) {
+            dbWidget->setFocus(Qt::OtherFocusReason);
+        } else {
+            m_ui->tabWidget->setFocus(Qt::OtherFocusReason);
+        }
+    }
 }
 
 void MainWindow::updateToolbarSeparatorVisibility()
