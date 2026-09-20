@@ -2199,7 +2199,13 @@ void DatabaseWidget::reloadDatabaseFile(bool triggeredBySave)
     hideMessage();
     emit updateSyncProgress(0, tr("Reloading database…"));
 
-    // Lock out interactions
+    // Lock out interactions. Move focus first if a view is about to be
+    // disabled so keyboard and screen-reader focus is not stranded.
+    QWidget* focusedWidget = QApplication::focusWidget();
+    if (focusedWidget && (m_entryView->isAncestorOf(focusedWidget) || m_groupView->isAncestorOf(focusedWidget)
+                          || m_tagView->isAncestorOf(focusedWidget))) {
+        setFocus(Qt::OtherFocusReason);
+    }
     m_entryView->setDisabled(true);
     m_groupView->setDisabled(true);
     m_tagView->setDisabled(true);
