@@ -151,25 +151,45 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget* parent)
     connect(m_generalUi->resetSettingsButton, SIGNAL(clicked()), SLOT(resetSettings()));
     connect(m_generalUi->importSettingsButton, SIGNAL(clicked()), SLOT(importSettings()));
     connect(m_generalUi->exportSettingsButton, SIGNAL(clicked()), SLOT(exportSettings()));
-    connect(m_generalUi->useAlternativeSaveCheckBox, SIGNAL(toggled(bool)),
-            m_generalUi->alternativeSaveComboBox, SLOT(setEnabled(bool)));
+    connect(m_generalUi->useAlternativeSaveCheckBox, &QCheckBox::toggled, this, [this](bool enabled) {
+        if (!enabled && m_generalUi->alternativeSaveComboBox->hasFocus()) {
+            m_generalUi->useAlternativeSaveCheckBox->setFocus();
+        }
+        m_generalUi->alternativeSaveComboBox->setEnabled(enabled);
+    });
 
-    connect(m_generalUi->backupBeforeSaveCheckBox, SIGNAL(toggled(bool)),
-            m_generalUi->backupFilePath, SLOT(setEnabled(bool)));
-    connect(m_generalUi->backupBeforeSaveCheckBox, SIGNAL(toggled(bool)),
-            m_generalUi->backupFilePathPicker, SLOT(setEnabled(bool)));
+    connect(m_generalUi->backupBeforeSaveCheckBox, &QCheckBox::toggled, this, [this](bool enabled) {
+        if (!enabled
+            && (m_generalUi->backupFilePath->hasFocus() || m_generalUi->backupFilePathPicker->hasFocus())) {
+            m_generalUi->backupBeforeSaveCheckBox->setFocus();
+        }
+        m_generalUi->backupFilePath->setEnabled(enabled);
+        m_generalUi->backupFilePathPicker->setEnabled(enabled);
+    });
     connect(m_generalUi->backupFilePathPicker, SIGNAL(pressed()), SLOT(selectBackupDirectory()));
     connect(m_generalUi->showExpiredEntriesOnDatabaseUnlockCheckBox, SIGNAL(toggled(bool)),
             SLOT(showExpiredEntriesOnDatabaseUnlockToggled(bool)));
     connect(m_generalUi->autoTypeAskCheckBox, SIGNAL(toggled(bool)),
             SLOT(autoTypeAskToggled(bool)));
 
-    connect(m_secUi->clearClipboardCheckBox, SIGNAL(toggled(bool)),
-            m_secUi->clearClipboardSpinBox, SLOT(setEnabled(bool)));
-    connect(m_secUi->clearSearchCheckBox, SIGNAL(toggled(bool)),
-            m_secUi->clearSearchSpinBox, SLOT(setEnabled(bool)));
-    connect(m_secUi->lockDatabaseIdleCheckBox, SIGNAL(toggled(bool)),
-            m_secUi->lockDatabaseIdleSpinBox, SLOT(setEnabled(bool)));
+    connect(m_secUi->clearClipboardCheckBox, &QCheckBox::toggled, this, [this](bool enabled) {
+        if (!enabled && m_secUi->clearClipboardSpinBox->hasFocus()) {
+            m_secUi->clearClipboardCheckBox->setFocus();
+        }
+        m_secUi->clearClipboardSpinBox->setEnabled(enabled);
+    });
+    connect(m_secUi->clearSearchCheckBox, &QCheckBox::toggled, this, [this](bool enabled) {
+        if (!enabled && m_secUi->clearSearchSpinBox->hasFocus()) {
+            m_secUi->clearSearchCheckBox->setFocus();
+        }
+        m_secUi->clearSearchSpinBox->setEnabled(enabled);
+    });
+    connect(m_secUi->lockDatabaseIdleCheckBox, &QCheckBox::toggled, this, [this](bool enabled) {
+        if (!enabled && m_secUi->lockDatabaseIdleSpinBox->hasFocus()) {
+            m_secUi->lockDatabaseIdleCheckBox->setFocus();
+        }
+        m_secUi->lockDatabaseIdleSpinBox->setEnabled(enabled);
+    });
     // clang-format on
 
     connect(m_generalUi->minimizeAfterUnlockCheckBox, &QCheckBox::toggled, this, [this](bool state) {
@@ -658,12 +678,20 @@ void ApplicationSettingsWidget::autoSaveToggled(bool checked)
         m_generalUi->autoSaveOnExitCheckBox->setChecked(true);
         m_generalUi->autoSaveNonDataChangesCheckBox->setChecked(true);
     }
+    if (checked
+        && (m_generalUi->autoSaveOnExitCheckBox->hasFocus() || m_generalUi->autoSaveNonDataChangesCheckBox->hasFocus())) {
+        m_generalUi->autoSaveAfterEveryChangeCheckBox->setFocus();
+    }
     m_generalUi->autoSaveOnExitCheckBox->setEnabled(!checked);
     m_generalUi->autoSaveNonDataChangesCheckBox->setEnabled(!checked);
 }
 
 void ApplicationSettingsWidget::hideWindowOnCopyCheckBoxToggled(bool checked)
 {
+    if (!checked
+        && (m_generalUi->minimizeOnCopyRadioButton->hasFocus() || m_generalUi->dropToBackgroundOnCopyRadioButton->hasFocus())) {
+        m_generalUi->hideWindowOnCopyCheckBox->setFocus();
+    }
     m_generalUi->minimizeOnCopyRadioButton->setEnabled(checked);
     m_generalUi->dropToBackgroundOnCopyRadioButton->setEnabled(checked);
 }
@@ -689,16 +717,25 @@ void ApplicationSettingsWidget::rememberDatabasesToggled(bool checked)
 
 void ApplicationSettingsWidget::checkUpdatesToggled(bool checked)
 {
+    if (!checked && m_generalUi->checkForUpdatesIncludeBetasCheckBox->hasFocus()) {
+        m_generalUi->checkForUpdatesOnStartupCheckBox->setFocus();
+    }
     m_generalUi->checkForUpdatesIncludeBetasCheckBox->setEnabled(checked);
 }
 
 void ApplicationSettingsWidget::showExpiredEntriesOnDatabaseUnlockToggled(bool checked)
 {
+    if (!checked && m_generalUi->showExpiredEntriesOnDatabaseUnlockOffsetSpinBox->hasFocus()) {
+        m_generalUi->showExpiredEntriesOnDatabaseUnlockCheckBox->setFocus();
+    }
     m_generalUi->showExpiredEntriesOnDatabaseUnlockOffsetSpinBox->setEnabled(checked);
 }
 
 void ApplicationSettingsWidget::autoTypeAskToggled(bool checked)
 {
+    if (!checked && m_generalUi->autoTypeSkipMainWindowConfirmationCheckBox->hasFocus()) {
+        m_generalUi->autoTypeAskCheckBox->setFocus();
+    }
     m_generalUi->autoTypeSkipMainWindowConfirmationCheckBox->setEnabled(checked);
 }
 
