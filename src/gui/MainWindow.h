@@ -190,6 +190,7 @@ private:
     QPointer<QProgressBar> m_progressBar;
     QPointer<QLabel> m_progressBarLabel;
     QPointer<QLabel> m_statusBarLabel;
+    QPointer<QWidget> m_yubiKeyFocusWidget;
 
     Q_DISABLE_COPY(MainWindow)
 
