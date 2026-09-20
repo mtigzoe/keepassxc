@@ -67,7 +67,11 @@
     </layout>
    </item>
    <item>
-    <widget class="QTextBrowser" name="previewTextBrowser"/>
+    <widget class="QTextBrowser" name="previewTextBrowser">
+     <property name="accessibleName">
+      <string>Attachment text preview</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
