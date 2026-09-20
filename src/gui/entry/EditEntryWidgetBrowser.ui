@@ -91,6 +91,9 @@
      <layout class="QHBoxLayout" name="horizontalLayout_1">
       <item>
        <widget class="QListView" name="additionalURLsView">
+        <property name="accessibleName">
+         <string>Additional URL entries</string>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
