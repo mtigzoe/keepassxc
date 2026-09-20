@@ -31,6 +31,7 @@
 #include "gui/osutils/macutils/MacUtils.h"
 #endif
 
+#include <QAccessible>
 #include <QStandardItemModel>
 
 IconDownloaderDialog::IconDownloaderDialog(QWidget* parent)
@@ -193,7 +194,11 @@ void IconDownloaderDialog::updateProgressBar()
 
 void IconDownloaderDialog::updateCancelButton()
 {
-    m_ui->cancelButton->setEnabled(!m_activeDownloaders.isEmpty());
+    const bool enabled = !m_activeDownloaders.isEmpty();
+    if (!enabled && m_ui->cancelButton->hasFocus()) {
+        m_ui->closeButton->setFocus();
+    }
+    m_ui->cancelButton->setEnabled(enabled);
 }
 
 void IconDownloaderDialog::updateTable(const QString& url, const QString& message)
