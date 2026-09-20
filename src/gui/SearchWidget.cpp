@@ -252,6 +252,9 @@ void SearchWidget::focusSearch()
 void SearchWidget::clearSearch()
 {
     m_ui->searchEdit->clear();
+    if (m_ui->saveIcon->isVisible() && m_ui->saveIcon->hasFocus()) {
+        m_ui->searchEdit->setFocus(Qt::OtherFocusReason);
+    }
     m_ui->saveIcon->setVisible(false);
     emit searchCanceled();
 }
@@ -291,6 +294,10 @@ void SearchWidget::performRequestedSearch(const QString& text)
 
 void SearchWidget::updateSaveButtonVisibility()
 {
-    // Show save button whenever there's non-empty text in the search field
-    m_ui->saveIcon->setVisible(!m_ui->searchEdit->text().isEmpty());
+    // Show save button whenever there's non-empty text in the search field.
+    const bool visible = !m_ui->searchEdit->text().isEmpty();
+    if (!visible && m_ui->saveIcon->isVisible() && m_ui->saveIcon->hasFocus()) {
+        m_ui->searchEdit->setFocus(Qt::OtherFocusReason);
+    }
+    m_ui->saveIcon->setVisible(visible);
 }
