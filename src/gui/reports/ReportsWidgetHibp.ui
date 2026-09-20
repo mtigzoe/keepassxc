@@ -116,6 +116,12 @@
        </item>
        <item>
         <widget class="QProgressBar" name="progressBar">
+    <property name="accessibleName">
+     <string>Online password exposure check progress</string>
+    </property>
+    <property name="accessibleDescription">
+     <string>Shows the progress of checking database passwords against the online exposure service.</string>
+    </property>
          <property name="value">
           <number>0</number>
          </property>
