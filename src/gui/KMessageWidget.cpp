@@ -192,6 +192,18 @@ void KMessageWidgetPrivate::createLayout()
 
     content->resize(q->size());
 
+    // Rebuilding the layout deletes and recreates every action button. If an
+    // action button currently has keyboard focus, deleting it leaves the
+    // keyboard/screen-reader focus target orphaned. Remember which QAction
+    // owned the focused button and restore focus to its replacement below.
+    QAction* focusedAction = nullptr;
+    if (auto* focusedButton = qobject_cast<QToolButton*>(QApplication::focusWidget())) {
+        focusedAction = focusedButton->defaultAction();
+        if (!d->buttons.contains(focusedButton)) {
+            focusedAction = nullptr;
+        }
+    }
+
     qDeleteAll(buttons);
     buttons.clear();
 
@@ -236,6 +248,15 @@ void KMessageWidgetPrivate::createLayout()
 
         layout->addWidget(closeButton);
     };
+
+    if (focusedAction) {
+        for (auto* button : asConst(buttons)) {
+            if (button->defaultAction() == focusedAction) {
+                button->setFocus(Qt::OtherFocusReason);
+                break;
+            }
+        }
+    }
 
     if (q->isVisible()) {
         q->setFixedHeight(content->sizeHint().height());
