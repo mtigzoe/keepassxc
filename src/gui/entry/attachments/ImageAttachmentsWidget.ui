@@ -80,7 +80,11 @@
     </widget>
    </item>
    <item>
-    <widget class="ImageAttachmentsView" name="imagesView"/>
+    <widget class="ImageAttachmentsView" name="imagesView">
+     <property name="accessibleName">
+      <string>Attachment image</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
