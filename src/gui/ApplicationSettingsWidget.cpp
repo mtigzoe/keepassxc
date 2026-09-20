@@ -199,7 +199,10 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget* parent)
         m_secUi->lockDatabaseMinimizeCheckBox->setToolTip(
             state ? tr("This setting cannot be enabled when minimize on unlock is enabled.") : "");
         if (state && m_secUi->lockDatabaseMinimizeCheckBox->hasFocus()) {
-            m_generalUi->minimizeAfterUnlockCheckBox->setFocus();
+            // The general settings page may be hidden while this setting is
+            // changed programmatically. Move focus to a visible control on
+            // the current security page before disabling the focused control.
+            m_secUi->lockDatabaseIdleCheckBox->setFocus();
         }
         m_secUi->lockDatabaseMinimizeCheckBox->setEnabled(!state);
     });
