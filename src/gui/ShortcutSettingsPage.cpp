@@ -52,12 +52,15 @@ public:
 
         auto hLayout = new QHBoxLayout();
         l->addLayout(hLayout);
-        hLayout->addWidget(new QLabel(QObject::tr("Enter Shortcut")));
+        auto shortcutLabel = new QLabel(QObject::tr("Enter Shortcut"));
+        shortcutLabel->setBuddy(m_keySeqEdit);
+        hLayout->addWidget(shortcutLabel);
         hLayout->addWidget(m_keySeqEdit);
 
         l->addStretch();
         l->addWidget(m_btnBox);
 
+        m_keySeqEdit->setAccessibleName(QObject::tr("Shortcut"));
         setFocusProxy(m_keySeqEdit);
     }
 
@@ -111,6 +114,7 @@ public:
         m_proxy.setFilterCaseSensitivity(Qt::CaseInsensitive);
         m_proxy.setSourceModel(&m_model);
 
+        m_filterLineEdit->setAccessibleName(QObject::tr("Filter shortcuts"));
         m_filterLineEdit->setPlaceholderText(QObject::tr("Filter..."));
         connect(m_filterLineEdit, &QLineEdit::textChanged, &m_proxy, &QSortFilterProxyModel::setFilterFixedString);
 
@@ -122,6 +126,7 @@ public:
             loadSettings();
         });
 
+        m_tableView->setAccessibleName(QObject::tr("Keyboard shortcuts"));
         m_tableView->setModel(&m_proxy);
         m_tableView->setSortingEnabled(true);
         m_tableView->sortByColumn(0, Qt::AscendingOrder);
