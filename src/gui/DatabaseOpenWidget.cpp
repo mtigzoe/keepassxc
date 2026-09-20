@@ -568,6 +568,17 @@ void DatabaseOpenWidget::pollHardwareKey(bool manualTrigger, int delay)
         return;
     }
 
+    // Hardware-key detection disables these controls while it runs. If one of
+    // them currently has keyboard or screen-reader focus, move focus to the
+    // password field before disabling it so focus does not remain on a
+    // temporarily disabled control.
+    const bool hardwareKeyComboHasFocus = m_ui->hardwareKeyCombo->hasFocus();
+    const bool hardwareKeyCheckBoxHasFocus = m_ui->useHardwareKeyCheckBox->hasFocus();
+    const bool refreshHardwareKeysHasFocus = m_ui->refreshHardwareKeys->hasFocus();
+    if (hardwareKeyComboHasFocus || hardwareKeyCheckBoxHasFocus || refreshHardwareKeysHasFocus) {
+        m_ui->editPassword->setFocus();
+    }
+
     m_ui->hardwareKeyCombo->setEnabled(false);
     m_ui->useHardwareKeyCheckBox->setEnabled(false);
     m_ui->hardwareKeyProgress->setVisible(true);
