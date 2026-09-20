@@ -369,8 +369,12 @@ void EditEntryWidget::setupAutoType()
     connect(m_autoTypeUi->enableButton, SIGNAL(toggled(bool)), SLOT(updateAutoTypeEnabled()));
     connect(m_autoTypeUi->customSequenceButton, &QRadioButton::toggled, this, &EditEntryWidget::updateAutoTypeEnabled);
     connect(m_autoTypeUi->openHelpButton, SIGNAL(clicked()), SLOT(openAutotypeHelp()));
-    connect(m_autoTypeUi->customWindowSequenceButton, SIGNAL(toggled(bool)),
-            m_autoTypeUi->windowSequenceEdit, SLOT(setEnabled(bool)));
+    connect(m_autoTypeUi->customWindowSequenceButton, &QRadioButton::toggled, this, [this](bool enabled) {
+        if (!enabled && m_autoTypeUi->windowSequenceEdit->hasFocus()) {
+            m_autoTypeUi->customWindowSequenceButton->setFocus();
+        }
+        m_autoTypeUi->windowSequenceEdit->setEnabled(enabled);
+    });
     connect(m_autoTypeUi->assocAddButton, SIGNAL(clicked()), SLOT(insertAutoTypeAssoc()));
     connect(m_autoTypeUi->assocRemoveButton, SIGNAL(clicked()), SLOT(removeAutoTypeAssoc()));
     connect(m_autoTypeUi->assocView->selectionModel(),
