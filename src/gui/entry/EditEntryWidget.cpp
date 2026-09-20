@@ -197,7 +197,8 @@ EditEntryWidget::EditEntryWidget(QWidget* parent)
             [this](const QString& rawText, QString& resolvedText) {
                 if (m_entry) {
                     // Dereferencing the password of the entry
-                    resolvedText = m_entry->resolveMultiplePlaceholders(rawText);                }
+                    resolvedText = m_entry->resolveMultiplePlaceholders(rawText);
+                }
             });
 }
 
@@ -396,7 +397,8 @@ void EditEntryWidget::setupBrowser()
         m_browserUi->additionalURLsView->setModel(m_additionalURLsDataModel);
 
         m_browserUi->messageWidget->setCloseButtonVisible(false);
-        m_browserUi->messageWidget->setAutoHideTimeout(-1);        m_browserUi->messageWidget->setAnimate(false);
+        m_browserUi->messageWidget->setAutoHideTimeout(-1);
+        m_browserUi->messageWidget->setAnimate(false);
         m_browserUi->messageWidget->setVisible(false);
 
         // Use a custom item delegate to align the icon to the right side
@@ -595,7 +597,8 @@ void EditEntryWidget::setupEntryUpdate()
     // Entry tab
     connect(m_mainUi->titleEdit, SIGNAL(textChanged(QString)), this, SLOT(setModified()));
     connect(m_mainUi->usernameComboBox->lineEdit(), SIGNAL(textChanged(QString)), this, SLOT(setModified()));
-    connect(m_mainUi->passwordEdit, SIGNAL(textChanged(QString)), this, SLOT(setModified()));    connect(m_mainUi->urlEdit, SIGNAL(textChanged(QString)), this, SLOT(setModified()));
+    connect(m_mainUi->passwordEdit, SIGNAL(textChanged(QString)), this, SLOT(setModified()));
+    connect(m_mainUi->urlEdit, SIGNAL(textChanged(QString)), this, SLOT(setModified()));
 #ifdef KPXC_FEATURE_NETWORK
     connect(m_mainUi->urlEdit, SIGNAL(textChanged(QString)), this, SLOT(updateFaviconButtonEnable(QString)));
 #endif
@@ -794,7 +797,8 @@ void EditEntryWidget::updateSSHAgentAttachments()
     QSignalBlocker sshAgent_externalFileEdit_Blocker(m_sshAgentUi->externalFileEdit);
     m_sshAgentUi->externalFileEdit->setText(m_sshAgentSettings.fileName());
 
-    if (m_sshAgentSettings.selectedType() == "attachment") {        m_sshAgentUi->attachmentRadioButton->setChecked(true);
+    if (m_sshAgentSettings.selectedType() == "attachment") {
+        m_sshAgentUi->attachmentRadioButton->setChecked(true);
     } else {
         m_sshAgentUi->externalFileRadioButton->setChecked(true);
     }
@@ -1009,7 +1013,8 @@ void EditEntryWidget::generatePrivateKey()
         for (int i = 0; i < 10; i++) {
             QString keyName = keyPrefix;
 
-            if (i > 0) {                keyName += "." + QString::number(i);
+            if (i > 0) {
+                keyName += "." + QString::number(i);
             }
 
             if (!m_entry->attachments()->hasKey(keyName)) {
@@ -1171,6 +1176,17 @@ void EditEntryWidget::setForms(Entry* entry, bool restore)
     if (m_attributesModel->rowCount() != 0) {
         m_advancedUi->attributesView->setCurrentIndex(m_attributesModel->index(0, 0));
     } else {
+        // Removing the last attribute clears the selection and disables the
+        // attribute controls. Return focus to the table before disabling a
+        // control that may currently have focus.
+        const bool protectHasFocus = m_advancedUi->protectAttributeButton->hasFocus();
+        const bool editHasFocus = m_advancedUi->editAttributeButton->hasFocus();
+        const bool removeHasFocus = m_advancedUi->removeAttributeButton->hasFocus();
+        const bool attributesEditHasFocus = m_advancedUi->attributesEdit->hasFocus();
+        const bool revealHasFocus = m_advancedUi->revealAttributeButton->hasFocus();
+        if (protectHasFocus || editHasFocus || removeHasFocus || attributesEditHasFocus || revealHasFocus) {
+            m_advancedUi->attributesView->setFocus();
+        }
         m_advancedUi->attributesEdit->setPlainText("");
         m_advancedUi->attributesEdit->setEnabled(false);
     }
@@ -1210,4 +1226,690 @@ void EditEntryWidget::setForms(Entry* entry, bool restore)
         updateSSHAgent();
     }
 #endif
+
+#ifdef KPXC_FEATURE_BROWSER
+    if (config()->get(Config::Browser_Enabled).toBool()) {
+        if (!hasPage(m_browserWidget)) {
+            setupBrowser();
+        }
+
+        const auto group = m_entry->group();
+        m_browserUi->messageWidget->showMessage(
+            tr("Some Browser Integration settings are overridden by group settings."), MessageWidget::Information);
+        m_browserUi->messageWidget->setVisible(false);
+
+        auto updateCheckBoxValue = [&](QCheckBox* checkBox, const QString& option) {
+            const auto optionEnabledInGroup = group ? group->resolveBrowserOptionEnabled(option) : false;
+            const auto optionInherited = group ? group->resolveCustomDataTriState(option) == Group::Inherit : true;
+
+            if (!optionInherited) {
+                m_browserUi->messageWidget->setVisible(true);
+            }
+
+            updateBrowserIntegrationCheckbox(checkBox, optionInherited, optionEnabledInGroup, option);
+        };
+
+        updateCheckBoxValue(m_browserUi->hideEntryCheckbox, BrowserService::OPTION_HIDE_ENTRY);
+        updateCheckBoxValue(m_browserUi->skipAutoSubmitCheckbox, BrowserService::OPTION_SKIP_AUTO_SUBMIT);
+        updateCheckBoxValue(m_browserUi->onlyHttpAuthCheckbox, BrowserService::OPTION_ONLY_HTTP_AUTH);
+        updateCheckBoxValue(m_browserUi->notHttpAuthCheckbox, BrowserService::OPTION_NOT_HTTP_AUTH);
+
+        m_browserUi->addURLButton->setEnabled(!m_history);
+        m_browserUi->removeURLButton->setEnabled(false);
+        m_browserUi->editURLButton->setEnabled(false);
+        m_browserUi->additionalURLsView->setEditTriggers(editTriggers);
+
+        if (m_additionalURLsDataModel->rowCount() != 0) {
+            m_browserUi->additionalURLsView->setCurrentIndex(m_additionalURLsDataModel->index(0, 0));
+        }
+    }
+
+    setPageHidden(m_browserWidget, !config()->get(Config::Browser_Enabled).toBool());
+#endif
+
+    m_editWidgetProperties->setFields(entry->timeInfo(), entry->uuid());
+
+    if (!m_history && !restore) {
+        m_historyModel->setEntries(entry->historyItems(), entry);
+        m_historyUi->historyView->sortByColumn(0, Qt::DescendingOrder);
+    }
+    if (m_historyModel->rowCount() > 0) {
+        m_historyUi->deleteAllButton->setEnabled(true);
+    } else {
+        m_historyUi->deleteAllButton->setEnabled(false);
+    }
+
+    updateHistoryButtons(m_historyUi->historyView->currentIndex(), QModelIndex());
+
+    m_mainUi->titleEdit->setFocus();
+}
+
+/**
+ * Commit the form values to in-memory database representation
+ *
+ * @return true is commit successful, otherwise false
+ */
+bool EditEntryWidget::commitEntry()
+{
+    if (m_history) {
+        clear();
+        hideMessage();
+        emit editFinished(false);
+        return true;
+    }
+
+    // HACK: Check that entry pointer is still valid, see https://github.com/keepassxreboot/keepassxc/issues/5722
+    if (!m_entry) {
+        QMessageBox::information(this,
+                                 tr("Invalid Entry"),
+                                 tr("An external merge operation has invalidated this entry.\n"
+                                    "Unfortunately, any changes made have been lost."));
+        return true;
+    }
+
+    // Check Auto-Type validity early
+    QString error;
+    if (m_autoTypeUi->customSequenceButton->isChecked()
+        && !AutoType::verifyAutoTypeSyntax(m_autoTypeUi->sequenceEdit->text(), m_entry, error)) {
+        auto res = MessageBox::question(this,
+                                        tr("Auto-Type Validation Error"),
+                                        tr("An error occurred while validating the custom Auto-Type sequence:\n%1\n"
+                                           "Would you like to correct it?")
+                                            .arg(error),
+                                        MessageBox::Yes | MessageBox::No,
+                                        MessageBox::Yes);
+        if (res == MessageBox::Yes) {
+            switchToPage(Page::AutoType);
+            return false;
+        }
+    }
+    for (const auto& assoc : m_autoTypeAssoc->getAll()) {
+        if (!AutoType::verifyAutoTypeSyntax(assoc.sequence, m_entry, error)) {
+            auto res =
+                MessageBox::question(this,
+                                     tr("Auto-Type Validation Error"),
+                                     tr("An error occurred while validating the Auto-Type sequence for \"%1\":\n%2\n"
+                                        "Would you like to correct it?")
+                                         .arg(assoc.window.left(40), error),
+                                     MessageBox::Yes | MessageBox::No,
+                                     MessageBox::Yes);
+            if (res == MessageBox::Yes) {
+                switchToPage(Page::AutoType);
+                return false;
+            }
+        }
+    }
+
+    if (m_advancedUi->attributesView->currentIndex().isValid() && m_advancedUi->attributesEdit->isEnabled()) {
+        QString key = m_attributesModel->keyByIndex(m_advancedUi->attributesView->currentIndex());
+        m_entryAttributes->set(key, m_advancedUi->attributesEdit->toPlainText(), m_entryAttributes->isProtected(key));
+    }
+
+    m_currentAttribute = QPersistentModelIndex();
+
+    // must stand before beginUpdate()
+    // we don't want to create a new history item, if only the history has changed
+    m_entry->removeHistoryItems(m_historyModel->deletedEntries());
+    m_historyModel->clearDeletedEntries();
+
+    m_autoTypeAssoc->removeEmpty();
+
+#ifdef KPXC_FEATURE_SSHAGENT
+    toKeeAgentSettings(m_sshAgentSettings);
+#endif
+
+    // Begin entry update
+    if (!m_create) {
+        m_entry->beginUpdate();
+    }
+
+#ifdef KPXC_FEATURE_BROWSER
+    if (config()->get(Config::Browser_Enabled).toBool()) {
+        updateBrowser();
+    }
+#endif
+
+    updateEntryData(m_entry);
+
+    if (!m_create) {
+        m_entry->endUpdate();
+    }
+    // End entry update
+
+    m_historyModel->setEntries(m_entry->historyItems(), m_entry);
+    setPageHidden(m_historyWidget, m_history || m_entry->historyItems().count() < 1);
+    m_advancedUi->attachmentsWidget->linkAttachments(m_entry->attachments());
+
+    showMessage(tr("Entry updated successfully."), MessageWidget::Positive);
+    setModified(false);
+    // Prevent a reload due to entry modified signals
+    m_entryModifiedTimer.stop();
+
+    return true;
+}
+
+void EditEntryWidget::acceptEntry()
+{
+    if (commitEntry()) {
+        clear();
+        emit editFinished(true);
+    }
+}
+
+void EditEntryWidget::updateEntryData(Entry* entry) const
+{
+    QRegularExpression newLineRegex("(?:\r?\n|\r)");
+
+    entry->attributes()->copyCustomKeysFrom(m_entryAttributes);
+    entry->attachments()->copyDataFrom(m_attachments.data());
+    entry->customData()->copyDataFrom(m_customData.data());
+    entry->setTitle(m_mainUi->titleEdit->text().replace(newLineRegex, " "));
+    entry->setUsername(m_mainUi->usernameComboBox->lineEdit()->text().replace(newLineRegex, " "));
+    entry->setUrl(m_mainUi->urlEdit->text().replace(newLineRegex, " "));
+    entry->setPassword(m_mainUi->passwordEdit->text());
+    entry->setExpires(m_mainUi->expireCheck->isChecked());
+    entry->setExpiryTime(m_mainUi->expireDatePicker->dateTime().toUTC());
+
+    QStringList uniqueTags(m_mainUi->tagsList->tags());
+    uniqueTags.removeDuplicates();
+    entry->setTags(uniqueTags.join(";"));
+
+    entry->setNotes(m_mainUi->notesEdit->toPlainText());
+
+    if (entry->excludeFromReports() != m_advancedUi->excludeReportsCheckBox->isChecked()) {
+        entry->setExcludeFromReports(m_advancedUi->excludeReportsCheckBox->isChecked());
+    }
+
+    if (m_advancedUi->fgColorCheckBox->isChecked() && m_advancedUi->fgColorButton->property("color").isValid()) {
+        entry->setForegroundColor(m_advancedUi->fgColorButton->property("color").toString());
+    } else {
+        entry->setForegroundColor(QString());
+    }
+
+    if (m_advancedUi->bgColorCheckBox->isChecked() && m_advancedUi->bgColorButton->property("color").isValid()) {
+        entry->setBackgroundColor(m_advancedUi->bgColorButton->property("color").toString());
+    } else {
+        entry->setBackgroundColor(QString());
+    }
+
+    IconStruct iconStruct = m_iconsWidget->state();
+
+    if (iconStruct.number < 0) {
+        entry->setIcon(Entry::DefaultIconNumber);
+    } else if (iconStruct.uuid.isNull()) {
+        entry->setIcon(iconStruct.number);
+    } else {
+        entry->setIcon(iconStruct.uuid);
+    }
+
+    entry->setAutoTypeEnabled(m_autoTypeUi->enableButton->isChecked());
+    if (m_autoTypeUi->inheritSequenceButton->isChecked()) {
+        entry->setDefaultAutoTypeSequence(QString());
+    } else {
+        entry->setDefaultAutoTypeSequence(m_autoTypeUi->sequenceEdit->text());
+    }
+
+    entry->autoTypeAssociations()->copyDataFrom(m_autoTypeAssoc);
+
+#ifdef KPXC_FEATURE_SSHAGENT
+    if (sshAgent()->isEnabled()) {
+        m_sshAgentSettings.toEntry(entry);
+    }
+#endif
+}
+
+void EditEntryWidget::updateBrowserIntegrationCheckbox(QCheckBox* checkBox,
+                                                       bool enabled,
+                                                       bool value,
+                                                       const QString& option)
+{
+    auto block = checkBox->signalsBlocked();
+    checkBox->blockSignals(true);
+
+    if (enabled) {
+        if (m_customData->contains(option)) {
+            checkBox->setChecked(m_customData->value(option) == TRUE_STR);
+        } else {
+            checkBox->setChecked(false);
+        }
+    } else {
+        checkBox->setChecked(value);
+    }
+    checkBox->setEnabled(enabled);
+
+    checkBox->blockSignals(block);
+}
+
+void EditEntryWidget::cancel()
+{
+    if (m_history) {
+        clear();
+        hideMessage();
+        emit editFinished(false);
+        return;
+    }
+
+    if (!m_entry->iconUuid().isNull() && !m_db->metadata()->hasCustomIcon(m_entry->iconUuid())) {
+        m_entry->setIcon(Entry::DefaultIconNumber);
+    }
+
+    bool accepted = false;
+    if (isModified()) {
+        auto result = MessageBox::question(this,
+                                           tr("Unsaved Changes"),
+                                           tr("Would you like to save changes to this entry?"),
+                                           MessageBox::Cancel | MessageBox::Save | MessageBox::Discard,
+                                           MessageBox::Cancel);
+        if (result == MessageBox::Cancel) {
+            return;
+        } else if (result == MessageBox::Save) {
+            accepted = true;
+            if (!commitEntry()) {
+                return;
+            }
+        }
+    }
+
+    clear();
+    emit editFinished(accepted);
+}
+
+void EditEntryWidget::clear()
+{
+    if (m_entry) {
+        m_entry->disconnect(this);
+    }
+
+    m_entry = nullptr;
+    m_db.reset();
+
+    m_mainUi->titleEdit->setText("");
+    m_mainUi->passwordEdit->setText("");
+    m_mainUi->urlEdit->setText("");
+    m_mainUi->notesEdit->clear();
+
+    m_entryAttributes->clear();
+#ifdef KPXC_FEATURE_SSHAGENT
+    QSignalBlocker attachmentsBlocker(m_attachments.data());
+#endif
+    m_attachments->clear();
+    m_customData->clear();
+    m_autoTypeAssoc->clear();
+    m_historyModel->clear();
+    m_iconsWidget->reset();
+    hideMessage();
+}
+
+#ifdef KPXC_FEATURE_NETWORK
+void EditEntryWidget::updateFaviconButtonEnable(const QString& url)
+{
+    m_mainUi->fetchFaviconButton->setDisabled(url.isEmpty());
+}
+#endif
+
+void EditEntryWidget::insertAttribute()
+{
+    Q_ASSERT(!m_history);
+
+    QString name = tr("New attribute");
+    int i = 1;
+
+    while (m_entryAttributes->keys().contains(name)) {
+        name = tr("New attribute %1").arg(i);
+        i++;
+    }
+
+    m_entryAttributes->set(name, "");
+    QModelIndex index = m_attributesModel->indexByKey(name);
+
+    m_advancedUi->attributesView->setCurrentIndex(index);
+    m_advancedUi->attributesView->edit(index);
+
+    setModified(true);
+}
+
+void EditEntryWidget::editCurrentAttribute()
+{
+    Q_ASSERT(!m_history);
+
+    QModelIndex index = m_advancedUi->attributesView->currentIndex();
+
+    if (index.isValid()) {
+        m_advancedUi->attributesView->edit(index);
+        setModified(true);
+    }
+}
+
+void EditEntryWidget::removeCurrentAttribute()
+{
+    Q_ASSERT(!m_history);
+
+    QModelIndex index = m_advancedUi->attributesView->currentIndex();
+
+    if (index.isValid()) {
+
+        auto result = MessageBox::question(this,
+                                           tr("Confirm Removal"),
+                                           tr("Are you sure you want to remove this attribute?"),
+                                           MessageBox::Remove | MessageBox::Cancel,
+                                           MessageBox::Cancel);
+
+        if (result == MessageBox::Remove) {
+            m_entryAttributes->remove(m_attributesModel->keyByIndex(index));
+            setModified(true);
+        }
+    }
+}
+
+void EditEntryWidget::updateCurrentAttribute()
+{
+    QModelIndex newIndex = m_advancedUi->attributesView->currentIndex();
+    QString newKey = m_attributesModel->keyByIndex(newIndex);
+
+    if (!m_history && m_currentAttribute != newIndex) {
+        // Save changes to the currently selected attribute if editing is enabled
+        if (m_currentAttribute.isValid() && m_advancedUi->attributesEdit->isEnabled()) {
+            QString currKey = m_attributesModel->keyByIndex(m_currentAttribute);
+            m_entryAttributes->set(
+                currKey, m_advancedUi->attributesEdit->toPlainText(), m_entryAttributes->isProtected(currKey));
+        }
+    }
+
+    displayAttribute(newIndex, m_entryAttributes->isProtected(newKey));
+
+    m_currentAttribute = newIndex;
+}
+
+void EditEntryWidget::displayAttribute(QModelIndex index, bool showProtected)
+{
+    // Block signals to prevent modified being set
+    m_advancedUi->protectAttributeButton->blockSignals(true);
+    m_advancedUi->attributesEdit->blockSignals(true);
+    m_advancedUi->revealAttributeButton->setText(tr("Reveal"));
+
+    if (index.isValid()) {
+        QString key = m_attributesModel->keyByIndex(index);
+        if (showProtected) {
+            // A protected attribute disables the editor. If it currently has
+            // focus, move focus to the Reveal button before disabling it so
+            // keyboard and screen-reader focus remains usable.
+            const bool attributesEditHasFocus = m_advancedUi->attributesEdit->hasFocus();
+            m_advancedUi->attributesEdit->setPlainText(tr("[PROTECTED] Press Reveal to view or edit"));
+            m_advancedUi->attributesEdit->setEnabled(false);
+            m_advancedUi->revealAttributeButton->setEnabled(true);
+            if (attributesEditHasFocus) {
+                m_advancedUi->revealAttributeButton->setFocus();
+            }
+            m_advancedUi->protectAttributeButton->setChecked(true);
+        } else {
+            m_advancedUi->attributesEdit->setPlainText(m_entryAttributes->value(key));
+            m_advancedUi->attributesEdit->setEnabled(true);
+            m_advancedUi->revealAttributeButton->setEnabled(false);
+            m_advancedUi->protectAttributeButton->setChecked(false);
+        }
+
+        // Don't allow editing in history view
+        const bool protectHasFocus = m_advancedUi->protectAttributeButton->hasFocus();
+        const bool editHasFocus = m_advancedUi->editAttributeButton->hasFocus();
+        const bool removeHasFocus = m_advancedUi->removeAttributeButton->hasFocus();
+        if (m_history && (protectHasFocus || editHasFocus || removeHasFocus)) {
+            m_advancedUi->attributesView->setFocus();
+        }
+        m_advancedUi->protectAttributeButton->setEnabled(!m_history);
+        m_advancedUi->editAttributeButton->setEnabled(!m_history);
+        m_advancedUi->removeAttributeButton->setEnabled(!m_history);
+    } else {
+        m_advancedUi->attributesEdit->setPlainText("");
+        m_advancedUi->attributesEdit->setEnabled(false);
+        m_advancedUi->revealAttributeButton->setEnabled(false);
+        m_advancedUi->protectAttributeButton->setChecked(false);
+        m_advancedUi->protectAttributeButton->setEnabled(false);
+        m_advancedUi->editAttributeButton->setEnabled(false);
+        m_advancedUi->removeAttributeButton->setEnabled(false);
+    }
+
+    m_advancedUi->protectAttributeButton->blockSignals(false);
+    m_advancedUi->attributesEdit->blockSignals(false);
+}
+
+void EditEntryWidget::protectCurrentAttribute(bool state)
+{
+    QModelIndex index = m_advancedUi->attributesView->currentIndex();
+    if (!m_history && index.isValid()) {
+        QString key = m_attributesModel->keyByIndex(index);
+        if (state) {
+            // Save the current text and protect the attribute
+            m_entryAttributes->set(key, m_advancedUi->attributesEdit->toPlainText(), true);
+        } else {
+            // Unprotect the current attribute value (don't save text as it is obscured)
+            m_entryAttributes->set(key, m_entryAttributes->value(key), false);
+        }
+
+        // Display the attribute
+        displayAttribute(index, state);
+    }
+}
+
+void EditEntryWidget::toggleCurrentAttributeVisibility()
+{
+    if (!m_advancedUi->attributesEdit->isEnabled()) {
+        QModelIndex index = m_advancedUi->attributesView->currentIndex();
+        if (index.isValid()) {
+            bool oldBlockSignals = m_advancedUi->attributesEdit->blockSignals(true);
+            QString key = m_attributesModel->keyByIndex(index);
+            m_advancedUi->attributesEdit->setPlainText(m_entryAttributes->value(key));
+            m_advancedUi->attributesEdit->setEnabled(true);
+            m_advancedUi->attributesEdit->blockSignals(oldBlockSignals);
+            m_advancedUi->attributesEdit->setFocus();
+            m_advancedUi->attributesEdit->setFocus();
+        }
+        m_advancedUi->revealAttributeButton->setText(tr("Hide"));
+    } else {
+        protectCurrentAttribute(true);
+        m_advancedUi->revealAttributeButton->setText(tr("Reveal"));
+    }
+}
+
+void EditEntryWidget::updateAutoTypeEnabled()
+{
+    QWidget* focusedWidget = QApplication::focusWidget();
+    bool autoTypeEnabled = m_autoTypeUi->enableButton->isChecked();
+    bool validIndex = m_autoTypeUi->assocView->currentIndex().isValid() && m_autoTypeAssoc->size() != 0;
+
+    m_autoTypeUi->enableButton->setEnabled(!m_history);
+    m_autoTypeUi->inheritSequenceButton->setEnabled(!m_history && autoTypeEnabled);
+    m_autoTypeUi->customSequenceButton->setEnabled(!m_history && autoTypeEnabled);
+    m_autoTypeUi->sequenceEdit->setEnabled(autoTypeEnabled && m_autoTypeUi->customSequenceButton->isChecked());
+    m_autoTypeUi->openHelpButton->setEnabled(autoTypeEnabled);
+
+    m_autoTypeUi->assocView->setEnabled(autoTypeEnabled);
+    m_autoTypeUi->assocAddButton->setEnabled(!m_history);
+    m_autoTypeUi->assocRemoveButton->setEnabled(!m_history && validIndex);
+
+    m_autoTypeUi->windowTitleLabel->setEnabled(autoTypeEnabled && validIndex);
+    m_autoTypeUi->windowTitleCombo->setEnabled(autoTypeEnabled && validIndex);
+    m_autoTypeUi->customWindowSequenceButton->setEnabled(!m_history && autoTypeEnabled && validIndex);
+    m_autoTypeUi->windowSequenceEdit->setEnabled(autoTypeEnabled && validIndex
+                                                 && m_autoTypeUi->customWindowSequenceButton->isChecked());
+
+    // Disabling an Auto-Type control can leave keyboard and screen-reader
+    // focus on a widget that is no longer usable. Move focus to the
+    // Auto-Type enable control before that happens.
+    if (focusedWidget && !focusedWidget->isEnabled()) {
+        if (m_autoTypeUi->enableButton->isEnabled()) {
+            m_autoTypeUi->enableButton->setFocus();
+        } else {
+            m_autoTypeUi->assocView->setFocus();
+        }
+    }
+}
+
+void EditEntryWidget::insertAutoTypeAssoc()
+{
+    AutoTypeAssociations::Association assoc;
+    m_autoTypeAssoc->add(assoc);
+    QModelIndex newIndex = m_autoTypeAssocModel->index(m_autoTypeAssoc->size() - 1, 0);
+    m_autoTypeUi->assocView->setCurrentIndex(newIndex);
+    loadCurrentAssoc(newIndex);
+    m_autoTypeUi->windowTitleCombo->setFocus();
+    setModified(true);
+}
+
+void EditEntryWidget::removeAutoTypeAssoc()
+{
+    QModelIndex currentIndex = m_autoTypeUi->assocView->currentIndex();
+
+    if (currentIndex.isValid()) {
+        m_autoTypeAssoc->remove(currentIndex.row());
+        setModified(true);
+    }
+}
+
+void EditEntryWidget::loadCurrentAssoc(const QModelIndex& current)
+{
+    bool modified = isModified();
+    if (current.isValid() && current.row() < m_autoTypeAssoc->size()) {
+        AutoTypeAssociations::Association assoc = m_autoTypeAssoc->get(current.row());
+        m_autoTypeUi->windowTitleCombo->setEditText(assoc.window);
+        if (assoc.sequence.isEmpty()) {
+            m_autoTypeUi->customWindowSequenceButton->setChecked(false);
+            m_autoTypeUi->windowSequenceEdit->setText(m_entry->effectiveAutoTypeSequence());
+        } else {
+            m_autoTypeUi->customWindowSequenceButton->setChecked(true);
+            m_autoTypeUi->windowSequenceEdit->setText(assoc.sequence);
+        }
+
+        updateAutoTypeEnabled();
+    } else {
+        clearCurrentAssoc();
+    }
+    setModified(modified);
+}
+
+void EditEntryWidget::clearCurrentAssoc()
+{
+    m_autoTypeUi->windowTitleCombo->setEditText("");
+
+    m_autoTypeUi->customWindowSequenceButton->setChecked(false);
+    m_autoTypeUi->windowSequenceEdit->setText("");
+
+    updateAutoTypeEnabled();
+}
+
+void EditEntryWidget::applyCurrentAssoc()
+{
+    QModelIndex index = m_autoTypeUi->assocView->currentIndex();
+
+    if (!index.isValid() || m_autoTypeAssoc->size() == 0 || m_history) {
+        return;
+    }
+
+    AutoTypeAssociations::Association assoc;
+    assoc.window = m_autoTypeUi->windowTitleCombo->currentText();
+    if (m_autoTypeUi->customWindowSequenceButton->isChecked()) {
+        assoc.sequence = m_autoTypeUi->windowSequenceEdit->text();
+    }
+
+    m_autoTypeAssoc->update(index.row(), assoc);
+}
+
+void EditEntryWidget::showHistoryEntry()
+{
+    QModelIndex index = m_sortModel->mapToSource(m_historyUi->historyView->currentIndex());
+    if (index.isValid()) {
+        emitHistoryEntryActivated(index);
+    }
+}
+
+void EditEntryWidget::restoreHistoryEntry()
+{
+    QModelIndex index = m_sortModel->mapToSource(m_historyUi->historyView->currentIndex());
+    auto entry = m_historyModel->entryFromIndex(index);
+    if (entry) {
+        setForms(entry, true);
+        setModified(true);
+    }
+}
+
+void EditEntryWidget::deleteHistoryEntry()
+{
+    QModelIndex index = m_sortModel->mapToSource(m_historyUi->historyView->currentIndex());
+    if (m_historyModel->entryFromIndex(index)) {
+        m_historyModel->deleteIndex(index);
+        if (m_historyModel->rowCount() > 0) {
+            m_historyUi->deleteAllButton->setEnabled(true);
+        } else {
+            m_historyUi->deleteAllButton->setEnabled(false);
+        }
+        setModified(true);
+    }
+}
+
+void EditEntryWidget::deleteAllHistoryEntries()
+{
+    m_historyModel->deleteAll();
+    const bool deleteAllHasFocus = m_historyUi->deleteAllButton->hasFocus();
+    if (deleteAllHasFocus && m_historyModel->rowCount() == 0) {
+        // The last history item was removed, so Delete All becomes disabled.
+        // Keep keyboard and screen-reader focus on the history table.
+        m_historyUi->historyView->setFocus();
+    }
+    m_historyUi->deleteAllButton->setEnabled(m_historyModel->rowCount() > 0);
+    setModified(true);
+}
+
+QMenu* EditEntryWidget::createPresetsMenu()
+{
+    auto* expirePresetsMenu = new QMenu(this);
+    expirePresetsMenu->addAction(tr("%n hour(s)", "", 12))->setData(QVariant::fromValue(TimeDelta::fromHours(12)));
+    expirePresetsMenu->addAction(tr("%n hour(s)", "", 24))->setData(QVariant::fromValue(TimeDelta::fromHours(24)));
+    expirePresetsMenu->addSeparator();
+    expirePresetsMenu->addAction(tr("%n week(s)", "", 1))->setData(QVariant::fromValue(TimeDelta::fromDays(7)));
+    expirePresetsMenu->addAction(tr("%n week(s)", "", 2))->setData(QVariant::fromValue(TimeDelta::fromDays(14)));
+    expirePresetsMenu->addAction(tr("%n week(s)", "", 3))->setData(QVariant::fromValue(TimeDelta::fromDays(21)));
+    expirePresetsMenu->addSeparator();
+    expirePresetsMenu->addAction(tr("%n month(s)", "", 1))->setData(QVariant::fromValue(TimeDelta::fromMonths(1)));
+    expirePresetsMenu->addAction(tr("%n month(s)", "", 2))->setData(QVariant::fromValue(TimeDelta::fromMonths(2)));
+    expirePresetsMenu->addAction(tr("%n month(s)", "", 3))->setData(QVariant::fromValue(TimeDelta::fromMonths(3)));
+    expirePresetsMenu->addAction(tr("%n month(s)", "", 6))->setData(QVariant::fromValue(TimeDelta::fromMonths(6)));
+    expirePresetsMenu->addSeparator();
+    expirePresetsMenu->addAction(tr("%n year(s)", "", 1))->setData(QVariant::fromValue(TimeDelta::fromYears(1)));
+    expirePresetsMenu->addAction(tr("%n year(s)", "", 2))->setData(QVariant::fromValue(TimeDelta::fromYears(2)));
+    expirePresetsMenu->addAction(tr("%n year(s)", "", 3))->setData(QVariant::fromValue(TimeDelta::fromYears(3)));
+    return expirePresetsMenu;
+}
+
+void EditEntryWidget::setupColorButton(bool foreground, const QColor& color)
+{
+    QWidget* button = m_advancedUi->fgColorButton;
+    QCheckBox* checkBox = m_advancedUi->fgColorCheckBox;
+    if (!foreground) {
+        button = m_advancedUi->bgColorButton;
+        checkBox = m_advancedUi->bgColorCheckBox;
+    }
+
+    if (color.isValid()) {
+        button->setStyleSheet(QString("background-color:%1").arg(color.name()));
+        button->setProperty("color", color.name());
+        checkBox->setChecked(true);
+    } else {
+        button->setStyleSheet("");
+        button->setProperty("color", QVariant());
+        checkBox->setChecked(false);
+    }
+}
+
+void EditEntryWidget::pickColor()
+{
+    bool isForeground = (sender() == m_advancedUi->fgColorButton);
+    QColor oldColor = QColor(m_advancedUi->fgColorButton->property("color").toString());
+    if (!isForeground) {
+        oldColor = QColor(m_advancedUi->bgColorButton->property("color").toString());
+    }
+
+    QColor newColor = QColorDialog::getColor(oldColor);
+    if (newColor.isValid()) {
+        setupColorButton(isForeground, newColor);
+        setModified(true);
+    }
 }
