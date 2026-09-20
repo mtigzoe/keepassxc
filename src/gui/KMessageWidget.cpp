@@ -476,6 +476,14 @@ bool KMessageWidget::isCloseButtonVisible() const
 
 void KMessageWidget::setCloseButtonVisible(bool show)
 {
+    if (!show && d->closeButton->hasFocus()) {
+        if (!d->buttons.isEmpty()) {
+            d->buttons.first()->setFocus(Qt::OtherFocusReason);
+        } else {
+            clearFocus();
+        }
+    }
+
     d->closeButton->setVisible(show);
     updateGeometry();
 }
