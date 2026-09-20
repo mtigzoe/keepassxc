@@ -146,7 +146,7 @@ void ReportsDialog::entryActivationSignalReceived(Entry* entry)
     m_sender = qobject_cast<QWidget*>(sender());
     // Opening the entry editor hides the report page containing the current
     // focus. Preserve that widget so keyboard and screen-reader focus can be
-    // be restored when the editor closes.
+    // restored when the editor closes.
     m_focusWidget = QApplication::focusWidget();
     m_editEntryWidget->loadEntry(entry, false, false, entry->group()->hierarchy().join(" > "), m_db);
     m_ui->stackedWidget->setCurrentWidget(m_editEntryWidget);
