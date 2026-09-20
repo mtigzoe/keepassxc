@@ -1164,6 +1164,8 @@ int DatabaseWidget::addChildWidget(QWidget* w)
 
 void DatabaseWidget::syncWithRemote(const RemoteParams* params)
 {
+    // Preserve the focused control while the database widget is disabled for remote sync.
+    m_remoteSyncFocusWidget = QApplication::focusWidget();
     setDisabled(true);
     emit databaseSyncInProgress();
 
@@ -1228,6 +1230,10 @@ void DatabaseWidget::uploadAndFinishSync(const RemoteParams* params, RemoteHandl
 void DatabaseWidget::finishSync(const RemoteParams* params, RemoteHandler::RemoteResult result)
 {
     setDisabled(false);
+    if (m_remoteSyncFocusWidget && m_remoteSyncFocusWidget->isVisible() && m_remoteSyncFocusWidget->isEnabled()) {
+        m_remoteSyncFocusWidget->setFocus();
+    }
+    m_remoteSyncFocusWidget.clear();
     emit updateSyncProgress(-1, "");
     if (result.success) {
         emit databaseSyncCompleted(params->name);
