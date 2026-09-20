@@ -20,6 +20,8 @@
 #include "SSHAgent.h"
 #include "ui_AgentSettingsWidget.h"
 
+#include <QApplication>
+
 AgentSettingsWidget::AgentSettingsWidget(QWidget* parent)
     : QWidget(parent)
     , m_ui(new Ui::AgentSettingsWidget())
@@ -103,5 +105,9 @@ void AgentSettingsWidget::saveSettings()
 
 void AgentSettingsWidget::toggleSettingsEnabled()
 {
-    m_ui->agentConfigPageBody->setEnabled(m_ui->enableSSHAgentCheckBox->isChecked());
+    const bool enabled = m_ui->enableSSHAgentCheckBox->isChecked();
+    if (!enabled && m_ui->agentConfigPageBody->isAncestorOf(QApplication::focusWidget())) {
+        m_ui->enableSSHAgentCheckBox->setFocus(Qt::OtherFocusReason);
+    }
+    m_ui->agentConfigPageBody->setEnabled(enabled);
 }
