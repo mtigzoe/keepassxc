@@ -113,6 +113,9 @@ void DatabaseSettingsWidgetBrowser::removeSelectedKey()
 
 void DatabaseSettingsWidgetBrowser::toggleRemoveButton(const QItemSelection& selected)
 {
+    if (selected.isEmpty() && m_ui->removeCustomDataButton->hasFocus()) {
+        m_ui->customDataTable->setFocus();
+    }
     m_ui->removeCustomDataButton->setEnabled(!selected.isEmpty());
 }
 
@@ -134,6 +137,9 @@ void DatabaseSettingsWidgetBrowser::updateModel()
         }
     }
 
+    if (m_ui->removeCustomDataButton->hasFocus()) {
+        m_ui->customDataTable->setFocus();
+    }
     m_ui->removeCustomDataButton->setEnabled(false);
 }
 
