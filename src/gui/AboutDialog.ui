@@ -305,6 +305,9 @@
        </item>
        <item>
         <widget class="QPlainTextEdit" name="debugInfo">
+         <property name="accessibleName">
+          <string>Debug information</string>
+         </property>
          <property name="readOnly">
           <bool>true</bool>
          </property>
