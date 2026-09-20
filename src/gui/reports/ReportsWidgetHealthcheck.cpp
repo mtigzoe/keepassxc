@@ -292,8 +292,15 @@ void ReportsWidgetHealthcheck::calculateHealth()
     m_ui->healthcheckTableView->resizeColumnsToContents();
     m_ui->healthcheckTableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
 
-    // Only show the "show excluded" checkbox if there are any excluded entries in the database
-    m_ui->showExcluded->setVisible(health->anyExcludedEntries());
+    // The checkbox can be focused while the asynchronous health calculation is
+    // running. If it is removed from the UI, move focus to the report table
+    // first so keyboard and screen-reader focus does not remain on a hidden
+    // widget.
+    const bool showExcluded = health->anyExcludedEntries();
+    if (!showExcluded && m_ui->showExcluded->hasFocus()) {
+        m_ui->healthcheckTableView->setFocus();
+    }
+    m_ui->showExcluded->setVisible(showExcluded);
 }
 
 void ReportsWidgetHealthcheck::emitEntryActivated(const QModelIndex& index)
