@@ -5,8 +5,7 @@
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ *  the Free Software Foundation, either version 2 or 3 of the License.
  *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -27,6 +26,7 @@
 #include "core/Global.h"
 #include "gui/Icons.h"
 
+#include <QApplication>
 #include <QWindow>
 
 #include <functional>
@@ -160,6 +160,9 @@ void AccessControlDialog::setupDetails(const FdoSecrets::PeerInfo& info)
 void AccessControlDialog::denyEntryClicked(const QUuid& uuid, const QModelIndex& index)
 {
     m_decisions.insert(uuid, AuthDecision::Denied);
+    if (m_ui->itemsTable->isAncestorOf(QApplication::focusWidget())) {
+        m_ui->itemsTable->setFocus(Qt::OtherFocusReason);
+    }
     m_model->removeRow(index.row());
     if (m_model->rowCount({}) == 0) {
         reject();
