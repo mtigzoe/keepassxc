@@ -121,6 +121,12 @@ MainWindow::MainWindow()
     new QShortcut(QKeySequence::Find, this, SLOT(focusSearchWidget()));
 
     connect(m_searchWidget, &SearchWidget::searchCanceled, this, [this] {
+        // Clearing the search can hide the toolbar while the search field still
+        // owns keyboard/screen-reader focus. Move focus first so it is not left
+        // on a control inside a hidden toolbar.
+        if (m_searchWidget->hasFocus()) {
+            m_ui->tabWidget->setFocus(Qt::OtherFocusReason);
+        }
         m_ui->toolBar->setExpanded(false);
         m_ui->toolBar->setVisible(!config()->get(Config::GUI_HideToolbar).toBool());
     });
