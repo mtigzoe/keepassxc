@@ -18,6 +18,7 @@
 #include "UpdateCheckDialog.h"
 #include "ui_UpdateCheckDialog.h"
 
+#include <QAccessible>
 #include <QPushButton>
 
 #include "config-keepassx.h"
@@ -44,6 +45,10 @@ void UpdateCheckDialog::showUpdateCheckResponse(bool hasUpdate, const QString& v
 {
     m_ui->progressBar->setVisible(false);
     m_ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Close"));
+
+    // The status changes asynchronously while focus remains on the Close button.
+    // Explicitly announce the final result so screen readers do not miss it.
+    QAccessible::updateAccessibility(new QAccessibleEvent(m_ui->statusLabel, QAccessible::Alert));
 
     setWindowTitle(tr("Software Update"));
 
