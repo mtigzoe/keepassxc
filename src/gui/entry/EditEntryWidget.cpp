@@ -26,6 +26,7 @@
 
 #include <functional>
 
+#include <QApplication>
 #include <QColorDialog>
 #include <QDesktopServices>
 #include <QLineEdit>
@@ -1664,6 +1665,7 @@ void EditEntryWidget::toggleCurrentAttributeVisibility()
 
 void EditEntryWidget::updateAutoTypeEnabled()
 {
+    QWidget* focusedWidget = QApplication::focusWidget();
     bool autoTypeEnabled = m_autoTypeUi->enableButton->isChecked();
     bool validIndex = m_autoTypeUi->assocView->currentIndex().isValid() && m_autoTypeAssoc->size() != 0;
 
@@ -1682,6 +1684,17 @@ void EditEntryWidget::updateAutoTypeEnabled()
     m_autoTypeUi->customWindowSequenceButton->setEnabled(!m_history && autoTypeEnabled && validIndex);
     m_autoTypeUi->windowSequenceEdit->setEnabled(autoTypeEnabled && validIndex
                                                  && m_autoTypeUi->customWindowSequenceButton->isChecked());
+
+    // Disabling an Auto-Type control can leave keyboard and screen-reader
+    // focus on a widget that is no longer usable. Move focus to the
+    // Auto-Type enable control before that happens.
+    if (focusedWidget && !focusedWidget->isEnabled()) {
+        if (m_autoTypeUi->enableButton->isEnabled()) {
+            m_autoTypeUi->enableButton->setFocus();
+        } else {
+            m_autoTypeUi->assocView->setFocus();
+        }
+    }
 }
 
 void EditEntryWidget::insertAutoTypeAssoc()
