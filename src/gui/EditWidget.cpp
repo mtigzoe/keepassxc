@@ -19,7 +19,8 @@
 #include "EditWidget.h"
 #include "ui_EditWidget.h"
 
-#include <QApplication>\n#include <QPushButton>
+#include <QApplication>
+#include <QPushButton>
 #include <QScrollArea>
 
 EditWidget::EditWidget(QWidget* parent)
@@ -152,10 +153,22 @@ void EditWidget::setReadOnly(bool readOnly)
 {
     m_readOnly = readOnly;
 
+    // Changing the standard buttons can remove the button that currently has
+    // keyboard or screen-reader focus. Preserve focus on the replacement
+    // standard button instead of leaving focus on a removed widget.
+    QWidget* focusedWidget = QApplication::focusWidget();
+    const bool focusIsOnButton = focusedWidget && m_ui->buttonBox->standardButton(qobject_cast<QAbstractButton*>(focusedWidget)) != QDialogButtonBox::NoButton;
+
     if (readOnly) {
         m_ui->buttonBox->setStandardButtons(QDialogButtonBox::Close);
+        if (focusIsOnButton) {
+            m_ui->buttonBox->button(QDialogButtonBox::Close)->setFocus();
+        }
     } else {
         m_ui->buttonBox->setStandardButtons(QDialogButtonBox::Ok | QDialogButtonBox::Cancel | QDialogButtonBox::Apply);
+        if (focusIsOnButton && m_ui->buttonBox->button(QDialogButtonBox::Ok)) {
+            m_ui->buttonBox->button(QDialogButtonBox::Ok)->setFocus();
+        }
     }
 }
 
@@ -187,12 +200,30 @@ void EditWidget::showApplyButton(bool state)
 {
     if (!m_readOnly) {
         auto buttons = m_ui->buttonBox->standardButtons();
+        const bool applyHasFocus = m_ui->buttonBox->button(QDialogButtonBox::Apply)
+            && m_ui->buttonBox->button(QDialogButtonBox::Apply)->hasFocus();
+
         if (state) {
             buttons |= QDialogButtonBox::Apply;
         } else {
             buttons &= ~QDialogButtonBox::Apply;
         }
+
+        if (applyHasFocus && !state) {
+            // Removing the Apply button while it has focus would strand
+            // keyboard and screen-reader focus on the removed control.
+            if (m_ui->buttonBox->button(QDialogButtonBox::Ok)) {
+                m_ui->buttonBox->button(QDialogButtonBox::Ok)->setFocus();
+            }
+        }
+
         m_ui->buttonBox->setStandardButtons(buttons);
+
+        // QDialogButtonBox may recreate its buttons when the standard button
+        // set changes. Restore focus after the replacement has been created.
+        if (applyHasFocus && !state && m_ui->buttonBox->button(QDialogButtonBox::Ok)) {
+            m_ui->buttonBox->button(QDialogButtonBox::Ok)->setFocus();
+        }
     }
 }
 
