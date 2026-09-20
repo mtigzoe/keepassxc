@@ -90,6 +90,12 @@ void WelcomeWidget::refreshLastDatabases()
     }
 
     bool recent_visibility = (m_ui->recentListWidget->count() > 0);
+    if (!recent_visibility && m_ui->recentListWidget->hasFocus()) {
+        // Removing the last recent database hides the focused list. Move focus
+        // to a usable action before hiding it so keyboard/screen-reader focus
+        // is not left on an invisible control.
+        m_ui->buttonNewDatabase->setFocus(Qt::OtherFocusReason);
+    }
     m_ui->startLabel->setVisible(!recent_visibility);
     m_ui->recentListWidget->setVisible(recent_visibility);
     m_ui->recentLabel->setVisible(recent_visibility);
