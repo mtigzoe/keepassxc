@@ -23,6 +23,7 @@
 #include "gui/FileDialog.h"
 #include "keeshare/KeeShare.h"
 
+#include <QApplication>
 #include <QDir>
 #include <QStandardPaths>
 
@@ -95,6 +96,15 @@ void EditGroupWidgetKeeShare::updateSharingState()
 {
     // Only enable controls if we are active
     bool isEnabled = m_ui->typeComboBox->currentData().toInt() > KeeShareSettings::Inactive;
+    if (!isEnabled) {
+        auto* focusWidget = QApplication::focusWidget();
+        if (focusWidget && (m_ui->pathEdit->isAncestorOf(focusWidget)
+                            || m_ui->pathSelectionButton->isAncestorOf(focusWidget)
+                            || m_ui->passwordEdit->isAncestorOf(focusWidget)
+                            || m_ui->keepGroupsCheckbox->isAncestorOf(focusWidget))) {
+            m_ui->typeComboBox->setFocus(Qt::OtherFocusReason);
+        }
+    }
     m_ui->pathEdit->setEnabled(isEnabled);
     m_ui->pathSelectionButton->setEnabled(isEnabled);
     m_ui->passwordEdit->setEnabled(isEnabled);
