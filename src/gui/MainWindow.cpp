@@ -1751,6 +1751,8 @@ void MainWindow::applySettingsChanges()
     m_ui->actionShowToolbar->setChecked(!hideToolbar);
     m_ui->actionShowMenubar->setChecked(!hideMenubar);
 
+    const auto focusWidget = QApplication::focusWidget();
+
 #ifndef Q_OS_MACOS
     // When menubar is hidden with setHidden() the menu keyboard shortcuts are disabled on Wayland,
     // so force height of 0 instead and use maximumHeight() > 0 instead of isVisible() elsewhere
@@ -1758,6 +1760,18 @@ void MainWindow::applySettingsChanges()
 #endif
 
     m_ui->toolBar->setHidden(config()->get(Config::GUI_HideToolbar).toBool());
+
+    // Hiding the toolbar or menubar can remove the focused widget from the UI.
+    // Move focus to the database area instead of leaving keyboard/screen-reader
+    // focus on a hidden control.
+    if (focusWidget && !focusWidget->isVisible()) {
+        if (auto* dbWidget = m_ui->tabWidget->currentDatabaseWidget(); dbWidget && dbWidget->isVisible()
+            && dbWidget->isEnabled()) {
+            dbWidget->setFocus(Qt::OtherFocusReason);
+        } else {
+            m_ui->tabWidget->setFocus(Qt::OtherFocusReason);
+        }
+    }
     auto movable = config()->get(Config::GUI_MovableToolbar).toBool();
     m_ui->toolBar->setMovable(movable);
     if (!movable) {
