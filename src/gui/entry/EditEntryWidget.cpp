@@ -1675,6 +1675,19 @@ void EditEntryWidget::displayAttribute(QModelIndex index, bool showProtected)
         m_advancedUi->editAttributeButton->setEnabled(!m_history);
         m_advancedUi->removeAttributeButton->setEnabled(!m_history);
     } else {
+        // Clearing the attribute selection disables the editor and its
+        // selection-dependent controls. If one of them currently has focus,
+        // move focus to the attribute table before disabling it so keyboard
+        // and screen-reader focus remains usable.
+        const bool attributesEditHasFocus = m_advancedUi->attributesEdit->hasFocus();
+        const bool revealHasFocus = m_advancedUi->revealAttributeButton->hasFocus();
+        const bool protectHasFocus = m_advancedUi->protectAttributeButton->hasFocus();
+        const bool editHasFocus = m_advancedUi->editAttributeButton->hasFocus();
+        const bool removeHasFocus = m_advancedUi->removeAttributeButton->hasFocus();
+        if (attributesEditHasFocus || revealHasFocus || protectHasFocus || editHasFocus || removeHasFocus) {
+            m_advancedUi->attributesView->setFocus();
+        }
+
         m_advancedUi->attributesEdit->setPlainText("");
         m_advancedUi->attributesEdit->setEnabled(false);
         m_advancedUi->revealAttributeButton->setEnabled(false);
