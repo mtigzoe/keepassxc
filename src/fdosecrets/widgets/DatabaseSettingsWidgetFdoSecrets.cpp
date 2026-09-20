@@ -24,6 +24,7 @@
 #include "core/Metadata.h"
 #include "gui/group/GroupModel.h"
 
+#include <QApplication>
 #include <QSortFilterProxyModel>
 
 namespace
@@ -162,7 +163,12 @@ void DatabaseSettingsWidgetFdoSecrets::saveSettings()
 
 void DatabaseSettingsWidgetFdoSecrets::settingsWarning()
 {
-    if (FdoSecrets::settings()->isEnabled()) {
+    const bool enabled = FdoSecrets::settings()->isEnabled();
+    if (!enabled && m_ui->groupBox->isAncestorOf(QApplication::focusWidget())) {
+        m_ui->radioDonotExpose->setFocus(Qt::OtherFocusReason);
+    }
+
+    if (enabled) {
         m_ui->groupBox->setEnabled(true);
         m_ui->warningWidget->hideMessage();
     } else {
