@@ -94,7 +94,12 @@ void TotpDialog::updateTotp()
     if (isValid) {
         totpCode.insert(totpCode.size() / 2, " ");
     }
-    m_ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(isValid);
+
+    auto* copyButton = m_ui->buttonBox->button(QDialogButtonBox::Ok);
+    if (!isValid && copyButton->hasFocus()) {
+        m_ui->buttonBox->button(QDialogButtonBox::Cancel)->setFocus(Qt::OtherFocusReason);
+    }
+    copyButton->setEnabled(isValid);
     m_ui->progressBar->setVisible(isValid);
     m_ui->timerLabel->setVisible(isValid);
     m_ui->totpLabel->setText(totpCode);
