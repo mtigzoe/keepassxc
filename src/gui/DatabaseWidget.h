@@ -322,6 +322,7 @@ private:
     QPointer<GroupView> m_groupView;
     QPointer<TagView> m_tagView;
     QPointer<EntryView> m_entryView;
+    QPointer<QWidget> m_remoteSyncFocusWidget;
 
     QScopedPointer<Group> m_newGroup;
     QScopedPointer<Entry> m_newEntry;
