@@ -181,6 +181,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="excludeReportsCheckBox">
+     <property name="accessibleName">
+      <string>Exclude entry from database reports</string>
+     </property>
      <property name="toolTip">
       <string>If checked, the entry will not appear in reports like Health Check and HIBP even if it doesn't match the quality requirements.</string>
      </property>
