@@ -48,6 +48,9 @@ void DatabaseSettingsWidgetMaintenance::populateIcons(QSharedPointer<Database> d
 {
     m_customIconModel->setIcons(Icons::customIconsPixmaps(db.data(), IconSize::Default),
                                 db->metadata()->customIconsOrder());
+    if (m_ui->deleteButton->hasFocus()) {
+        m_ui->customIconsView->setFocus();
+    }
     m_ui->deleteButton->setEnabled(false);
 }
 
@@ -64,6 +67,9 @@ void DatabaseSettingsWidgetMaintenance::selectionChanged()
 {
     QList<QModelIndex> indexes = m_ui->customIconsView->selectionModel()->selectedIndexes();
     if (indexes.isEmpty()) {
+        if (m_ui->deleteButton->hasFocus()) {
+            m_ui->customIconsView->setFocus();
+        }
         m_ui->deleteButton->setEnabled(false);
     } else {
         m_ui->deleteButton->setEnabled(true);
