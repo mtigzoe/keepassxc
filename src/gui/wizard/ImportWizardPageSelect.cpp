@@ -296,6 +296,9 @@ void ImportWizardPageSelect::chooseKeyFile()
 
 void ImportWizardPageSelect::setCredentialState(bool passwordEnabled, bool keyFileEnable)
 {
+    const bool passwordHadFocus = m_ui->passwordEdit->hasFocus();
+    const bool keyFileHadFocus = m_ui->keyFileEdit->hasFocus();
+    const bool keyFileButtonHadFocus = m_ui->keyFileButton->hasFocus();
     bool passwordStateChanged = m_ui->passwordLabel->isVisible() != passwordEnabled;
     m_ui->passwordLabel->setVisible(passwordEnabled);
     m_ui->passwordEdit->setVisible(passwordEnabled);
@@ -304,6 +307,10 @@ void ImportWizardPageSelect::setCredentialState(bool passwordEnabled, bool keyFi
     m_ui->keyFileLabel->setVisible(keyFileEnable);
     m_ui->keyFileEdit->setVisible(keyFileEnable);
     m_ui->keyFileButton->setVisible(keyFileEnable);
+
+    if ((!passwordEnabled && passwordHadFocus) || (!keyFileEnable && (keyFileHadFocus || keyFileButtonHadFocus))) {
+        m_ui->importTypeList->setFocus(Qt::OtherFocusReason);
+    }
 
     // Workaround Qt bug where the wizard window is not updated when the internal layout changes
     if (window()) {
@@ -322,6 +329,12 @@ void ImportWizardPageSelect::setCredentialState(bool passwordEnabled, bool keyFi
 
 void ImportWizardPageSelect::setDownloadCommand(bool downloadCommandEnabled)
 {
+    const bool importFileHadFocus = m_ui->importFileEdit->hasFocus();
+    const bool importFileButtonHadFocus = m_ui->importFileButton->hasFocus();
+    const bool downloadCommandHadFocus = m_ui->downloadCommand->hasFocus();
+    const bool downloadInputHadFocus = m_ui->downloadCommandInput->hasFocus();
+    const bool downloadHelpButtonHadFocus = m_ui->downloadCommandHelpButton->hasFocus();
+    const bool temporaryDatabaseRadioHadFocus = m_ui->temporaryDatabaseRadio->hasFocus();
     bool downloadCommandStateChanged = m_ui->downloadCommandLabel->isVisible() != downloadCommandEnabled;
     m_ui->downloadCommandLabel->setVisible(downloadCommandEnabled);
     m_ui->downloadCommand->setVisible(downloadCommandEnabled);
@@ -334,6 +347,12 @@ void ImportWizardPageSelect::setDownloadCommand(bool downloadCommandEnabled)
     m_ui->importFileLabel->setVisible(!downloadCommandEnabled);
     m_ui->importFileEdit->setVisible(!downloadCommandEnabled);
     m_ui->importFileButton->setVisible(!downloadCommandEnabled);
+
+    if ((downloadCommandEnabled && (importFileHadFocus || importFileButtonHadFocus))
+        || (!downloadCommandEnabled
+            && (downloadCommandHadFocus || downloadInputHadFocus || downloadHelpButtonHadFocus || temporaryDatabaseRadioHadFocus))) {
+        m_ui->importTypeList->setFocus(Qt::OtherFocusReason);
+    }
 
     // Workaround Qt bug where the wizard window is not updated when the internal layout changes
     if (window()) {
