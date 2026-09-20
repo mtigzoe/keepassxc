@@ -100,6 +100,9 @@ void EditWidgetProperties::removeSelectedPluginData()
 
 void EditWidgetProperties::toggleRemoveButton(const QItemSelection& selected)
 {
+    if (selected.isEmpty() && m_ui->removeCustomDataButton->hasFocus()) {
+        m_ui->customDataTable->setFocus();
+    }
     m_ui->removeCustomDataButton->setEnabled(!selected.isEmpty());
 }
 
@@ -108,6 +111,9 @@ void EditWidgetProperties::update()
     m_customDataModel->clear();
     m_customDataModel->setHorizontalHeaderLabels({tr("Key"), tr("Value")});
     if (!m_customData) {
+        if (m_ui->removeCustomDataButton->hasFocus()) {
+            m_ui->customDataTable->setFocus();
+        }
         m_ui->removeCustomDataButton->setEnabled(false);
     } else {
         for (const QString& key : m_customData->keys()) {
