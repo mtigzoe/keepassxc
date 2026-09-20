@@ -132,6 +132,9 @@ void DatabaseSettingsWidgetRemote::removeCurrentSettings()
         m_ui->removeSettingsButton->setEnabled(true);
     } else {
         clearFields();
+        if (m_ui->removeSettingsButton->hasFocus()) {
+            m_ui->settingsListWidget->setFocus();
+        }
         m_ui->removeSettingsButton->setDisabled(true);
     }
 }
