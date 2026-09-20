@@ -86,6 +86,9 @@ namespace
         {
             auto* editor = QStyledItemDelegate::createEditor(parent, option, index);
             if (auto* lineEdit = qobject_cast<QLineEdit*>(editor)) {
+                lineEdit->setAccessibleName(QCoreApplication::translate("EditEntryWidget", "Attribute name"));
+                lineEdit->setAccessibleDescription(
+                    QCoreApplication::translate("EditEntryWidget", "Name of the custom attribute being edited."));
                 if (config()->get(Config::AutocompleteSuggestions).toBool()) {
                     auto* completer = new QCompleter(m_getSuggestion ? m_getSuggestion() : QStringList(), lineEdit);
                     completer->setCaseSensitivity(Qt::CaseInsensitive);
