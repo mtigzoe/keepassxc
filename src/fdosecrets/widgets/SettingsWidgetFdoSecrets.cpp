@@ -26,6 +26,7 @@
 
 #include "gui/DatabaseWidget.h"
 
+#include <QAccessible>
 #include <QAction>
 #include <QToolButton>
 
@@ -317,7 +318,11 @@ void SettingsWidgetFdoSecrets::checkDBusName()
 
 void SettingsWidgetFdoSecrets::updateServiceState()
 {
-    m_ui->tabWidget->setEnabled(m_plugin->serviceInstance() != nullptr);
+    const bool enabled = m_plugin->serviceInstance() != nullptr;
+    if (!enabled && m_ui->tabWidget->isAncestorOf(QApplication::focusWidget())) {
+        m_ui->enableFdoSecretService->setFocus(Qt::OtherFocusReason);
+    }
+    m_ui->tabWidget->setEnabled(enabled);
     if (m_ui->enableFdoSecretService->isChecked() && !m_plugin->serviceInstance()) {
         m_ui->tabWidget->setToolTip(
             tr("Save current changes to activate the plugin and enable editing of this section."));
