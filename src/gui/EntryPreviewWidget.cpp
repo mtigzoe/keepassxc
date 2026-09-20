@@ -246,6 +246,9 @@ void EntryPreviewWidget::updateEntryTotp()
 {
     Q_ASSERT(m_currentEntry);
     const bool hasTotp = m_currentEntry->hasTotp();
+    if (!hasTotp && m_ui->entryTotpButton->hasFocus()) {
+        m_ui->entryTabWidget->setFocus();
+    }
     m_ui->entryTotpButton->setVisible(hasTotp);
 
     if (hasTotp) {
@@ -349,10 +352,17 @@ void EntryPreviewWidget::updateEntryGeneralTab()
     if (config()->get(Config::GUI_HideUsernames).toBool()) {
         setUsernameVisible(false);
         // Show the username toggle button
-        m_ui->toggleUsernameButton->setVisible(!m_currentEntry->username().isEmpty());
+        const bool showUsernameToggle = !m_currentEntry->username().isEmpty();
+        if (!showUsernameToggle && m_ui->toggleUsernameButton->hasFocus()) {
+            m_ui->entryTabWidget->setFocus();
+        }
+        m_ui->toggleUsernameButton->setVisible(showUsernameToggle);
         m_ui->toggleUsernameButton->setChecked(false);
     } else {
         setUsernameVisible(true);
+        if (m_ui->toggleUsernameButton->hasFocus()) {
+            m_ui->entryTabWidget->setFocus();
+        }
         m_ui->toggleUsernameButton->setVisible(false);
     }
 
@@ -360,11 +370,18 @@ void EntryPreviewWidget::updateEntryGeneralTab()
         // Hide password
         setPasswordVisible(false);
         // Show the password toggle button if there are dots in the label
-        m_ui->togglePasswordButton->setVisible(!m_currentEntry->password().isEmpty());
+        const bool showPasswordToggle = !m_currentEntry->password().isEmpty();
+        if (!showPasswordToggle && m_ui->togglePasswordButton->hasFocus()) {
+            m_ui->entryTabWidget->setFocus();
+        }
+        m_ui->togglePasswordButton->setVisible(showPasswordToggle);
         m_ui->togglePasswordButton->setChecked(false);
     } else {
         // Show password
         setPasswordVisible(true);
+        if (m_ui->togglePasswordButton->hasFocus()) {
+            m_ui->entryTabWidget->setFocus();
+        }
         m_ui->togglePasswordButton->setVisible(false);
     }
 
@@ -372,8 +389,11 @@ void EntryPreviewWidget::updateEntryGeneralTab()
     auto hideNotes = config()->get(Config::Security_HideNotes).toBool();
 
     setEntryNotesVisible(hasNotes && !hideNotes);
-    m_ui->toggleEntryNotesButton->setVisible(hasNotes && hideNotes
-                                             && !m_ui->entryNotesTextEdit->toPlainText().isEmpty());
+    const bool showNotesToggle = hasNotes && hideNotes && !m_ui->entryNotesTextEdit->toPlainText().isEmpty();
+    if (!showNotesToggle && m_ui->toggleEntryNotesButton->hasFocus()) {
+        m_ui->entryTabWidget->setFocus();
+    }
+    m_ui->toggleEntryNotesButton->setVisible(showNotesToggle);
     m_ui->toggleEntryNotesButton->setChecked(false);
 
     if (config()->get(Config::GUI_MonospaceNotes).toBool()) {
@@ -536,10 +556,17 @@ void EntryPreviewWidget::updateGroupGeneralTab()
 
     if (config()->get(Config::Security_HideNotes).toBool()) {
         setGroupNotesVisible(false);
-        m_ui->toggleGroupNotesButton->setVisible(!m_ui->groupNotesTextEdit->toPlainText().isEmpty());
+        const bool showNotesToggle = !m_ui->groupNotesTextEdit->toPlainText().isEmpty();
+        if (!showNotesToggle && m_ui->toggleGroupNotesButton->hasFocus()) {
+            m_ui->groupTabWidget->setFocus();
+        }
+        m_ui->toggleGroupNotesButton->setVisible(showNotesToggle);
         m_ui->toggleGroupNotesButton->setChecked(false);
     } else {
         setGroupNotesVisible(true);
+        if (m_ui->toggleGroupNotesButton->hasFocus()) {
+            m_ui->groupTabWidget->setFocus();
+        }
         m_ui->toggleGroupNotesButton->setVisible(false);
     }
 
@@ -553,7 +580,12 @@ void EntryPreviewWidget::updateGroupGeneralTab()
 void EntryPreviewWidget::updateGroupSharingTab()
 {
     Q_ASSERT(m_currentGroup);
-    setTabEnabled(m_ui->groupTabWidget, m_ui->groupShareTab, KeeShare::isShared(m_currentGroup));
+    const bool shareEnabled = KeeShare::isShared(m_currentGroup);
+    if (!shareEnabled && m_ui->groupTabWidget->currentIndex() == m_ui->groupTabWidget->indexOf(m_ui->groupShareTab)
+        && m_ui->groupTabWidget->hasFocus()) {
+        m_ui->groupTabWidget->setCurrentIndex(GeneralTabIndex);
+    }
+    setTabEnabled(m_ui->groupTabWidget, m_ui->groupShareTab, shareEnabled);
     auto reference = KeeShare::referenceOf(m_currentGroup);
     m_ui->groupShareTypeLabel->setText(KeeShare::referenceTypeLabel(reference));
     m_ui->groupSharePathLabel->setText(reference.path);
