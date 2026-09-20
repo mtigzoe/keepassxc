@@ -108,6 +108,13 @@ DatabaseOpenWidget::DatabaseOpenWidget(QWidget* parent)
     m_ui->addKeyFileLinkLabel->setAccessibleName(tr("Add a key file"));
     connect(m_ui->keyFileLineEdit, &PasswordWidget::textChanged, this, [&](const QString& text) {
         bool state = !text.isEmpty();
+        if (state) {
+            if (m_ui->addKeyFileLinkLabel->hasFocus()) {
+                m_ui->keyFileLineEdit->setFocus();
+            }
+        } else if (m_ui->keyFileLineEdit->hasFocus()) {
+            m_ui->editPassword->setFocus();
+        }
         m_ui->addKeyFileLinkLabel->setVisible(!state);
         m_ui->selectKeyFileComponent->setVisible(state);
     });
