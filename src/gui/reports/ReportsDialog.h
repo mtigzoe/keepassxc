@@ -87,6 +87,7 @@ private:
 #endif
     QPointer<EditEntryWidget> m_editEntryWidget;
     QWidget* m_sender = nullptr;
+    QPointer<QWidget> m_focusWidget;
 
     class ExtraPage;
     QList<ExtraPage> m_extraPages;
