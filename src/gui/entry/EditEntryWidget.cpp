@@ -1629,6 +1629,7 @@ void EditEntryWidget::toggleCurrentAttributeVisibility()
             m_advancedUi->attributesEdit->setPlainText(m_entryAttributes->value(key));
             m_advancedUi->attributesEdit->setEnabled(true);
             m_advancedUi->attributesEdit->blockSignals(oldBlockSignals);
+            m_advancedUi->attributesEdit->setFocus();
         }
         m_advancedUi->revealAttributeButton->setText(tr("Hide"));
     } else {
