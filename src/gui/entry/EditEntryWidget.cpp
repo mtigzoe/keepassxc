@@ -166,7 +166,13 @@ EditEntryWidget::EditEntryWidget(QWidget* parent)
     connect(&m_entryModifiedTimer, &QTimer::timeout, this, [this] {
         // TODO: Upon refactor of this widget, this needs to merge unsaved changes in the UI
         if (isVisible() && m_entry) {
+            // Reloading the form after an external entry change must not steal
+            // keyboard or screen-reader focus from the control being edited.
+            QWidget* focusedWidget = QApplication::focusWidget();
             setForms(m_entry);
+            if (focusedWidget && focusedWidget->isVisible() && focusedWidget->isEnabled()) {
+                focusedWidget->setFocus();
+            }
         }
     });
 
