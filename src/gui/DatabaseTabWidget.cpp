@@ -17,7 +17,7 @@
 
 #include "DatabaseTabWidget.h"
 
-#include <QFileInfo>
+#include <QApplication>\n#include <QFileInfo>
 #include <QTabBar>
 
 #include "autotype/AutoType.h"
@@ -407,6 +407,14 @@ bool DatabaseTabWidget::closeDatabaseTab(DatabaseWidget* dbWidget)
     tabIndex = indexOf(dbWidget);
     if (tabIndex < 0) {
         return false;
+    }
+
+    if (dbWidget->isAncestorOf(QApplication::focusWidget())) {
+        if (count() > 1) {
+            tabBar()->setFocus(Qt::OtherFocusReason);
+        } else {
+            clearFocus();
+        }
     }
 
     removeTab(tabIndex);
