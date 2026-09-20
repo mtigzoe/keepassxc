@@ -145,6 +145,9 @@
        </property>
        <item>
         <widget class="QTableView" name="hibpTableView">
+         <property name="accessibleName">
+          <string>Online password exposure report entries</string>
+         </property>
          <property name="contextMenuPolicy">
           <enum>Qt::CustomContextMenu</enum>
          </property>
