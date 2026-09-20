@@ -46,10 +46,6 @@ void UpdateCheckDialog::showUpdateCheckResponse(bool hasUpdate, const QString& v
     m_ui->progressBar->setVisible(false);
     m_ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Close"));
 
-    // The status changes asynchronously while focus remains on the Close button.
-    // Explicitly announce the final result so screen readers do not miss it.
-    QAccessible::updateAccessibility(new QAccessibleEvent(m_ui->statusLabel, QAccessible::Alert));
-
     setWindowTitle(tr("Software Update"));
 
     if (version == UpdateChecker::ErrorVersion) {
@@ -63,6 +59,11 @@ void UpdateCheckDialog::showUpdateCheckResponse(bool hasUpdate, const QString& v
     } else {
         m_ui->statusLabel->setText(tr("You have the latest version of KeePassXC"));
     }
+
+    // The status changes asynchronously while focus remains on the Close button.
+    // Announce the final text after it has been updated so screen readers receive the result.
+    QAccessibleEvent statusChanged(m_ui->statusLabel, QAccessible::Alert);
+    QAccessible::updateAccessibility(&statusChanged);
 }
 
 UpdateCheckDialog::~UpdateCheckDialog()
