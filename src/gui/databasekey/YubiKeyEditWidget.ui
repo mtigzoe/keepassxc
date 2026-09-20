@@ -48,6 +48,12 @@
        </item>
        <item>
         <widget class="QProgressBar" name="yubikeyProgress">
+       <property name="accessibleName">
+        <string>Hardware key detection progress</string>
+       </property>
+       <property name="accessibleDescription">
+        <string>Indicates that KeePassXC is detecting hardware security keys.</string>
+       </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
