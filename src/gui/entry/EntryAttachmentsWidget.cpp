@@ -22,6 +22,8 @@
 #include "PreviewEntryAttachmentsDialog.h"
 #include "ui_EntryAttachmentsWidget.h"
 
+#include <QApplication>
+
 #include <QDebug>
 #include <QDropEvent>
 #include <QLineEdit>
@@ -444,6 +446,21 @@ void EntryAttachmentsWidget::updateButtonsEnabled()
     const auto selectionModel = m_ui->attachmentsView->selectionModel();
     const bool hasSelection = selectionModel && selectionModel->hasSelection();
 
+    // Selection/model changes can disable attachment controls while one of
+    // them still has keyboard or screen-reader focus. Return focus to the
+    // attachment table before changing the controls' enabled state.
+    QWidget* focusedWidget = QApplication::focusWidget();
+    const bool focusNeedsHandoff =
+        focusedWidget
+        && (focusedWidget == m_ui->removeAttachmentButton || focusedWidget == m_ui->editAttachmentButton
+            || focusedWidget == m_ui->saveAttachmentButton || focusedWidget == m_ui->previewAttachmentButton
+            || focusedWidget == m_ui->openAttachmentButton)
+        && (!hasSelection || m_readOnly);
+
+    if (focusNeedsHandoff) {
+        m_ui->attachmentsView->setFocus();
+    }
+
     m_ui->addAttachmentButton->setEnabled(!m_readOnly);
     m_ui->removeAttachmentButton->setEnabled(hasSelection && !m_readOnly);
 
@@ -468,6 +485,17 @@ void EntryAttachmentsWidget::updateLinesVisibility()
 
 void EntryAttachmentsWidget::updateButtonsVisible()
 {
+    QWidget* focusedWidget = QApplication::focusWidget();
+    const bool focusNeedsHandoff =
+        focusedWidget
+        && (focusedWidget == m_ui->addAttachmentButton || focusedWidget == m_ui->editAttachmentButton
+            || focusedWidget == m_ui->removeAttachmentButton)
+        && (!m_buttonsVisible || m_readOnly);
+
+    if (focusNeedsHandoff) {
+        m_ui->attachmentsView->setFocus();
+    }
+
     m_ui->addAttachmentButton->setVisible(m_buttonsVisible && !m_readOnly);
     m_ui->editAttachmentButton->setVisible(m_buttonsVisible && !m_readOnly);
     m_ui->removeAttachmentButton->setVisible(m_buttonsVisible && !m_readOnly);
