@@ -1550,6 +1550,11 @@ void EditEntryWidget::clear()
 #ifdef KPXC_FEATURE_NETWORK
 void EditEntryWidget::updateFaviconButtonEnable(const QString& url)
 {
+    // Clearing the URL can disable the favicon button while it has keyboard
+    // or screen-reader focus. Return focus to the URL field first.
+    if (url.isEmpty() && m_mainUi->fetchFaviconButton->hasFocus()) {
+        m_mainUi->urlEdit->setFocus();
+    }
     m_mainUi->fetchFaviconButton->setDisabled(url.isEmpty());
 }
 #endif
