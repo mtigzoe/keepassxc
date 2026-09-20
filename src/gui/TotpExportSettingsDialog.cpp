@@ -44,6 +44,7 @@ TotpExportSettingsDialog::TotpExportSettingsDialog(DatabaseWidget* parent, Entry
 {
     setObjectName("entryQrCodeWidget");
     m_totpSvgContainerWidget->addWidget(m_totpSvgWidget);
+    m_totpSvgWidget->setAccessibleName(tr("TOTP QR code"));
 
     m_verticalLayout->addWidget(m_warningLabel);
     m_verticalLayout->addItem(new QSpacerItem(0, 0));
