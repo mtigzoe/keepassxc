@@ -421,7 +421,9 @@ void DatabaseWidget::onConfigChanged(Config::ConfigKey key)
         // focus to the entry view first so keyboard and screen-reader users
         // are not left with focus on a hidden widget.
         const bool hideGroupPanel = config()->get(Config::GUI_HideGroupPanel).toBool();
-        if (hideGroupPanel && m_groupSplitter->isVisible() && m_groupSplitter->hasFocus()) {
+        const auto focusWidget = QApplication::focusWidget();
+        if (hideGroupPanel && m_groupSplitter->isVisible() && focusWidget
+            && m_groupSplitter->isAncestorOf(focusWidget)) {
             m_entryView->setFocus();
         }
         m_groupSplitter->setVisible(!hideGroupPanel);
