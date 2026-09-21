@@ -17,7 +17,8 @@
 
 #include "DatabaseTabWidget.h"
 
-#include <QApplication>\n#include <QFileInfo>
+#include <QApplication>
+#include <QFileInfo>
 #include <QTabBar>
 
 #include "autotype/AutoType.h"
