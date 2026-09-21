@@ -14,8 +14,7 @@
    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
-   </sizepolicy>
-  </property>
+   </property>
   <property name="windowTitle">
    <string>Download Favicons</string>
   </property>
@@ -98,6 +97,9 @@ You can enable the DuckDuckGo website icon service in the security section of th
    </item>
    <item>
     <widget class="QTableView" name="tableView">
+     <property name="accessibleName">
+      <string>Favicon download results</string>
+     </property>
      <property name="verticalScrollBarPolicy">
       <enum>Qt::ScrollBarAsNeeded</enum>
      </property>
