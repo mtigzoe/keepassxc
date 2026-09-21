@@ -105,7 +105,7 @@ def main():
         print(f"\n  {el.name!r}")
         print(f"    role={el.role!r} visible={el.visible!r} bounds={el.bounds!r}")
         print(f"    raw={el.raw!r}")
-        for attribute in ("value", "is_enabled", "is_keyboard_focusable", "has_keyboard_focus"):
+        for attribute in ("value", "numeric_value", "min_value", "max_value", "focused", "focusable", "enabled"):
             try:
                 value = getattr(el, attribute)
             except Exception as exc:
