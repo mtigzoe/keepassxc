@@ -482,6 +482,12 @@ void DatabaseSettingsWidgetEncryption::memoryChanged(int value)
     // the spin box's numeric RangeValuePattern value.
     QAccessibleValueChangeEvent event(m_ui->memorySpinBox, value);
     QAccessible::updateAccessibility(&event);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    // Request immediate feedback while focus remains on the spin box.
+    QAccessibleAnnouncementEvent announcementEvent(m_ui->memorySpinBox, QString::number(value));
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
 }
 
 /**
@@ -496,6 +502,12 @@ void DatabaseSettingsWidgetEncryption::parallelismChanged(int value)
     // the spin box's numeric RangeValuePattern value.
     QAccessibleValueChangeEvent event(m_ui->parallelismSpinBox, value);
     QAccessible::updateAccessibility(&event);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    // Request immediate feedback while focus remains on the spin box.
+    QAccessibleAnnouncementEvent announcementEvent(m_ui->parallelismSpinBox, QString::number(value));
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
 }
 
 /**
