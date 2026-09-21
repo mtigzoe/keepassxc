@@ -53,9 +53,10 @@ $ScriptDir =
     elseif ($MyInvocation.MyCommand.Path) { Split-Path -Parent $MyInvocation.MyCommand.Path }
     else { (Get-Location).Path }
 
-$ParentDir = Split-Path -Parent $ScriptDir
+$RepoRoot = Split-Path -Parent $ScriptDir
+$ParentDir = Split-Path -Parent $RepoRoot
 
-if (-not $Repo)      { $Repo = Join-Path $ParentDir "keepassxc" }
+if (-not $Repo)      { $Repo = $RepoRoot }
 if (-not $VcpkgRoot) { $VcpkgRoot = Join-Path $ParentDir "vcpkg" }
 if (-not $RubyRoot)  { $RubyRoot = Join-Path $ParentDir "ruby" }
 
