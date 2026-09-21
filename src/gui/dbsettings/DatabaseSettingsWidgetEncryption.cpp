@@ -477,8 +477,10 @@ void DatabaseSettingsWidgetEncryption::memoryChanged(int value)
 {
     m_ui->memorySpinBox->setSuffix(tr(" MiB", "Abbreviation for Mebibytes (KDF settings)", value));
 
-    // See benchmarkTransformRounds() for why this uses text() (a QString) rather than value (an int).
-    QAccessibleValueChangeEvent event(m_ui->memorySpinBox, m_ui->memorySpinBox->text());
+    // Pass the numeric value so Windows UI Automation raises the RangeValue Value property.
+    // A textual value raises UIA_ValueValuePropertyId instead, which does not represent
+    // the spin box's numeric RangeValuePattern value.
+    QAccessibleValueChangeEvent event(m_ui->memorySpinBox, value);
     QAccessible::updateAccessibility(&event);
 }
 
@@ -489,8 +491,10 @@ void DatabaseSettingsWidgetEncryption::parallelismChanged(int value)
 {
     m_ui->parallelismSpinBox->setSuffix(tr(" thread(s)", "Threads for parallel execution (KDF settings)", value));
 
-    // See benchmarkTransformRounds() for why this uses text() (a QString) rather than value (an int).
-    QAccessibleValueChangeEvent event(m_ui->parallelismSpinBox, m_ui->parallelismSpinBox->text());
+    // Pass the numeric value so Windows UI Automation raises the RangeValue Value property.
+    // A textual value raises UIA_ValueValuePropertyId instead, which does not represent
+    // the spin box's numeric RangeValuePattern value.
+    QAccessibleValueChangeEvent event(m_ui->parallelismSpinBox, value);
     QAccessible::updateAccessibility(&event);
 }
 
@@ -500,7 +504,8 @@ void DatabaseSettingsWidgetEncryption::parallelismChanged(int value)
  */
 void DatabaseSettingsWidgetEncryption::transformRoundsChanged()
 {
-    QAccessibleValueChangeEvent event(m_ui->transformRoundsSpinBox, m_ui->transformRoundsSpinBox->text());
+    // Pass the numeric value so Windows UI Automation raises the RangeValue Value property.
+    QAccessibleValueChangeEvent event(m_ui->transformRoundsSpinBox, m_ui->transformRoundsSpinBox->value());
     QAccessible::updateAccessibility(&event);
 }
 
