@@ -24,6 +24,7 @@
 #include "gui/Icons.h"
 
 #include <QAccessible>
+#include <QApplication>
 #include <QAccessibleWidget>
 #include <QAction>
 #include <QBoxLayout>
