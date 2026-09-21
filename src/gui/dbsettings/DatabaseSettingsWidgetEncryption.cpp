@@ -504,9 +504,18 @@ void DatabaseSettingsWidgetEncryption::parallelismChanged(int value)
  */
 void DatabaseSettingsWidgetEncryption::transformRoundsChanged()
 {
+    const auto value = m_ui->transformRoundsSpinBox->value();
+
     // Pass the numeric value so Windows UI Automation raises the RangeValue Value property.
-    QAccessibleValueChangeEvent event(m_ui->transformRoundsSpinBox, m_ui->transformRoundsSpinBox->value());
+    QAccessibleValueChangeEvent event(m_ui->transformRoundsSpinBox, value);
     QAccessible::updateAccessibility(&event);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    // JAWS does not announce the RangeValue change while focus remains on the spin box.
+    // An explicit announcement requests immediate feedback without moving focus.
+    QAccessibleAnnouncementEvent announcementEvent(m_ui->transformRoundsSpinBox, QString::number(value));
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
 }
 
 bool DatabaseSettingsWidgetEncryption::isAdvancedMode()
