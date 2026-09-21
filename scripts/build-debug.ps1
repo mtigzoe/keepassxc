@@ -628,7 +628,6 @@ cmake -S . -B build `
     -DCMAKE_BUILD_TYPE=Debug `
     -DCMAKE_TOOLCHAIN_FILE="$VcpkgToolchain" `
     -DQt6_DIR="$QtDir" `
-    -DWINDEPLOYQT_EXE="$WinDeployQtDebug" `
     -DWITH_TESTS=OFF
 
 if ($LASTEXITCODE -ne 0) {
@@ -647,6 +646,13 @@ Write-Host "============================================================"
 # vcpkg stores Debug Qt DLLs under debug\bin. Keep that directory first
 # in PATH for any Qt tools that resolve runtime dependencies through PATH.
 $env:PATH = "$QtDebugBin;$QtToolsBin;$env:PATH"
+
+# KeePassXC uses CMake's WINDEPLOYQT post-build command. CMake ignores
+# WINDEPLOYQT_EXE because the project does not expose it as a cache variable.
+# Put the Debug wrapper first on PATH so the generated post-build command
+# resolves the vcpkg wrapper and its Debug Qt DLLs correctly.
+$WinDeployQtWrapperDir = Split-Path -Parent $WinDeployQtDebug
+$env:PATH = "$WinDeployQtWrapperDir;$env:PATH"
 
 cmake --build build --parallel
 
