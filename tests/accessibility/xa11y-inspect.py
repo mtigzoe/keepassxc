@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 import xa11y
 
@@ -71,9 +72,65 @@ def find_keepassxc_pid():
     return None
 
 
+def run_spin_value_test(app):
+    """Exercise each spin button through xa11y's Windows accessibility API.
+
+    This is opt-in because increment/decrement changes the live KeePassXC
+    settings. Each successful increment is followed by a decrement so the
+    original value is restored.
+    """
+    print("\n--- Spin buttons: live UIA value test ---")
+    spin_buttons = app.locator("spin_button").elements()
+    if not spin_buttons:
+        print("  (none)")
+        return
+
+    for el in spin_buttons:
+        print(f"\n  {el.name!r}")
+        try:
+            original = el.numeric_value
+            print(
+                f"    BEFORE: value={el.value!r} "
+                f"numeric_value={el.numeric_value!r} focused={el.focused!r}"
+            )
+
+            el.focus()
+            time.sleep(0.2)
+            print(
+                f"    FOCUSED: value={el.value!r} "
+                f"numeric_value={el.numeric_value!r} focused={el.focused!r}"
+            )
+
+            if original is None:
+                print("    SKIP: no numeric value exposed")
+                continue
+
+            el.increment()
+            time.sleep(0.5)
+            print(
+                f"    AFTER UP: value={el.value!r} "
+                f"numeric_value={el.numeric_value!r} focused={el.focused!r}"
+            )
+
+            el.decrement()
+            time.sleep(0.5)
+            print(
+                f"    AFTER DOWN: value={el.value!r} "
+                f"numeric_value={el.numeric_value!r} focused={el.focused!r}"
+            )
+
+            restored = el.numeric_value == original
+            print(f"    RESTORED: {restored!r}")
+        except Exception as exc:
+            print(f"    ERROR: {exc}")
+
+
 def main():
-    if len(sys.argv) > 1:
-        app = xa11y.App.by_pid(int(sys.argv[1]))
+    spin_value_test = "--spin-test" in sys.argv
+    positional_args = [arg for arg in sys.argv[1:] if arg != "--spin-test"]
+
+    if positional_args:
+        app = xa11y.App.by_pid(int(positional_args[0]))
     else:
         pid = find_keepassxc_pid()
         try:
@@ -152,6 +209,9 @@ def main():
                 f"      role={child.role!r} name={child.name!r} "
                 f"visible={child.visible!r} raw={raw!r}"
             )
+
+    if spin_value_test:
+        run_spin_value_test(app)
 
     print("\n--- All named elements ---")
     all_elements = app.locator("*").elements()
