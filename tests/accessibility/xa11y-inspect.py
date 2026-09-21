@@ -137,6 +137,22 @@ def main():
         except Exception as exc:
             print(f"      <error: {exc}>")
 
+        print("    children:")
+        try:
+            children = el.children()
+        except Exception as exc:
+            print(f"      <error: {exc}>")
+            children = []
+        for child in children:
+            try:
+                raw = child.raw
+            except Exception:
+                raw = None
+            print(
+                f"      role={child.role!r} name={child.name!r} "
+                f"visible={child.visible!r} raw={raw!r}"
+            )
+
     print("\n--- All named elements ---")
     all_elements = app.locator("*").elements()
     for el in all_elements:
