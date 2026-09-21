@@ -1875,6 +1875,13 @@ void EditEntryWidget::restoreHistoryEntry()
     auto entry = m_historyModel->entryFromIndex(index);
     if (entry) {
         setForms(entry, true);
+        // Restoring from the History page reloads the form and setForms()
+        // normally focuses the Main-page title field. Keep focus on the
+        // visible History table instead of leaving keyboard and screen-reader
+        // focus on a widget hidden behind another page.
+        if (pageIndex(m_historyWidget) == m_ui->stackedWidget->currentIndex()) {
+            m_historyUi->historyView->setFocus();
+        }
         setModified(true);
     }
 }
