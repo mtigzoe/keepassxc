@@ -458,6 +458,8 @@ void DatabaseSettingsWidgetEncryption::benchmarkTransformRounds(int millisecs)
     int rounds = AsyncTask::runAndWaitForFuture([&kdf, millisecs]() { return kdf->benchmark(millisecs); });
 
     m_ui->transformRoundsSpinBox->setValue(rounds);
+    QAccessibleValueChangeEvent event(m_ui->transformRoundsSpinBox, rounds);
+    QAccessible::updateAccessibility(&event);
     m_ui->transformBenchmarkButton->setEnabled(true);
     m_ui->transformRoundsSpinBox->setEnabled(true);
     m_ui->transformRoundsSpinBox->setFocus();
@@ -471,6 +473,9 @@ void DatabaseSettingsWidgetEncryption::benchmarkTransformRounds(int millisecs)
 void DatabaseSettingsWidgetEncryption::memoryChanged(int value)
 {
     m_ui->memorySpinBox->setSuffix(tr(" MiB", "Abbreviation for Mebibytes (KDF settings)", value));
+
+    QAccessibleValueChangeEvent event(m_ui->memorySpinBox, value);
+    QAccessible::updateAccessibility(&event);
 }
 
 /**
@@ -479,6 +484,9 @@ void DatabaseSettingsWidgetEncryption::memoryChanged(int value)
 void DatabaseSettingsWidgetEncryption::parallelismChanged(int value)
 {
     m_ui->parallelismSpinBox->setSuffix(tr(" thread(s)", "Threads for parallel execution (KDF settings)", value));
+
+    QAccessibleValueChangeEvent event(m_ui->parallelismSpinBox, value);
+    QAccessible::updateAccessibility(&event);
 }
 
 bool DatabaseSettingsWidgetEncryption::isAdvancedMode()
