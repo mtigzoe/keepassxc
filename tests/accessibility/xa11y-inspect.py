@@ -26,7 +26,14 @@ def main():
     if len(sys.argv) > 1:
         app = xa11y.App.by_pid(int(sys.argv[1]))
     else:
-        app = xa11y.App.by_name("KeePassXC")
+        try:
+            app = xa11y.App.by_name("KeePassXC")
+        except Exception as exc:
+            print("KeePassXC is not running or could not be discovered.")
+            print("Launch KeePassXC and run this script again.")
+            print(f"Discovery error: {exc}")
+            return 1
+
     print(f"Connected to: {app.name} (pid={app.pid})")
 
     print("\n--- Buttons ---")
@@ -72,6 +79,8 @@ def main():
     for name, roles in dupes.items():
         print(f"  {name!r} exposed as roles: {sorted(roles)}")
 
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
