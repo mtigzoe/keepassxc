@@ -22,15 +22,79 @@ def ancestor_chain(el, max_depth=10):
     return chain
 
 
+def find_keepassxc_pid():
+    """Find KeePassXC by executable path in either supported build directory."""
+    if sys.platform != "win32":
+        return None
+
+    repo_root = __file__
+    for _ in range(3):
+        repo_root = __import__("os").path.dirname(repo_root)
+
+    import json
+    import subprocess
+
+    result = subprocess.run(
+        [
+            "powershell.exe",
+            "-NoProfile",
+            "-Command",
+            "Get-CimInstance Win32_Process -Filter \"Name='KeePassXC.exe'\" "
+            "| Select-Object ProcessId,ExecutablePath | ConvertTo-Json -Compress",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0 or not result.stdout.strip():
+        return None
+
+    try:
+        processes = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
+
+    if isinstance(processes, dict):
+        processes = [processes]
+
+    expected_paths = {
+        __import__("os").path.normcase(
+            __import__("os").path.abspath(
+                __import__("os").path.join(repo_root, "build", "src", "KeePassXC.exe")
+            )
+        ),
+        __import__("os").path.normcase(
+            __import__("os").path.abspath(
+                __import__("os").path.join(
+                    repo_root, "build-vscode-86", "src", "KeePassXC.exe"
+                )
+            )
+        ),
+    }
+
+    for process in processes:
+        executable = process.get("ExecutablePath")
+        if executable and __import__("os").path.normcase(
+            __import__("os").path.abspath(executable)
+        ) in expected_paths:
+            return int(process["ProcessId"])
+
+    return None
+
+
 def main():
     if len(sys.argv) > 1:
         app = xa11y.App.by_pid(int(sys.argv[1]))
     else:
+        pid = find_keepassxc_pid()
         try:
-            app = xa11y.App.by_name("KeePassXC")
+            if pid is not None:
+                app = xa11y.App.by_pid(pid)
+            else:
+                app = xa11y.App.by_name("KeePassXC")
         except Exception as exc:
             print("KeePassXC is not running or could not be discovered.")
-            print("Launch KeePassXC and run this script again.")
+            print("Launch KeePassXC from build/src or build-vscode-86/src and run this script again.")
             print(f"Discovery error: {exc}")
             return 1
 
