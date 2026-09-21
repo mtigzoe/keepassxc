@@ -1,3 +1,4 @@
+import os
 import sys
 
 import xa11y
@@ -27,9 +28,7 @@ def find_keepassxc_pid():
     if sys.platform != "win32":
         return None
 
-    repo_root = __file__
-    for _ in range(3):
-        repo_root = __import__("os").path.dirname(repo_root)
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
     import json
     import subprocess
@@ -58,25 +57,15 @@ def find_keepassxc_pid():
         processes = [processes]
 
     expected_paths = {
-        __import__("os").path.normcase(
-            __import__("os").path.abspath(
-                __import__("os").path.join(repo_root, "build", "src", "KeePassXC.exe")
-            )
-        ),
-        __import__("os").path.normcase(
-            __import__("os").path.abspath(
-                __import__("os").path.join(
-                    repo_root, "build-vscode-86", "src", "KeePassXC.exe"
-                )
-            )
+        os.path.normcase(os.path.abspath(os.path.join(repo_root, "build", "src", "KeePassXC.exe"))),
+        os.path.normcase(
+            os.path.abspath(os.path.join(repo_root, "build-vscode-86", "src", "KeePassXC.exe"))
         ),
     }
 
     for process in processes:
         executable = process.get("ExecutablePath")
-        if executable and __import__("os").path.normcase(
-            __import__("os").path.abspath(executable)
-        ) in expected_paths:
+        if executable and os.path.normcase(os.path.abspath(executable)) in expected_paths:
             return int(process["ProcessId"])
 
     return None
@@ -114,12 +103,17 @@ def main():
         if el.name:
             print(f"  {el.role}: {el.name!r}")
 
-    # --- New: find every button with no accessible name, and show its ---
-    # --- full ancestor chain + raw platform data (uia_control_type,     ---
-    # --- uia_class_name, etc. on Windows) so we can identify exactly    ---
-    # --- which widget it is instead of guessing from source.           ---
+    # xa11y can expose some Qt layout widgets (QFrame/QSplitter) as
+    # buttons on Windows UI Automation. They are not interactive controls,
+    # so exclude those known non-interactive Qt classes from the report.
     print("\n--- Unnamed buttons: detail ---")
-    unnamed = [el for el in app.locator("button").elements() if not el.name]
+    button_elements = app.locator("button").elements()
+    non_interactive_qt_classes = {"QFrame", "QSplitter"}
+    unnamed = [
+        el
+        for el in button_elements
+        if not el.name and el.raw.get("class_name") not in non_interactive_qt_classes
+    ]
     if not unnamed:
         print("  (none)")
     for el in unnamed:
@@ -129,15 +123,17 @@ def main():
         for i, anc in enumerate(ancestor_chain(el)):
             print(f"    [{i}] role={anc.role!r} name={anc.name!r} raw={anc.raw!r}")
 
-    # --- New: find any name that's shared between a button and a       ---
-    # --- static_text (or any two different roles) -- this is the       ---
-    # --- duplicate-announcement pattern from the warning banner.       ---
+    # Report duplicate names only when a button shares its name with another role.
     print("\n--- Names duplicated across different roles ---")
     by_name = {}
     for el in all_elements:
         if el.name:
             by_name.setdefault(el.name, set()).add(str(el.role))
-    dupes = {name: roles for name, roles in by_name.items() if len(roles) > 1}
+    dupes = {
+        name: roles
+        for name, roles in by_name.items()
+        if len(roles) > 1 and "button" in roles
+    }
     if not dupes:
         print("  (none)")
     for name, roles in dupes.items():
