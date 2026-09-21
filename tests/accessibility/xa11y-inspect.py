@@ -97,6 +97,35 @@ def main():
     for el in app.locator("text_field").elements():
         print(f"  {el.name!r}")
 
+    print("\n--- Spin buttons: UIA value details ---")
+    spin_buttons = app.locator("spin_button").elements()
+    if not spin_buttons:
+        print("  (none)")
+    for el in spin_buttons:
+        print(f"\n  {el.name!r}")
+        print(f"    role={el.role!r} visible={el.visible!r} bounds={el.bounds!r}")
+        print(f"    raw={el.raw!r}")
+        for attribute in ("value", "is_enabled", "is_keyboard_focusable", "has_keyboard_focus"):
+            try:
+                value = getattr(el, attribute)
+            except Exception as exc:
+                print(f"    {attribute}=<error: {exc}>")
+                continue
+            try:
+                value = value() if callable(value) else value
+            except Exception as exc:
+                value = f"<error: {exc}>"
+            print(f"    {attribute}={value!r}")
+        print("    public attributes containing value/focus/pattern:")
+        try:
+            names = sorted(
+                name for name in dir(el)
+                if any(token in name.lower() for token in ("value", "focus", "pattern"))
+            )
+            print(f"      {names!r}")
+        except Exception as exc:
+            print(f"      <error: {exc}>")
+
     print("\n--- All named elements ---")
     all_elements = app.locator("*").elements()
     for el in all_elements:
