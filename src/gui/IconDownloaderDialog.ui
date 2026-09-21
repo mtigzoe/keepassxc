@@ -14,7 +14,7 @@
    <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
-   </property>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Download Favicons</string>
