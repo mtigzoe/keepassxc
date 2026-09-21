@@ -126,6 +126,17 @@ def main():
         except Exception as exc:
             print(f"      <error: {exc}>")
 
+        print("    public attributes containing child/descendant/parent:")
+        try:
+            names = sorted(
+                name
+                for name in dir(el)
+                if any(token in name.lower() for token in ("child", "descendant", "parent"))
+            )
+            print(f"      {names!r}")
+        except Exception as exc:
+            print(f"      <error: {exc}>")
+
     print("\n--- All named elements ---")
     all_elements = app.locator("*").elements()
     for el in all_elements:
