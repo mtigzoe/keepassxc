@@ -154,6 +154,16 @@ if ($LASTEXITCODE -ne 0) {
     throw "Visual Studio Developer environment failed to load."
 }
 
+# Developer PowerShell normally supplies the standard Windows system
+# directories, but preserve System32 explicitly because build tools such
+# as where.exe depend on it. This also keeps the script resilient when
+# launched from a shell with a customized PATH.
+$System32 = Join-Path $env:SystemRoot "System32"
+if ((Test-Path "$System32\where.exe") -and
+    -not (($env:PATH -split ';') -contains $System32)) {
+    $env:PATH = "$System32;$env:PATH"
+}
+
 # Visual Studio can modify VCPKG_ROOT. Set it again after loading VS.
 $env:VCPKG_ROOT = $VcpkgRoot
 
