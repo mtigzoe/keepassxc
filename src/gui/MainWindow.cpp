@@ -1488,9 +1488,46 @@ bool MainWindow::focusNextPrevChild(bool next)
             m_ui->toolBar->setFocus(reason);
         };
 
+        // Return the currently navigable toolbar action widgets in toolbar order.
+        auto toolbarFocusableWidgets = [this] {
+            QList<QWidget*> widgets;
+            for (QAction* action : m_ui->toolBar->actions()) {
+                if (action->isSeparator() || !action->isEnabled() || !action->isVisible()) {
+                    continue;
+                }
+                QWidget* w = m_ui->toolBar->widgetForAction(action);
+                if (!w || !w->isVisible() || w->focusPolicy() == Qt::NoFocus || w == m_searchWidget
+                    || m_searchWidget->isAncestorOf(w)) {
+                    continue;
+                }
+                widgets.append(w);
+            }
+            return widgets;
+        };
+
+        // Move between toolbar action widgets before leaving the toolbar.
+        auto focusAdjacentToolbarWidget = [&toolbarFocusableWidgets](const QWidget* current, bool forward) {
+            const auto widgets = toolbarFocusableWidgets();
+            int index = -1;
+            for (int i = 0; i < widgets.size(); ++i) {
+                if (widgets.at(i) == current) {
+                    index = i;
+                    break;
+                }
+            }
+            const int adjacent = index + (forward ? 1 : -1);
+            if (index < 0 || adjacent < 0 || adjacent >= widgets.size()) {
+                return false;
+            }
+            widgets.at(adjacent)->setFocus(forward ? Qt::TabFocusReason : Qt::BacktabFocusReason);
+            return true;
+        };
+
         if (next) {
             if (toolbarFocused) {
-                focusSearchWidget();
+                if (!focusAdjacentToolbarWidget(focusWidget, true)) {
+                    focusSearchWidget();
+                }
             } else if (searchFocused) {
                 if (multiTabs) {
                     m_ui->tabWidget->setFocus(Qt::TabFocusReason);
@@ -1506,7 +1543,9 @@ bool MainWindow::focusNextPrevChild(bool next)
             if (searchFocused) {
                 focusToolbar(Qt::BacktabFocusReason);
             } else if (toolbarFocused) {
-                dbWidget->setFocus(Qt::BacktabFocusReason);
+                if (!focusAdjacentToolbarWidget(focusWidget, false)) {
+                    dbWidget->setFocus(Qt::BacktabFocusReason);
+                }
             } else if (tabFocused) {
                 focusSearchWidget();
             } else {
