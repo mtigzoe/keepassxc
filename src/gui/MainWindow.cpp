@@ -558,11 +558,6 @@ MainWindow::MainWindow()
     auto* eventFilter = new MainWindowEventFilter(this);
     m_ui->menubar->installEventFilter(eventFilter);
     m_ui->toolBar->installEventFilter(eventFilter);
-    // SearchWidget uses a focus proxy, so its line edit receives Tab before
-    // the normal focus traversal can reach MainWindow::focusNextPrevChild().
-    // Filter that actual focus widget so Tab and Shift+Tab can cross the
-    // composite search control and enter/leave the toolbar predictably.
-    m_searchWidget->focusProxy()->installEventFilter(eventFilter);
     m_ui->tabWidget->tabBar()->installEventFilter(eventFilter);
     installEventFilter(eventFilter);
 
@@ -1474,25 +1469,6 @@ bool MainWindow::focusNextPrevChild(bool next)
         const bool tabFocused = m_ui->tabWidget->hasFocus();
         const bool multiTabs = m_ui->tabWidget->count() > 1;
 
-        auto focusToolbar = [this](Qt::FocusReason reason) {
-            m_ui->toolBar->setVisible(true);
-            m_ui->toolBar->setExpanded(true);
-            // Focus the first focusable toolbar button for screen readers
-            for (QAction* action : m_ui->toolBar->actions()) {
-                if (action->isSeparator() || !action->isEnabled() || !action->isVisible()) {
-                    continue;
-                }
-                if (QWidget* w = m_ui->toolBar->widgetForAction(action)) {
-                    if (w->focusPolicy() != Qt::NoFocus && w != m_searchWidget
-                        && !m_searchWidget->isAncestorOf(w)) {
-                        w->setFocus(reason);
-                        return;
-                    }
-                }
-            }
-            m_ui->toolBar->setFocus(reason);
-        };
-
         // Return the currently navigable toolbar action widgets in toolbar order.
         auto toolbarFocusableWidgets = [this] {
             QList<QWidget*> widgets;
@@ -1508,6 +1484,21 @@ bool MainWindow::focusNextPrevChild(bool next)
                 widgets.append(w);
             }
             return widgets;
+        };
+
+        // Enter the toolbar at its first widget when moving forward, or its last widget
+        // when moving backward, so Shift+Tab out of Search reaches the last button (e.g.
+        // Settings) instead of always landing back on the first one.
+        auto focusToolbar = [this, &toolbarFocusableWidgets](Qt::FocusReason reason) {
+            m_ui->toolBar->setVisible(true);
+            m_ui->toolBar->setExpanded(true);
+            const auto widgets = toolbarFocusableWidgets();
+            if (widgets.isEmpty()) {
+                m_ui->toolBar->setFocus(reason);
+                return;
+            }
+            const bool forward = (reason == Qt::TabFocusReason);
+            widgets.at(forward ? 0 : widgets.size() - 1)->setFocus(reason);
         };
 
         // Move between toolbar action widgets before leaving the toolbar.
@@ -2398,46 +2389,6 @@ bool MainWindowEventFilter::eventFilter(QObject* watched, QEvent* event)
     }
 
     auto eventType = event->type();
-    if (eventType == QEvent::KeyPress && watched == mainWindow->m_searchWidget->focusProxy()) {
-        auto keyEvent = static_cast<QKeyEvent*>(event);
-        if (keyEvent->key() == Qt::Key_Tab) {
-            auto dbWidget = mainWindow->m_ui->tabWidget->currentDatabaseWidget();
-            if (dbWidget && dbWidget->isVisible() && dbWidget->isEntryViewActive()) {
-                const bool backward = keyEvent->modifiers().testFlag(Qt::ShiftModifier);
-                if (backward) {
-                    mainWindow->m_ui->toolBar->setVisible(true);
-                    mainWindow->m_ui->toolBar->setExpanded(true);
-
-                    // Shift+Tab from Search should enter the toolbar at its
-                    // last focusable action, not its first action.
-                    const auto actions = mainWindow->m_ui->toolBar->actions();
-                    for (auto it = actions.crbegin(); it != actions.crend(); ++it) {
-                        auto* action = *it;
-                        if (action->isSeparator() || !action->isEnabled() || !action->isVisible()) {
-                            continue;
-                        }
-                        if (auto* widget = mainWindow->m_ui->toolBar->widgetForAction(action)) {
-                            if (widget->isVisible() && widget->isEnabled()
-                                && widget->focusPolicy() != Qt::NoFocus
-                                && widget != mainWindow->m_searchWidget
-                                && !mainWindow->m_searchWidget->isAncestorOf(widget)) {
-                                widget->setFocus(Qt::BacktabFocusReason);
-                                return true;
-                            }
-                        }
-                    }
-                } else {
-                    if (mainWindow->m_ui->tabWidget->count() > 1) {
-                        mainWindow->m_ui->tabWidget->setFocus(Qt::TabFocusReason);
-                    } else {
-                        dbWidget->setFocus(Qt::TabFocusReason);
-                    }
-                    return true;
-                }
-            }
-        }
-    }
-
     if (eventType == QEvent::MouseButtonPress) {
         auto mouseEvent = dynamic_cast<QMouseEvent*>(event);
         if (watched == mainWindow->m_ui->menubar) {
