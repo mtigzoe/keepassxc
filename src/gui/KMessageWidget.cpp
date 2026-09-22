@@ -200,7 +200,7 @@ void KMessageWidgetPrivate::createLayout()
     QAction* focusedAction = nullptr;
     if (auto* focusedButton = qobject_cast<QToolButton*>(QApplication::focusWidget())) {
         focusedAction = focusedButton->defaultAction();
-        if (!d->buttons.contains(focusedButton)) {
+        if (!buttons.contains(focusedButton)) {
             focusedAction = nullptr;
         }
     }
