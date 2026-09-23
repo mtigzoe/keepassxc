@@ -1745,7 +1745,6 @@ void EditEntryWidget::toggleCurrentAttributeVisibility()
             m_advancedUi->attributesEdit->setEnabled(true);
             m_advancedUi->attributesEdit->blockSignals(oldBlockSignals);
             m_advancedUi->attributesEdit->setFocus();
-            m_advancedUi->attributesEdit->setFocus();
         }
         m_advancedUi->revealAttributeButton->setText(tr("Hide"));
     } else {
@@ -1773,15 +1772,18 @@ void EditEntryWidget::updateAutoTypeEnabled()
     m_autoTypeUi->windowTitleLabel->setEnabled(autoTypeEnabled && validIndex);
     m_autoTypeUi->windowTitleCombo->setEnabled(autoTypeEnabled && validIndex);
     m_autoTypeUi->customWindowSequenceButton->setEnabled(!m_history && autoTypeEnabled && validIndex);
-    m_autoTypeUi->windowSequenceEdit->setEnabled(autoTypeEnabled && validIndex
-                                                 && m_autoTypeUi->customWindowSequenceButton->isChecked());
-
-    // Disabling an Auto-Type control can leave keyboard and screen-reader
-    // focus on a widget that is no longer usable. Move focus to an enabled
-    // Auto-Type control before that happens. The association view can also
-    // be disabled when Auto-Type is off, so use the entry title as a final
-    // fallback when editing a history entry.
-    if (focusedWidget && !focusedWidget->isEnabled()) {
+    // Disabling an Auto-Type editor while it has focus can leave keyboard
+    // and screen-reader focus on a control that is no longer usable. Check
+    // the focused Auto-Type controls before changing their enabled state.
+    const bool focusedAutoTypeControl = focusedWidget
+        && (focusedWidget == m_autoTypeUi->enableButton || focusedWidget == m_autoTypeUi->inheritSequenceButton
+            || focusedWidget == m_autoTypeUi->customSequenceButton || focusedWidget == m_autoTypeUi->sequenceEdit
+            || focusedWidget == m_autoTypeUi->openHelpButton || focusedWidget == m_autoTypeUi->assocView
+            || focusedWidget == m_autoTypeUi->assocAddButton || focusedWidget == m_autoTypeUi->assocRemoveButton
+            || focusedWidget == m_autoTypeUi->windowTitleCombo
+            || focusedWidget == m_autoTypeUi->customWindowSequenceButton
+            || focusedWidget == m_autoTypeUi->windowSequenceEdit);
+    if (focusedAutoTypeControl) {
         if (m_autoTypeUi->enableButton->isEnabled()) {
             m_autoTypeUi->enableButton->setFocus();
         } else if (m_autoTypeUi->assocView->isEnabled()) {
