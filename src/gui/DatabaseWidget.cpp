@@ -1149,7 +1149,9 @@ void DatabaseWidget::deleteGroup()
 
         if (result == MessageBox::Delete) {
             delete currentGroup;
-            m_groupView->setCurrentGroup(fallbackGroup);
+            if (!m_groupView->currentGroup()) {
+                m_groupView->setCurrentGroup(fallbackGroup);
+            }
         }
     } else {
         auto result = MessageBox::question(this,
@@ -1161,7 +1163,9 @@ void DatabaseWidget::deleteGroup()
                                            MessageBox::Cancel);
         if (result == MessageBox::Move) {
             m_db->recycleGroup(currentGroup);
-            m_groupView->setCurrentGroup(fallbackGroup);
+            if (!m_groupView->currentGroup()) {
+                m_groupView->setCurrentGroup(fallbackGroup);
+            }
         }
     }
 }
