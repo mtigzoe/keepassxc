@@ -277,8 +277,11 @@ void EntryPreviewWidget::updateEntryTotp()
 {
     Q_ASSERT(m_currentEntry);
     const bool hasTotp = m_currentEntry->hasTotp();
-    if (!hasTotp && m_ui->entryTotpButton->hasFocus()) {
-        m_ui->entryTabWidget->setFocus();
+    if (!hasTotp) {
+        if (auto* focusedWidget = QApplication::focusWidget();
+            focusedWidget && m_ui->entryTotp->isAncestorOf(focusedWidget)) {
+            m_ui->entryTabWidget->setFocus(Qt::OtherFocusReason);
+        }
     }
     m_ui->entryTotpButton->setVisible(hasTotp);
 
@@ -641,6 +644,10 @@ void EntryPreviewWidget::updateTotpLabel()
         m_ui->entryTotpProgress->setVisible(isValid);
         m_ui->entryTotpLabel->setText(totpCode);
     } else {
+        if (auto* focusedWidget = QApplication::focusWidget();
+            focusedWidget && m_ui->entryTotp->isAncestorOf(focusedWidget)) {
+            m_ui->entryTabWidget->setFocus(Qt::OtherFocusReason);
+        }
         m_ui->entryTotp->setVisible(false);
         m_totpTimer.stop();
     }
