@@ -353,6 +353,7 @@
   <tabstop>scrollArea</tabstop>
   <tabstop>debugInfo</tabstop>
   <tabstop>copyToClipboard</tabstop>
+  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>
