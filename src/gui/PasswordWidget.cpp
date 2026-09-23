@@ -28,6 +28,7 @@
 #include "gui/styles/StateColorPalette.h"
 
 #include <QAccessible>
+#include <QApplication>
 #include <QEvent>
 #include <QLineEdit>
 #include <QTimer>
@@ -202,6 +203,22 @@ void PasswordWidget::setRepeatPartner(PasswordWidget* repeatPartner)
 void PasswordWidget::setParentPasswordEdit(PasswordWidget* parent)
 {
     m_parentPasswordWidget = parent;
+
+    // These actions are keyboard-focusable. If either internal QLineEdit action
+    // button currently has focus, hiding it would remove the focused widget from
+    // the focus chain. Return focus to the password editor before hiding them.
+    if (auto* focusedWidget = QApplication::focusWidget();
+        focusedWidget && m_ui->passwordEdit->isAncestorOf(focusedWidget)) {
+        for (QToolButton* button : m_ui->passwordEdit->findChildren<QToolButton*>()) {
+            if (button == focusedWidget
+                && (button->defaultAction() == m_toggleVisibleAction
+                    || button->defaultAction() == m_passwordGeneratorAction)) {
+                m_ui->passwordEdit->setFocus(Qt::OtherFocusReason);
+                break;
+            }
+        }
+    }
+
     // Hide actions
     m_toggleVisibleAction->setVisible(false);
     m_passwordGeneratorAction->setVisible(false);
