@@ -94,6 +94,11 @@ SearchWidget::SearchWidget(QWidget* parent)
     m_ui->saveIcon->setVisible(false);
 
     // Fix initial visibility of actions (bug in Qt)
+    QToolButton* searchButton = nullptr;
+    QToolButton* helpButton = nullptr;
+    QToolButton* saveButton = nullptr;
+    QToolButton* clearButton = nullptr;
+
     for (QToolButton* toolButton : m_ui->searchEdit->findChildren<QToolButton*>()) {
         QAction* action = toolButton->defaultAction();
         toolButton->setVisible(action->isVisible());
@@ -109,12 +114,16 @@ SearchWidget::SearchWidget(QWidget* parent)
         // button (or, if Qt ever adds another internal control of its
         // own, something equally nameless that needs a name either way).
         if (action == m_ui->searchIcon) {
+            searchButton = toolButton;
             toolButton->setAccessibleName(tr("Search options"));
         } else if (action == m_ui->helpIcon) {
+            helpButton = toolButton;
             toolButton->setAccessibleName(tr("Search help"));
         } else if (action == m_ui->saveIcon) {
+            saveButton = toolButton;
             toolButton->setAccessibleName(tr("Save search"));
         } else {
+            clearButton = toolButton;
             toolButton->setAccessibleName(tr("Clear Search"));
         }
 
@@ -123,6 +132,24 @@ SearchWidget::SearchWidget(QWidget* parent)
         // save, and clear actions inaccessible to keyboard and screen-reader
         // users even though the actions are visible and have accessible names.
         toolButton->setFocusPolicy(Qt::TabFocus);
+    }
+
+    // Make the action buttons follow the search field in a deterministic order.
+    // Qt otherwise derives tab order from implicit widget creation order.
+    if (searchButton) {
+        QWidget::setTabOrder(m_ui->searchEdit, searchButton);
+        if (helpButton) {
+            QWidget::setTabOrder(searchButton, helpButton);
+        }
+        if (saveButton) {
+            QWidget::setTabOrder(helpButton ? static_cast<QWidget*>(helpButton) : static_cast<QWidget*>(searchButton), saveButton);
+        }
+        if (clearButton) {
+            QWidget::setTabOrder(saveButton ? static_cast<QWidget*>(saveButton)
+                                             : (helpButton ? static_cast<QWidget*>(helpButton)
+                                                           : static_cast<QWidget*>(searchButton)),
+                                 clearButton);
+        }
     }
 }
 
