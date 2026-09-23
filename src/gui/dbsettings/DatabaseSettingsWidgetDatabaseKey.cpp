@@ -30,6 +30,7 @@
 #include "quickunlock/QuickUnlockInterface.h"
 
 #include <QAccessible>
+#include <QApplication>
 #include <QLayout>
 #include <QPushButton>
 #include <QTimer>
@@ -269,6 +270,16 @@ void DatabaseSettingsWidgetDatabaseKey::showAdditionalKeyOptions()
 
 void DatabaseSettingsWidgetDatabaseKey::setAdditionalKeyOptionsVisible(bool show)
 {
+    if (!show) {
+        // Reloading a database can hide the additional-key section while a
+        // keyboard or screen-reader user still has focus inside it. Move
+        // focus to the control that replaces the hidden section first.
+        if (auto* focusedWidget = QApplication::focusWidget();
+            focusedWidget && (focusedWidget == m_additionalKeyOptions || m_additionalKeyOptions->isAncestorOf(focusedWidget))) {
+            m_additionalKeyOptionsToggle->setFocus(Qt::OtherFocusReason);
+        }
+    }
+
     m_additionalKeyOptionsToggle->setVisible(!show);
     m_additionalKeyOptions->setVisible(show);
 }
