@@ -632,6 +632,9 @@ void PasswordGeneratorWidget::updateGenerator()
         auto path = m_ui->comboBoxWordList->currentData().toString();
         if (m_ui->comboBoxWordList->currentIndex() < m_firstCustomWordlistIndex) {
             path = resources()->wordlistPath(path);
+            if (m_ui->buttonDeleteWordList->hasFocus()) {
+                m_ui->comboBoxWordList->setFocus(Qt::OtherFocusReason);
+            }
             m_ui->buttonDeleteWordList->setEnabled(false);
         } else {
             m_ui->buttonDeleteWordList->setEnabled(true);
