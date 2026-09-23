@@ -639,8 +639,8 @@ void DatabaseWidget::restoreSelectedEntries()
         }
     }
 
-    if (index.isValid()) {
-        m_entryView->setCurrentIndex(index);
+    if (focusIndex.isValid()) {
+        m_entryView->setCurrentIndex(focusIndex);
     } else {
         m_entryView->setFirstEntryActive();
     }
