@@ -56,6 +56,9 @@
         <property name="accessibleName">
          <string>Saved sync commands</string>
         </property>
+   <property name="tabKeyNavigation">
+    <bool>false</bool>
+   </property>
        </widget>
       </item>
       <item>

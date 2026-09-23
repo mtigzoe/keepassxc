@@ -113,6 +113,9 @@
            <property name="accessibleName">
             <string>Stored browser keys</string>
            </property>
+   <property name="tabKeyNavigation">
+    <bool>false</bool>
+   </property>
            <property name="editTriggers">
             <set>QAbstractItemView::NoEditTriggers</set>
            </property>

@@ -49,6 +49,9 @@
         <property name="accessibleName">
          <string>Custom icons</string>
         </property>
+   <property name="tabKeyNavigation">
+    <bool>false</bool>
+   </property>
         <property name="editTriggers">
          <set>QAbstractItemView::NoEditTriggers</set>
         </property>
