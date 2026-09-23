@@ -167,6 +167,10 @@ void ImageAttachmentsWidget::openAttachment(attachments::Attachment attachment, 
 {
     m_attachment = std::move(attachment);
 
+    m_ui->imagesView->setAccessibleName(m_attachment.name.isEmpty()
+                                            ? tr("Attachment image")
+                                            : tr("Attachment image: %1").arg(m_attachment.name));
+
     if (mode == attachments::OpenMode::ReadWrite) {
         qWarning() << "Read-write mode is not supported for image attachments";
     }
