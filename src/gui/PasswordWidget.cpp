@@ -346,6 +346,7 @@ void PasswordWidget::updatePasswordStrength(const QString& password)
     if (password.isEmpty()) {
         m_ui->qualityProgressBar->setValue(0);
         m_ui->qualityProgressBar->setToolTip((tr("")));
+        m_ui->qualityProgressBar->setAccessibleDescription(tr("Password quality: Not available"));
         return;
     }
 
