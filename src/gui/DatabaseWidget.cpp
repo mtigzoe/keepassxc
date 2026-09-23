@@ -1130,6 +1130,11 @@ void DatabaseWidget::deleteGroup()
         return;
     }
 
+    // Keep a valid group selected after the current group is removed or moved.
+    // Without this, deleting the only child can leave the tree with no current
+    // index even though focus remains on the group view.
+    auto fallbackGroup = currentGroup->parentGroup();
+
     auto* recycleBin = m_db->metadata()->recycleBin();
     bool inRecycleBin = recycleBin && recycleBin->findGroupByUuid(currentGroup->uuid());
     bool isRecycleBin = recycleBin && (currentGroup == recycleBin);
@@ -1144,6 +1149,7 @@ void DatabaseWidget::deleteGroup()
 
         if (result == MessageBox::Delete) {
             delete currentGroup;
+            m_groupView->setCurrentGroup(fallbackGroup);
         }
     } else {
         auto result = MessageBox::question(this,
@@ -1155,6 +1161,7 @@ void DatabaseWidget::deleteGroup()
                                            MessageBox::Cancel);
         if (result == MessageBox::Move) {
             m_db->recycleGroup(currentGroup);
+            m_groupView->setCurrentGroup(fallbackGroup);
         }
     }
 }
