@@ -625,11 +625,11 @@ void DatabaseWidget::restoreSelectedEntries()
     }
 
     // Keep a valid selection in the recycle-bin view after restored entries are removed.
-    auto index = m_entryView->indexAbove(selected.first());
+    auto focusIndex = m_entryView->indexAbove(selected.first());
 
     // Resolve entries from the selection model
     QList<Entry*> selectedEntries;
-    for (auto& index : selected) {
+    for (const auto& index : selected) {
         selectedEntries.append(m_entryView->entryFromIndex(index));
     }
 
