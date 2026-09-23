@@ -1357,7 +1357,7 @@ void DatabaseWidget::loadDatabase(bool accepted)
         switchToMainView();
         processAutoOpen();
 
-        restoreGroupEntryFocus(m_groupBeforeLock, m_entryBeforeLock);
+        restoreGroupEntryFocus(m_groupBeforeLock, m_entryBeforeLock, m_groupViewHadFocusBeforeLock);
 
         // Only show expired entries if first unlock and option is enabled
         if (m_groupBeforeLock.isNull() && config()->get(Config::GUI_ShowExpiredEntriesOnDatabaseUnlock).toBool()) {
@@ -1530,7 +1530,7 @@ void DatabaseWidget::unlockDatabase(bool accepted)
     }
     replaceDatabase(db);
 
-    restoreGroupEntryFocus(m_groupBeforeLock, m_entryBeforeLock);
+    restoreGroupEntryFocus(m_groupBeforeLock, m_entryBeforeLock, m_groupViewHadFocusBeforeLock);
     m_groupBeforeLock = QUuid();
     m_entryBeforeLock = QUuid();
 
@@ -2254,6 +2254,8 @@ void DatabaseWidget::reloadDatabaseFile(bool triggeredBySave)
             merger.merge();
         }
 
+        const bool groupViewHadFocusBeforeReload = m_groupView && (m_groupView->hasFocus() || m_groupView->viewport()->hasFocus());
+
         QUuid groupBeforeReload = m_db->rootGroup()->uuid();
         if (m_groupView && m_groupView->currentGroup()) {
             groupBeforeReload = m_groupView->currentGroup()->uuid();
@@ -2266,7 +2268,7 @@ void DatabaseWidget::reloadDatabaseFile(bool triggeredBySave)
 
         replaceDatabase(db);
         processAutoOpen();
-        restoreGroupEntryFocus(groupBeforeReload, entryBeforeReload);
+        restoreGroupEntryFocus(groupBeforeReload, entryBeforeReload, groupViewHadFocusBeforeReload);
         m_blockAutoSave = false;
 
         emit updateSyncProgress(100, tr("Reload successful"));
@@ -2395,7 +2397,7 @@ QStringList DatabaseWidget::customEntryAttributes() const
 /*
  * Restores the focus on the group and entry provided
  */
-void DatabaseWidget::restoreGroupEntryFocus(const QUuid& groupUuid, const QUuid& entryUuid)
+void DatabaseWidget::restoreGroupEntryFocus(const QUuid& groupUuid, const QUuid& entryUuid, bool focusGroupView)
 {
     auto group = m_db->rootGroup()->findGroupByUuid(groupUuid);
     if (group) {
@@ -2403,6 +2405,12 @@ void DatabaseWidget::restoreGroupEntryFocus(const QUuid& groupUuid, const QUuid&
         auto entry = group->findEntryByUuid(entryUuid, false);
         if (entry) {
             m_entryView->setCurrentEntry(entry);
+        }
+
+        if (focusGroupView) {
+            m_groupView->setFocus(Qt::OtherFocusReason);
+        } else {
+            m_entryView->setFocus(Qt::OtherFocusReason);
         }
     }
 }
