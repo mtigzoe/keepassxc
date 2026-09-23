@@ -93,6 +93,11 @@ int EditWidget::pageIndex(const QWidget* widget) const
     return -1;
 }
 
+int EditWidget::currentPageIndex() const
+{
+    return m_ui->stackedWidget->currentIndex();
+}
+
 void EditWidget::setPageHidden(QWidget* widget, bool hidden)
 {
     int index = -1;
