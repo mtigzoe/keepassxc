@@ -33,6 +33,8 @@ GroupView::GroupView(Database* db, QWidget* parent)
 {
     QTreeView::setModel(m_model);
     setHeaderHidden(true);
+    // Tab moves between major controls; use arrow keys for tree navigation.
+    setTabKeyNavigation(false);
     setUniformRowHeights(true);
     setTextElideMode(Qt::ElideNone);
 

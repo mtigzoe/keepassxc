@@ -64,6 +64,9 @@ public:
 
 EntryView::EntryView(QWidget* parent)
     : QTreeView(parent)
+{
+    // Tab moves between major controls; use arrow keys for entry navigation.
+    setTabKeyNavigation(false);
     , m_model(new EntryModel(this))
     , m_sortModel(new SortFilterHideProxyModel(this))
     , m_lastIndex(-1)

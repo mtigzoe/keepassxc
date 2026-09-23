@@ -54,6 +54,8 @@ TagView::TagView(QWidget* parent)
     , m_model(new TagModel(this))
 {
     setModel(m_model);
+    // Tab moves between major controls; use arrow keys for list navigation.
+    setTabKeyNavigation(false);
     setAccessibleName(tr("Searches and Tags"));
     setFrameStyle(QFrame::NoFrame);
     setSelectionMode(QListView::ExtendedSelection);
