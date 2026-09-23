@@ -28,6 +28,9 @@
      <property name="accessibleName">
       <string>Browser integration report entries</string>
      </property>
+     <property name="accessibleDescription">
+      <string>Use the arrow keys to review browser integration report entries. Double-click a row to edit the entry; use the context menu for entry actions.</string>
+     </property>
      <property name="contextMenuPolicy">
       <enum>Qt::CustomContextMenu</enum>
      </property>
