@@ -613,7 +613,7 @@ void DatabaseOpenWidget::hardwareKeyResponse(bool found)
 
     if (!found) {
         toggleHardwareKeyComponent(false);
-        const message = YubiKey::instance()->connectedKeys() > 0
+        const auto message = YubiKey::instance()->connectedKeys() > 0
                             ? tr("Hardware keys found, but no slots are configured.")
                             : tr("No hardware keys found.");
         QAccessibleEvent alertEvent(m_ui->useHardwareKeyCheckBox, QAccessible::Alert);
