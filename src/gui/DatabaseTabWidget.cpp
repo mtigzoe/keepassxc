@@ -410,7 +410,11 @@ bool DatabaseTabWidget::closeDatabaseTab(DatabaseWidget* dbWidget)
         return false;
     }
 
-    if (dbWidget->isAncestorOf(QApplication::focusWidget())) {
+    const auto focusWidget = QApplication::focusWidget();
+    const bool focusIsInClosedDatabase = dbWidget->isAncestorOf(focusWidget);
+    const bool focusIsInTabBar = tabBar()->isAncestorOf(focusWidget);
+
+    if (focusIsInClosedDatabase) {
         if (count() > 1) {
             tabBar()->setFocus(Qt::OtherFocusReason);
         } else {
@@ -421,6 +425,14 @@ bool DatabaseTabWidget::closeDatabaseTab(DatabaseWidget* dbWidget)
     removeTab(tabIndex);
     dbWidget->deleteLater();
     toggleTabbar();
+
+    // If focus was in the closed database or its tab bar, make sure it lands
+    // on the remaining database content after the tab bar is hidden or removed.
+    if ((focusIsInClosedDatabase || focusIsInTabBar) && count() > 0) {
+        if (auto* currentWidget = currentDatabaseWidget()) {
+            currentWidget->setFocus(Qt::OtherFocusReason);
+        }
+    }
     emit databaseClosed(filePath);
     return true;
 }
