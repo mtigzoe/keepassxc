@@ -1879,7 +1879,7 @@ void EditEntryWidget::restoreHistoryEntry()
         // normally focuses the Main-page title field. Keep focus on the
         // visible History table instead of leaving keyboard and screen-reader
         // focus on a widget hidden behind another page.
-        if (pageIndex(m_historyWidget) == m_ui->stackedWidget->currentIndex()) {
+        if (pageIndex(m_historyWidget) == currentPageIndex()) {
             m_historyUi->historyView->setFocus();
         }
         setModified(true);
