@@ -75,6 +75,9 @@ DatabaseSettingsWidgetEncryption::DatabaseSettingsWidgetEncryption(QWidget* pare
 
     connect(m_ui->memorySpinBox, SIGNAL(valueChanged(int)), this, SLOT(memoryChanged(int)));
     connect(m_ui->parallelismSpinBox, SIGNAL(valueChanged(int)), this, SLOT(parallelismChanged(int)));
+    // Only benchmarkTransformRounds() fired the accessible value-change event; a user directly
+    // pressing Up/Down on transformRoundsSpinBox never did, unlike the other two spin boxes.
+    connect(m_ui->transformRoundsSpinBox, SIGNAL(valueChanged(int)), this, SLOT(transformRoundsChanged()));
 
     m_ui->compatibilitySelection->addItem(tr("KDBX 4 (recommended)"), KeePass2::KDF_ARGON2D);
     m_ui->compatibilitySelection->addItem(tr("KDBX 3"), KeePass2::KDF_AES_KDBX3);
@@ -457,9 +460,9 @@ void DatabaseSettingsWidgetEncryption::benchmarkTransformRounds(int millisecs)
     // Determine the number of rounds required to meet 1 second delay
     int rounds = AsyncTask::runAndWaitForFuture([&kdf, millisecs]() { return kdf->benchmark(millisecs); });
 
+    // setValue() triggers transformRoundsChanged() (if the value actually changed), which
+    // announces the new value -- no separate accessibility event needed here.
     m_ui->transformRoundsSpinBox->setValue(rounds);
-    QAccessibleValueChangeEvent event(m_ui->transformRoundsSpinBox, rounds);
-    QAccessible::updateAccessibility(&event);
     m_ui->transformBenchmarkButton->setEnabled(true);
     m_ui->transformRoundsSpinBox->setEnabled(true);
     m_ui->transformRoundsSpinBox->setFocus();
@@ -474,8 +477,17 @@ void DatabaseSettingsWidgetEncryption::memoryChanged(int value)
 {
     m_ui->memorySpinBox->setSuffix(tr(" MiB", "Abbreviation for Mebibytes (KDF settings)", value));
 
+    // Pass the numeric value so Windows UI Automation raises the RangeValue Value property.
+    // A textual value raises UIA_ValueValuePropertyId instead, which does not represent
+    // the spin box's numeric RangeValuePattern value.
     QAccessibleValueChangeEvent event(m_ui->memorySpinBox, value);
     QAccessible::updateAccessibility(&event);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    // Request immediate feedback while focus remains on the spin box.
+    QAccessibleAnnouncementEvent announcementEvent(m_ui->memorySpinBox, QString::number(value));
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
 }
 
 /**
@@ -485,8 +497,37 @@ void DatabaseSettingsWidgetEncryption::parallelismChanged(int value)
 {
     m_ui->parallelismSpinBox->setSuffix(tr(" thread(s)", "Threads for parallel execution (KDF settings)", value));
 
+    // Pass the numeric value so Windows UI Automation raises the RangeValue Value property.
+    // A textual value raises UIA_ValueValuePropertyId instead, which does not represent
+    // the spin box's numeric RangeValuePattern value.
     QAccessibleValueChangeEvent event(m_ui->parallelismSpinBox, value);
     QAccessible::updateAccessibility(&event);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    // Request immediate feedback while focus remains on the spin box.
+    QAccessibleAnnouncementEvent announcementEvent(m_ui->parallelismSpinBox, QString::number(value));
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
+}
+
+/**
+ * Announce transform rounds spin box value change (e.g. manual Up/Down), matching
+ * the announcement benchmarkTransformRounds() already sends after a benchmark run.
+ */
+void DatabaseSettingsWidgetEncryption::transformRoundsChanged()
+{
+    const auto value = m_ui->transformRoundsSpinBox->value();
+
+    // Pass the numeric value so Windows UI Automation raises the RangeValue Value property.
+    QAccessibleValueChangeEvent event(m_ui->transformRoundsSpinBox, value);
+    QAccessible::updateAccessibility(&event);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    // JAWS does not announce the RangeValue change while focus remains on the spin box.
+    // An explicit announcement requests immediate feedback without moving focus.
+    QAccessibleAnnouncementEvent announcementEvent(m_ui->transformRoundsSpinBox, QString::number(value));
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
 }
 
 bool DatabaseSettingsWidgetEncryption::isAdvancedMode()

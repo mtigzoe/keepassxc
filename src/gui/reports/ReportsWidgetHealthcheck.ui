@@ -87,6 +87,7 @@
  </widget>
  <tabstops>
   <tabstop>healthcheckTableView</tabstop>
+  <tabstop>showExpired</tabstop>
   <tabstop>showExcluded</tabstop>
  </tabstops>
  <resources/>

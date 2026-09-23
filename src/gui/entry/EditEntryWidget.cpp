@@ -1777,13 +1777,17 @@ void EditEntryWidget::updateAutoTypeEnabled()
                                                  && m_autoTypeUi->customWindowSequenceButton->isChecked());
 
     // Disabling an Auto-Type control can leave keyboard and screen-reader
-    // focus on a widget that is no longer usable. Move focus to the
-    // Auto-Type enable control before that happens.
+    // focus on a widget that is no longer usable. Move focus to an enabled
+    // Auto-Type control before that happens. The association view can also
+    // be disabled when Auto-Type is off, so use the entry title as a final
+    // fallback when editing a history entry.
     if (focusedWidget && !focusedWidget->isEnabled()) {
         if (m_autoTypeUi->enableButton->isEnabled()) {
             m_autoTypeUi->enableButton->setFocus();
-        } else {
+        } else if (m_autoTypeUi->assocView->isEnabled()) {
             m_autoTypeUi->assocView->setFocus();
+        } else {
+            m_mainUi->titleEdit->setFocus();
         }
     }
 }
@@ -1871,6 +1875,13 @@ void EditEntryWidget::restoreHistoryEntry()
     auto entry = m_historyModel->entryFromIndex(index);
     if (entry) {
         setForms(entry, true);
+        // Restoring from the History page reloads the form and setForms()
+        // normally focuses the Main-page title field. Keep focus on the
+        // visible History table instead of leaving keyboard and screen-reader
+        // focus on a widget hidden behind another page.
+        if (pageIndex(m_historyWidget) == currentPageIndex()) {
+            m_historyUi->historyView->setFocus();
+        }
         setModified(true);
     }
 }

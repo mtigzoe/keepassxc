@@ -599,3 +599,4 @@ void KMessageWidget::setIcon(const QIcon &icon)
 }
 
 #include "moc_KMessageWidget.cpp"
+

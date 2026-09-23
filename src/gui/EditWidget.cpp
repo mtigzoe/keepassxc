@@ -93,6 +93,11 @@ int EditWidget::pageIndex(const QWidget* widget) const
     return -1;
 }
 
+int EditWidget::currentPageIndex() const
+{
+    return m_ui->stackedWidget->currentIndex();
+}
+
 void EditWidget::setPageHidden(QWidget* widget, bool hidden)
 {
     int index = -1;
@@ -124,9 +129,17 @@ void EditWidget::setPageHidden(QWidget* widget, bool hidden)
     m_ui->categoryList->setCategoryHidden(index, hidden);
 
     if (changed && index == m_ui->stackedWidget->currentIndex()) {
-        int newIndex = m_ui->stackedWidget->currentIndex() - 1;
-        if (newIndex < 0) {
-            newIndex = m_ui->stackedWidget->count() - 1;
+        // Select the nearest visible page. A hidden page immediately before
+        // the current page must not become the new category selection.
+        const int currentIndex = m_ui->stackedWidget->currentIndex();
+        int newIndex = currentIndex;
+        for (int offset = 1; offset <= m_ui->stackedWidget->count(); ++offset) {
+            const int candidate = (currentIndex - offset + m_ui->stackedWidget->count())
+                % m_ui->stackedWidget->count();
+            if (!m_ui->categoryList->isCategoryHidden(candidate)) {
+                newIndex = candidate;
+                break;
+            }
         }
         m_ui->categoryList->setCurrentCategory(newIndex);
     }
