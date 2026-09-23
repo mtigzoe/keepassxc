@@ -561,6 +561,36 @@ void KMessageWidget::animatedShow()
 
 void KMessageWidget::animatedHide()
 {
+    // Hiding the message can be triggered by its close button or by an
+    // asynchronous status update. If a message action currently owns focus,
+    // move it to the next focusable widget outside this message before the
+    // widget disappears, otherwise keyboard/screen-reader focus can remain on
+    // a hidden control.
+    const auto focusedWidget = QApplication::focusWidget();
+    if (focusedWidget && (focusedWidget == this || isAncestorOf(focusedWidget))) {
+        QWidget* candidate = focusedWidget->nextInFocusChain();
+        while (candidate && candidate != this) {
+            if (!isAncestorOf(candidate) && candidate->isVisibleTo(window()) && candidate->isEnabled()
+                && candidate->focusPolicy() != Qt::NoFocus) {
+                candidate->setFocus(Qt::OtherFocusReason);
+                break;
+            }
+            candidate = candidate->nextInFocusChain();
+        }
+
+        if (QApplication::focusWidget() == focusedWidget) {
+            candidate = focusedWidget->previousInFocusChain();
+            while (candidate && candidate != this) {
+                if (!isAncestorOf(candidate) && candidate->isVisibleTo(window()) && candidate->isEnabled()
+                    && candidate->focusPolicy() != Qt::NoFocus) {
+                    candidate->setFocus(Qt::OtherFocusReason);
+                    break;
+                }
+                candidate = candidate->previousInFocusChain();
+            }
+        }
+    }
+
     if (!style()->styleHint(QStyle::SH_Widget_Animate, nullptr, this)) {
         hide();
         emit hideAnimationFinished();
