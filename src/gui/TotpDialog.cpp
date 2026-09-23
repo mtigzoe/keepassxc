@@ -49,7 +49,11 @@ TotpDialog::TotpDialog(QWidget* parent, Entry* entry)
 
     new QShortcut(QKeySequence(QKeySequence::Copy), this, SLOT(copyToClipboard()));
 
-    m_ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Copy"));
+    auto* closeButton = m_ui->buttonBox->button(QDialogButtonBox::Cancel);
+    auto* copyButton = m_ui->buttonBox->button(QDialogButtonBox::Ok);
+    copyButton->setText(tr("Copy"));
+    setTabOrder(m_ui->totpLabel, closeButton);
+    setTabOrder(closeButton, copyButton);
     m_ui->totpLabel->setFocusPolicy(Qt::StrongFocus);
     m_ui->totpLabel->setFocus(Qt::OtherFocusReason);
 
@@ -109,6 +113,8 @@ void TotpDialog::updateTotp()
 
     if (isValid && totpCode != m_lastAnnouncedTotpCode) {
         m_lastAnnouncedTotpCode = totpCode;
+        QAccessibleValueChangeEvent valueEvent(m_ui->totpLabel, totpCode);
+        QAccessible::updateAccessibility(&valueEvent);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
         QAccessibleAnnouncementEvent announcementEvent(m_ui->totpLabel, tr("TOTP code %1").arg(totpCode));
         QAccessible::updateAccessibility(&announcementEvent);
