@@ -376,3 +376,50 @@ void PasswordWidget::updatePasswordStrength(const QString& password)
     case PasswordHealth::Quality::Bad:
     case PasswordHealth::Quality::Poor:
         m_ui->qualityProgressBar->setStyleSheet(
+            style.arg(qualityPalette.color(StateColorPalette::HealthCritical).name()));
+
+        m_ui->qualityProgressBar->setToolTip(tr("Quality: %1").arg(tr("Poor", "Password quality")));
+
+        break;
+
+    case PasswordHealth::Quality::Weak:
+        m_ui->qualityProgressBar->setStyleSheet(style.arg(qualityPalette.color(StateColorPalette::HealthBad).name()));
+
+        m_ui->qualityProgressBar->setToolTip(tr("Quality: %1").arg(tr("Weak", "Password quality")));
+
+        break;
+    case PasswordHealth::Quality::Good:
+        m_ui->qualityProgressBar->setStyleSheet(style.arg(qualityPalette.color(StateColorPalette::HealthOk).name()));
+
+        m_ui->qualityProgressBar->setToolTip(tr("Quality: %1").arg(tr("Good", "Password quality")));
+
+        break;
+    case PasswordHealth::Quality::Excellent:
+
+        m_ui->qualityProgressBar->setStyleSheet(
+            style.arg(qualityPalette.color(StateColorPalette::HealthExcellent).name()));
+
+        m_ui->qualityProgressBar->setToolTip(tr("Quality: %1").arg(tr("Excellent", "Password quality")));
+
+        break;
+    }
+
+    QString qualityText;
+    switch (health.quality()) {
+    case PasswordHealth::Quality::Bad:
+    case PasswordHealth::Quality::Poor:
+        qualityText = tr("Poor", "Password quality");
+        break;
+    case PasswordHealth::Quality::Weak:
+        qualityText = tr("Weak", "Password quality");
+        break;
+    case PasswordHealth::Quality::Good:
+        qualityText = tr("Good", "Password quality");
+        break;
+    case PasswordHealth::Quality::Excellent:
+        qualityText = tr("Excellent", "Password quality");
+        break;
+    }
+    m_ui->qualityProgressBar->setAccessibleDescription(
+        tr("Password quality: %1.").arg(qualityText));
+}
