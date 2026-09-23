@@ -1661,15 +1661,15 @@ void EditEntryWidget::displayAttribute(QModelIndex index, bool showProtected)
         QString key = m_attributesModel->keyByIndex(index);
         if (showProtected) {
             // A protected attribute disables the editor. If it currently has
-            // focus, move focus to the Reveal button before disabling it so
-            // keyboard and screen-reader focus remains usable.
+            // focus, move focus to the enabled Reveal button before disabling
+            // the editor so keyboard and screen-reader focus remains usable.
             const bool attributesEditHasFocus = m_advancedUi->attributesEdit->hasFocus();
             m_advancedUi->attributesEdit->setPlainText(tr("[PROTECTED] Press Reveal to view or edit"));
-            m_advancedUi->attributesEdit->setEnabled(false);
             m_advancedUi->revealAttributeButton->setEnabled(true);
             if (attributesEditHasFocus) {
-                m_advancedUi->revealAttributeButton->setFocus();
+                m_advancedUi->revealAttributeButton->setFocus(Qt::OtherFocusReason);
             }
+            m_advancedUi->attributesEdit->setEnabled(false);
             m_advancedUi->protectAttributeButton->setChecked(true);
         } else {
             m_advancedUi->attributesEdit->setPlainText(m_entryAttributes->value(key));
