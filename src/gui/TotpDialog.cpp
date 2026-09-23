@@ -24,6 +24,7 @@
 #include "gui/Clipboard.h"
 #include "gui/MainWindow.h"
 
+#include <QAccessible>
 #include <QPushButton>
 #include <QShortcut>
 
@@ -103,6 +104,14 @@ void TotpDialog::updateTotp()
     m_ui->progressBar->setVisible(isValid);
     m_ui->timerLabel->setVisible(isValid);
     m_ui->totpLabel->setText(totpCode);
+
+    if (isValid && totpCode != m_lastAnnouncedTotpCode) {
+        m_lastAnnouncedTotpCode = totpCode;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+        QAccessibleAnnouncementEvent announcementEvent(m_ui->totpLabel, tr("TOTP code %1").arg(totpCode));
+        QAccessible::updateAccessibility(&announcementEvent);
+#endif
+    }
 }
 
 void TotpDialog::resetCounter()
