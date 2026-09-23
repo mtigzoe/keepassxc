@@ -20,6 +20,7 @@
 #include "ui_PasswordGeneratorWidget.h"
 
 #include <QAccessible>
+#include <QApplication>
 #include <QCloseEvent>
 #include <QDir>
 #include <QShortcut>
@@ -500,6 +501,17 @@ void PasswordGeneratorWidget::setAdvancedMode(bool advanced)
         m_ui->checkBoxSpecialChars->setToolTip(tr("Special Characters"));
         m_ui->checkBoxSpecialChars->setAccessibleName(tr("Special characters"));
         m_ui->checkBoxSpecialChars->setChecked(config()->get(Config::PasswordGenerator_SpecialChars).toBool());
+    }
+
+    // Switching back to basic mode hides the advanced options. If keyboard or
+    // screen-reader focus is inside that container, move it to the still-visible
+    // mode toggle before hiding the container.
+    if (!advanced) {
+        auto* focusedWidget = QApplication::focusWidget();
+        if (focusedWidget
+            && (focusedWidget == m_ui->advancedContainer || m_ui->advancedContainer->isAncestorOf(focusedWidget))) {
+            m_ui->buttonAdvancedMode->setFocus(Qt::OtherFocusReason);
+        }
     }
 
     m_ui->advancedContainer->setVisible(advanced);
