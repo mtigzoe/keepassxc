@@ -462,12 +462,17 @@ void PasswordGeneratorWidget::setAdvancedMode(bool advanced)
 {
     saveSettings();
 
+    m_ui->buttonAdvancedMode->setAccessibleDescription(
+        advanced ? tr("Hide advanced password generation options") : tr("Show advanced password generation options"));
+
     if (advanced) {
+        m_ui->buttonAdvancedMode->setToolTip(tr("Switch to basic mode"));
         m_ui->checkBoxSpecialChars->setText("# $ % && @ ^ ` ~");
         m_ui->checkBoxSpecialChars->setToolTip(tr("Logograms"));
         m_ui->checkBoxSpecialChars->setAccessibleName(tr("Logograms"));
         m_ui->checkBoxSpecialChars->setChecked(config()->get(Config::PasswordGenerator_Logograms).toBool());
     } else {
+        m_ui->buttonAdvancedMode->setToolTip(tr("Switch to advanced mode"));
         m_ui->checkBoxSpecialChars->setText("/ * + && …");
         m_ui->checkBoxSpecialChars->setToolTip(tr("Special Characters"));
         m_ui->checkBoxSpecialChars->setAccessibleName(tr("Special characters"));
