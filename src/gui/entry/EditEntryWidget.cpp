@@ -820,6 +820,16 @@ void EditEntryWidget::updateSSHAgentKeyInfo()
     const bool copyHasFocus = m_sshAgentUi->copyToClipboardButton->hasFocus();
     const bool decryptHasFocus = m_sshAgentUi->decryptButton->hasFocus();
 
+    // These controls are reset below. Redirect focus before disabling them
+    // so keyboard and screen-reader users remain on an interactive control.
+    if (addHasFocus || removeHasFocus || copyHasFocus || decryptHasFocus) {
+        if (m_sshAgentUi->attachmentRadioButton->isChecked()) {
+            m_sshAgentUi->attachmentComboBox->setFocus(Qt::OtherFocusReason);
+        } else {
+            m_sshAgentUi->externalFileEdit->setFocus(Qt::OtherFocusReason);
+        }
+    }
+
     m_sshAgentUi->addToAgentButton->setEnabled(false);
     m_sshAgentUi->removeFromAgentButton->setEnabled(false);
     m_sshAgentUi->copyToClipboardButton->setEnabled(false);
@@ -827,17 +837,6 @@ void EditEntryWidget::updateSSHAgentKeyInfo()
     m_sshAgentUi->commentTextLabel->setText(tr("n/a"));
     m_sshAgentUi->decryptButton->setEnabled(false);
     m_sshAgentUi->publicKeyEdit->document()->setPlainText("");
-
-    // Rebuilding SSH key information can disable the control that currently
-    // has keyboard or screen-reader focus. Return focus to the key source
-    // control before leaving focus on a disabled button.
-    if (addHasFocus || removeHasFocus || copyHasFocus || decryptHasFocus) {
-        if (m_sshAgentUi->attachmentRadioButton->isChecked()) {
-            m_sshAgentUi->attachmentComboBox->setFocus();
-        } else {
-            m_sshAgentUi->externalFileEdit->setFocus();
-        }
-    }
 
     OpenSSHKey key;
 
