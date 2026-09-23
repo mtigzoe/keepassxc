@@ -835,10 +835,24 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>groupCombo</tabstop>
+  <tabstop>titleCombo</tabstop>
+  <tabstop>usernameCombo</tabstop>
+  <tabstop>passwordCombo</tabstop>
+  <tabstop>urlCombo</tabstop>
+  <tabstop>tagsCombo</tabstop>
+  <tabstop>notesCombo</tabstop>
+  <tabstop>totpCombo</tabstop>
+  <tabstop>iconCombo</tabstop>
+  <tabstop>lastModifiedCombo</tabstop>
+  <tabstop>createdCombo</tabstop>
   <tabstop>comboBoxCodec</tabstop>
   <tabstop>comboBoxTextQualifier</tabstop>
   <tabstop>comboBoxFieldSeparator</tabstop>
   <tabstop>comboBoxComment</tabstop>
+  <tabstop>spinBoxSkip</tabstop>
+  <tabstop>checkBoxBackslash</tabstop>
+  <tabstop>checkBoxFieldNames</tabstop>
   <tabstop>tableViewFields</tabstop>
  </tabstops>
  <resources/>
