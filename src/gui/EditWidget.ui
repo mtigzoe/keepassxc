@@ -74,7 +74,7 @@
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="focusPolicy">
-        <enum>Qt::TabFocus</enum>
+        <enum>Qt::NoFocus</enum>
        </property>
        <property name="currentIndex">
         <number>-1</number>
@@ -118,7 +118,6 @@
  </customwidgets>
  <tabstops>
   <tabstop>categoryList</tabstop>
-  <tabstop>stackedWidget</tabstop>
   <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
