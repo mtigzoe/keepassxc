@@ -32,6 +32,9 @@
    </item>
    <item>
     <widget class="QListView" name="defaultIconsView">
+     <property name="accessibleName">
+      <string>Default icons</string>
+     </property>
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>
@@ -80,6 +83,9 @@
    </item>
    <item>
     <widget class="QListView" name="customIconsView">
+     <property name="accessibleName">
+      <string>Custom icons</string>
+     </property>
      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>
@@ -127,6 +133,9 @@
      </item>
      <item>
       <widget class="QLineEdit" name="faviconURL">
+       <property name="accessibleName">
+        <string>Favicon URL</string>
+       </property>
        <property name="minimumSize">
         <size>
          <width>200</width>
