@@ -134,6 +134,8 @@ SearchWidget::SearchWidget(QWidget* parent)
         toolButton->setFocusPolicy(Qt::TabFocus);
     }
 
+    m_clearButton = clearButton;
+
     // Make the action buttons follow the search field in a deterministic order.
     // Qt otherwise derives tab order from implicit widget creation order.
     if (searchButton) {

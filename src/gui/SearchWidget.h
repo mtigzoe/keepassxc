@@ -89,7 +89,7 @@ private:
     QAction* m_actionLimitGroup;
     QAction* m_actionWaitForEnter;
     QMenu* m_searchMenu;
-    QToolButton* m_clearButton;
+    QToolButton* m_clearButton = nullptr;
 };
 
 #endif // SEARCHWIDGET_H
