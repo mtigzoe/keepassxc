@@ -28,6 +28,9 @@
      <property name="accessibleName">
       <string>Entry history selection</string>
      </property>
+     <property name="tabKeyNavigation">
+      <bool>false</bool>
+     </property>
      <property name="alternatingRowColors">
       <bool>true</bool>
      </property>

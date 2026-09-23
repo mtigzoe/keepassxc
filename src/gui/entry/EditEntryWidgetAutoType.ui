@@ -132,6 +132,9 @@
           <property name="accessibleName">
            <string>Existing window associations</string>
           </property>
+          <property name="tabKeyNavigation">
+           <bool>false</bool>
+          </property>
           <property name="rootIsDecorated">
            <bool>false</bool>
           </property>
