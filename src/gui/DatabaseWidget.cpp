@@ -19,6 +19,7 @@
 #include "DatabaseWidget.h"
 
 #include <QApplication>
+#include <QAccessible>
 #include <QBoxLayout>
 #include <QCheckBox>
 #include <QDesktopServices>
@@ -169,6 +170,7 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
 
     // Add a notification for when we are searching
     m_searchingLabel->setObjectName("SearchBanner");
+    m_searchingLabel->setAccessibleName(tr("Search status"));
     m_searchingLabel->setText(tr("Searching…"));
     m_searchingLabel->setAlignment(Qt::AlignCenter);
     m_searchingLabel->setVisible(false);
@@ -1789,6 +1791,10 @@ void DatabaseWidget::search(const QString& searchtext)
     m_lastSearchText = searchtext;
 
     m_searchingLabel->setVisible(true);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QAccessibleAnnouncementEvent announcementEvent(m_searchingLabel, m_searchingLabel->text());
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
     m_shareLabel->setVisible(false);
 
     emit searchModeActivated();
