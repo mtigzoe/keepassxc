@@ -284,6 +284,13 @@ void ReportsWidgetHibp::startValidation()
     // Store the number of passwords we need to check for the progress bar
     m_ui->progressBar->show();
     m_ui->progressBar->setMaximum(m_downloader.passwordsToValidate());
+
+    // The validation button is normally focused when activated from the
+    // keyboard. Move focus before disabling it so keyboard and screen-reader
+    // focus is not left on a disabled control while validation runs.
+    if (QApplication::focusWidget() == m_ui->validationButton) {
+        m_ui->hibpTableView->setFocus(Qt::OtherFocusReason);
+    }
     m_ui->validationButton->setEnabled(false);
 
     m_downloader.validate();
