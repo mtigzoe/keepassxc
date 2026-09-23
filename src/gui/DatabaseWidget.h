@@ -293,7 +293,7 @@ private slots:
     void emitCurrentModeChanged();
     // Database autoreload slots
     void reloadDatabaseFile(bool triggeredBySave);
-    void restoreGroupEntryFocus(const QUuid& groupUuid, const QUuid& EntryUuid);
+    void restoreGroupEntryFocus(const QUuid& groupUuid, const QUuid& entryUuid, bool focusGroupView);
     void onConfigChanged(Config::ConfigKey key);
 
 private:
