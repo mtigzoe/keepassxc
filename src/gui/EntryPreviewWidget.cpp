@@ -196,6 +196,16 @@ void EntryPreviewWidget::setGroup(Group* selectedGroup)
     m_currentGroup = selectedGroup;
 
     if (!m_currentGroup) {
+        // The group preview can contain keyboard focus. Restore focus before
+        // hiding it so keyboard and screen-reader focus is not left on a
+        // hidden control.
+        if (auto* focusedWidget = QApplication::focusWidget();
+            focusedWidget && (focusedWidget == this || isAncestorOf(focusedWidget))) {
+            if (auto* parent = parentWidget(); parent && parent->isVisibleTo(window()) && parent->isEnabled()
+                && parent->focusPolicy() != Qt::NoFocus) {
+                parent->setFocus(Qt::OtherFocusReason);
+            }
+        }
         hide();
         return;
     }
