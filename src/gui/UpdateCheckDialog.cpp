@@ -64,6 +64,10 @@ void UpdateCheckDialog::showUpdateCheckResponse(bool hasUpdate, const QString& v
     // Announce the final text after it has been updated so screen readers receive the result.
     QAccessibleEvent statusChanged(m_ui->statusLabel, QAccessible::Alert);
     QAccessible::updateAccessibility(&statusChanged);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QAccessibleAnnouncementEvent announcementEvent(m_ui->statusLabel, m_ui->statusLabel->text());
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
 }
 
 UpdateCheckDialog::~UpdateCheckDialog()
