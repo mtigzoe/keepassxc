@@ -148,6 +148,9 @@
          <property name="accessibleName">
           <string>Online password exposure report entries</string>
          </property>
+         <property name="accessibleDescription">
+          <string>Use the arrow keys to review password exposure results. Select a row to access entry actions from the context menu.</string>
+         </property>
          <property name="contextMenuPolicy">
           <enum>Qt::CustomContextMenu</enum>
          </property>
