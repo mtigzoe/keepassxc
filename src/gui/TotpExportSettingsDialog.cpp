@@ -28,6 +28,7 @@
 #include <QBuffer>
 #include <QDialogButtonBox>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QShortcut>
@@ -41,6 +42,7 @@ TotpExportSettingsDialog::TotpExportSettingsDialog(DatabaseWidget* parent, Entry
     , m_totpSvgWidget(new SquareSvgWidget(m_totpSvgContainerWidget))
     , m_countDown(new QLabel())
     , m_warningLabel(new QLabel())
+    , m_accessibilityText(new QLineEdit())
     , m_buttonBox(new QDialogButtonBox(QDialogButtonBox::Close | QDialogButtonBox::Ok))
 {
     setObjectName("entryQrCodeWidget");
@@ -51,6 +53,11 @@ TotpExportSettingsDialog::TotpExportSettingsDialog(DatabaseWidget* parent, Entry
     m_verticalLayout->addWidget(m_warningLabel);
     m_verticalLayout->addItem(new QSpacerItem(0, 0));
     m_verticalLayout->addWidget(m_totpSvgContainerWidget);
+    m_accessibilityText->setReadOnly(true);
+    m_accessibilityText->setFrame(false);
+    m_accessibilityText->setAccessibleName(tr("TOTP QR code instructions"));
+    m_accessibilityText->setText(tr("TOTP QR code. Scan this QR code with an authenticator app to configure TOTP."));
+    m_verticalLayout->addWidget(m_accessibilityText);
     m_verticalLayout->addWidget(m_countDown);
     m_verticalLayout->addWidget(m_buttonBox);
 
@@ -68,6 +75,9 @@ TotpExportSettingsDialog::TotpExportSettingsDialog(DatabaseWidget* parent, Entry
     m_buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Copy"));
     m_buttonBox->setFocus();
     m_countDown->setAlignment(Qt::AlignCenter);
+    setTabOrder(m_totpSvgWidget, m_accessibilityText);
+    setTabOrder(m_accessibilityText, m_buttonBox->button(QDialogButtonBox::Cancel));
+    setTabOrder(m_buttonBox->button(QDialogButtonBox::Cancel), m_buttonBox->button(QDialogButtonBox::Ok));
 
     m_secTillClose = 45;
     autoClose();
