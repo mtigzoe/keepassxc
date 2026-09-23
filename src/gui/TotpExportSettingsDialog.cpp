@@ -46,6 +46,7 @@ TotpExportSettingsDialog::TotpExportSettingsDialog(DatabaseWidget* parent, Entry
     setObjectName("entryQrCodeWidget");
     m_totpSvgContainerWidget->addWidget(m_totpSvgWidget);
     m_totpSvgWidget->setAccessibleName(tr("TOTP QR code"));
+    m_totpSvgWidget->setFocusPolicy(Qt::StrongFocus);
 
     m_verticalLayout->addWidget(m_warningLabel);
     m_verticalLayout->addItem(new QSpacerItem(0, 0));
@@ -91,6 +92,7 @@ TotpExportSettingsDialog::TotpExportSettingsDialog(DatabaseWidget* parent, Entry
         m_totpSvgWidget->load(buffer.data());
         m_totpSvgWidget->setAccessibleDescription(
             tr("Scan this QR code with an authenticator app to configure TOTP."));
+        m_totpSvgWidget->setFocus(Qt::OtherFocusReason);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
         QAccessibleAnnouncementEvent announcementEvent(m_totpSvgWidget, tr("TOTP QR code"));
         QAccessible::updateAccessibility(&announcementEvent);
