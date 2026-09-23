@@ -72,7 +72,7 @@ private slots:
     void openEntryUrl();
 
 private:
-    void setTabEnabled(QTabWidget* tabWidget, QWidget* widget, bool enabled);
+    void setTabEnabled(QTabWidget* tabWidget, QWidget* widget, bool enabled);\n    void setPreviewVisible(bool visible);
 
     static QString hierarchy(const Group* group, const QString& title);
 

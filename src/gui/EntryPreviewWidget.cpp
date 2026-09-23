@@ -92,7 +92,7 @@ EntryPreviewWidget::EntryPreviewWidget(QWidget* parent)
 
     connect(config(), &Config::changed, this, [this](Config::ConfigKey key) {
         if (key == Config::GUI_HidePreviewPanel) {
-            setVisible(!config()->get(Config::GUI_HidePreviewPanel).toBool());
+            setPreviewVisible(!config()->get(Config::GUI_HidePreviewPanel).toBool());
         } else if (key == Config::Security_HideTotpPreviewPanel) {
             m_ui->entryTotpButton->setChecked(!config()->get(Config::Security_HideTotpPreviewPanel).toBool());
         }
@@ -664,6 +664,21 @@ void EntryPreviewWidget::openEntryUrl()
     if (m_currentEntry) {
         emit entryUrlActivated(m_currentEntry);
     }
+}
+
+void EntryPreviewWidget::setPreviewVisible(bool visible)
+{
+    if (!visible) {
+        if (auto* focusedWidget = QApplication::focusWidget();
+            focusedWidget && (focusedWidget == this || isAncestorOf(focusedWidget))) {
+            if (auto* parent = parentWidget(); parent && parent->isVisibleTo(window()) && parent->isEnabled()
+                && parent->focusPolicy() != Qt::NoFocus) {
+                parent->setFocus(Qt::OtherFocusReason);
+            }
+        }
+    }
+
+    setVisible(visible);
 }
 
 void EntryPreviewWidget::setTabEnabled(QTabWidget* tabWidget, QWidget* widget, bool enabled)
