@@ -1530,11 +1530,11 @@ void DatabaseWidget::unlockDatabase(bool accepted)
     }
     replaceDatabase(db);
 
+    switchToMainView();
     restoreGroupEntryFocus(m_groupBeforeLock, m_entryBeforeLock, m_groupViewHadFocusBeforeLock);
     m_groupBeforeLock = QUuid();
     m_entryBeforeLock = QUuid();
-
-    switchToMainView();
+    m_groupViewHadFocusBeforeLock = false;
     processAutoOpen();
     emit databaseUnlocked();
 
