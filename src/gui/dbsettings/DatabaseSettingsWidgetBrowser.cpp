@@ -19,6 +19,7 @@
 #include "DatabaseSettingsWidgetBrowser.h"
 #include "ui_DatabaseSettingsWidgetBrowser.h"
 
+#include <QApplication>
 #include <QProgressDialog>
 
 #include "browser/BrowserService.h"
@@ -146,6 +147,14 @@ void DatabaseSettingsWidgetBrowser::updateModel()
 void DatabaseSettingsWidgetBrowser::settingsWarning()
 {
     if (!browserSettings()->isEnabled()) {
+        if (auto* focusedWidget = QApplication::focusWidget();
+            focusedWidget
+            && (focusedWidget == m_ui->removeSharedEncryptionKeys
+                || focusedWidget == m_ui->removeStoredPermissions
+                || focusedWidget == m_ui->customDataTable)) {
+            m_ui->refreshDatabaseID->setFocus(Qt::OtherFocusReason);
+        }
+
         m_ui->removeSharedEncryptionKeys->setEnabled(false);
         m_ui->removeStoredPermissions->setEnabled(false);
         m_ui->customDataTable->setEnabled(false);
