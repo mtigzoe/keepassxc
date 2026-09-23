@@ -502,7 +502,19 @@ void KMessageWidget::setCloseButtonVisible(bool show)
         if (!d->buttons.isEmpty()) {
             d->buttons.first()->setFocus(Qt::OtherFocusReason);
         } else {
-            clearFocus();
+            // Do not leave keyboard/screen-reader focus on a control that is
+            // about to disappear. Find the next focusable widget outside this
+            // message widget before hiding the close button.
+            QWidget* candidate = d->closeButton->nextInFocusChain();
+            const QWidget* const boundary = this;
+            while (candidate && candidate != boundary) {
+                if (candidate->isVisibleTo(window()) && candidate->isEnabled()
+                    && candidate->focusPolicy() != Qt::NoFocus && !candidate->isAncestorOf(this)) {
+                    candidate->setFocus(Qt::OtherFocusReason);
+                    break;
+                }
+                candidate = candidate->nextInFocusChain();
+            }
         }
     }
 
