@@ -624,6 +624,9 @@ void DatabaseWidget::restoreSelectedEntries()
         return;
     }
 
+    // Keep a valid selection in the recycle-bin view after restored entries are removed.
+    auto index = m_entryView->indexAbove(selected.first());
+
     // Resolve entries from the selection model
     QList<Entry*> selectedEntries;
     for (auto& index : selected) {
@@ -634,6 +637,12 @@ void DatabaseWidget::restoreSelectedEntries()
         if (entry->previousParentGroup()) {
             entry->setGroup(entry->previousParentGroup());
         }
+    }
+
+    if (index.isValid()) {
+        m_entryView->setCurrentIndex(index);
+    } else {
+        m_entryView->setFirstEntryActive();
     }
 }
 
