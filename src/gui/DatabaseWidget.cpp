@@ -2816,6 +2816,10 @@ void DatabaseWidget::emptyRecycleBin()
 
     if (result == MessageBox::Empty) {
         m_db->emptyRecycleBin();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+        QAccessibleAnnouncementEvent announcementEvent(m_entryView, tr("Recycle Bin emptied."));
+        QAccessible::updateAccessibility(&announcementEvent);
+#endif
     }
 }
 
