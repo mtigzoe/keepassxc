@@ -123,6 +123,12 @@ bool EntryPreviewWidget::eventFilter(QObject* object, QEvent* event)
 
 void EntryPreviewWidget::clear()
 {
+    if (auto* focusedWidget = QApplication::focusWidget(); focusedWidget && (focusedWidget == this || isAncestorOf(focusedWidget))) {
+        if (auto* parent = parentWidget(); parent && parent->isVisibleTo(window()) && parent->isEnabled()
+            && parent->focusPolicy() != Qt::NoFocus) {
+            parent->setFocus(Qt::OtherFocusReason);
+        }
+    }
     hide();
     m_currentEntry = nullptr;
     m_currentGroup = nullptr;
@@ -150,6 +156,13 @@ void EntryPreviewWidget::setEntry(Entry* selectedEntry)
     m_currentGroup = nullptr;
 
     if (!m_currentEntry) {
+        if (auto* focusedWidget = QApplication::focusWidget();
+            focusedWidget && (focusedWidget == this || isAncestorOf(focusedWidget))) {
+            if (auto* parent = parentWidget(); parent && parent->isVisibleTo(window()) && parent->isEnabled()
+                && parent->focusPolicy() != Qt::NoFocus) {
+                parent->setFocus(Qt::OtherFocusReason);
+            }
+        }
         hide();
         return;
     }
