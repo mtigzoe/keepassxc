@@ -330,6 +330,7 @@ private:
 
     QUuid m_groupBeforeLock;
     QUuid m_entryBeforeLock;
+    bool m_groupViewHadFocusBeforeLock = false;
 
     int m_saveAttempts;
     bool m_attemptingLock = false;
