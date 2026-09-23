@@ -110,7 +110,10 @@ You can enable the DuckDuckGo website icon service in the security section of th
      <property name="sizeAdjustPolicy">
       <enum>QAbstractScrollArea::AdjustToContents</enum>
      </property>
-     <property name="editTriggers">
+     <property name="tabKeyNavigation">
+       <bool>false</bool>
+      </property>
+      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>
      <property name="selectionMode">

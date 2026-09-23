@@ -54,7 +54,10 @@
      <property name="accessibleDescription">
       <string>Select one or more passkey entries to include in the export.</string>
      </property>
-     <property name="editTriggers">
+     <property name="tabKeyNavigation">
+       <bool>false</bool>
+      </property>
+      <property name="editTriggers">
       <set>QAbstractItemView::NoEditTriggers</set>
      </property>
      <property name="showDropIndicator" stdset="0">
