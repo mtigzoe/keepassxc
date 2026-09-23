@@ -94,6 +94,9 @@
         <property name="accessibleName">
          <string>Additional URL entries</string>
         </property>
+        <property name="tabKeyNavigation">
+         <bool>false</bool>
+        </property>
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -168,8 +171,10 @@
   </customwidget>
  </customwidgets>
  <tabstops>
+  <tabstop>hideEntryCheckbox</tabstop>
   <tabstop>skipAutoSubmitCheckbox</tabstop>
   <tabstop>onlyHttpAuthCheckbox</tabstop>
+  <tabstop>notHttpAuthCheckbox</tabstop>
   <tabstop>additionalURLsView</tabstop>
   <tabstop>addURLButton</tabstop>
   <tabstop>removeURLButton</tabstop>
