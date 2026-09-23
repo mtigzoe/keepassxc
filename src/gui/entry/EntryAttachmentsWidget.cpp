@@ -265,8 +265,8 @@ void EntryAttachmentsWidget::previewSelectedAttachment()
 
     previewDialog.exec();
 
-    // Set focus back to the widget to allow keyboard navigation
-    setFocus();
+    // Return focus to the attachment table so keyboard and screen-reader navigation can continue.
+    m_ui->attachmentsView->setFocus();
 }
 
 void EntryAttachmentsWidget::editSelectedAttachment()
