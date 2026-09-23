@@ -135,6 +135,12 @@
             </property>
             <item>
              <widget class="QLabel" name="entryTotpLabel">
+              <property name="accessibleName">
+               <string>Current TOTP code</string>
+              </property>
+              <property name="focusPolicy">
+               <enum>Qt::StrongFocus</enum>
+              </property>
               <property name="font">
                <font>
                 <bold>true</bold>
@@ -316,7 +322,7 @@
                     <item>
                      <widget class="QLabel" name="entryPasswordLabel">
                       <property name="focusPolicy">
-                       <enum>Qt::ClickFocus</enum>
+                       <enum>Qt::StrongFocus</enum>
                       </property>
                       <property name="text">
                        <string notr="true">TextLabel</string>
@@ -337,6 +343,9 @@
               </item>
               <item row="0" column="5">
                <widget class="ElidedLabel" name="entryUrlLabel">
+                <property name="accessibleName">
+                 <string>Entry URL</string>
+                </property>
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -443,7 +452,7 @@
                    <string>Entry notes</string>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::ClickFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="frameShape">
                    <enum>QFrame::NoFrame</enum>
@@ -772,8 +781,11 @@
            </item>
            <item row="1" column="0">
             <widget class="QTableWidget" name="entryAttributesTable">
+             <property name="accessibleName">
+              <string>Entry attributes</string>
+             </property>
              <property name="focusPolicy">
-              <enum>Qt::NoFocus</enum>
+              <enum>Qt::StrongFocus</enum>
              </property>
              <property name="styleSheet">
               <string notr="true">QTableView::item {padding: 3px;}</string>
@@ -875,8 +887,11 @@
            </item>
            <item>
             <widget class="QTreeWidget" name="entryAutotypeTree">
+             <property name="accessibleName">
+              <string>Auto-Type sequences</string>
+             </property>
              <property name="focusPolicy">
-              <enum>Qt::NoFocus</enum>
+              <enum>Qt::StrongFocus</enum>
              </property>
              <property name="frameShadow">
               <enum>QFrame::Sunken</enum>
