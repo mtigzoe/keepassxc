@@ -19,6 +19,7 @@
 #include "PasswordGeneratorWidget.h"
 #include "ui_PasswordGeneratorWidget.h"
 
+#include <QAccessible>
 #include <QCloseEvent>
 #include <QDir>
 #include <QShortcut>
@@ -606,7 +607,16 @@ void PasswordGeneratorWidget::updateGenerator()
 
         m_dicewareGenerator->setWordSeparator(m_ui->editWordSeparator->text());
 
-        m_ui->labelWordListWarning->setVisible(!m_dicewareGenerator->isWordListValid());
+        const bool wordListWarningVisible = !m_dicewareGenerator->isWordListValid();
+        const bool wordListWarningChanged = m_ui->labelWordListWarning->isVisible() != wordListWarningVisible;
+        m_ui->labelWordListWarning->setVisible(wordListWarningVisible);
+        if (wordListWarningChanged && wordListWarningVisible) {
+            m_ui->labelWordListWarning->setAccessibleName(tr("Wordlist warning"));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+            QAccessibleAnnouncementEvent announcementEvent(m_ui->labelWordListWarning, m_ui->labelWordListWarning->text());
+            QAccessible::updateAccessibility(&announcementEvent);
+#endif
+        }
         m_ui->buttonGenerate->setEnabled(true);
     }
 
