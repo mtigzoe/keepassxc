@@ -23,6 +23,7 @@
 #include "gui/SquareSvgWidget.h"
 #include "qrcode/QrCode.h"
 
+#include <QAccessible>
 #include <QBoxLayout>
 #include <QBuffer>
 #include <QDialogButtonBox>
@@ -88,6 +89,12 @@ TotpExportSettingsDialog::TotpExportSettingsDialog(DatabaseWidget* parent, Entry
         QBuffer buffer;
         qrc.writeSvg(&buffer, logicalDpiX());
         m_totpSvgWidget->load(buffer.data());
+        m_totpSvgWidget->setAccessibleDescription(
+            tr("Scan this QR code with an authenticator app to configure TOTP."));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+        QAccessibleAnnouncementEvent announcementEvent(m_totpSvgWidget, tr("TOTP QR code"));
+        QAccessible::updateAccessibility(&announcementEvent);
+#endif
         const auto minsize = static_cast<int>(logicalDpiX() * 2.5);
         m_totpSvgWidget->setMinimumSize(minsize, minsize);
     } else {
