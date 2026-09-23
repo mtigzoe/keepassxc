@@ -19,6 +19,7 @@
 #include "TextAttachmentsEditWidget.h"
 #include "TextAttachmentsPreviewWidget.h"
 
+#include <QApplication>
 #include <QSplitter>
 #include <QTextEdit>
 #include <QTimer>
@@ -54,7 +55,14 @@ attachments::Attachment TextAttachmentsWidget::getAttachment() const
 void TextAttachmentsWidget::updateWidget()
 {
     if (m_mode == attachments::OpenMode::ReadOnly) {
-        // Only show the preview widget in read-only mode
+        // Only show the preview widget in read-only mode. If the editor (or
+        // one of its children) currently owns focus, move focus to the
+        // preview before hiding it so keyboard and screen-reader users are
+        // not left on a hidden widget.
+        auto* focusedWidget = QApplication::focusWidget();
+        if (focusedWidget && (focusedWidget == m_editWidget || m_editWidget->isAncestorOf(focusedWidget))) {
+            m_ui->previewTextBrowser->setFocus(Qt::OtherFocusReason);
+        }
         m_splitter->setSizes({0, 1});
         m_editWidget->hide();
         m_previewWidget->openAttachment(m_attachment, m_mode);
