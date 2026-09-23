@@ -1044,6 +1044,12 @@ void EditEntryWidget::useExpiryPreset(QAction* action)
 
 void EditEntryWidget::toggleHideNotes(bool visible)
 {
+    // Hiding the notes editor while it owns focus would leave keyboard and
+    // screen-reader focus on a hidden control. Move focus to the reveal
+    // button before hiding it.
+    if (!visible && m_mainUi->notesEdit->hasFocus()) {
+        m_mainUi->revealNotesButton->setFocus(Qt::OtherFocusReason);
+    }
     m_mainUi->notesEdit->setVisible(visible);
     m_mainUi->revealNotesButton->setIcon(icons()->onOffIcon("password-show", visible));
 }
