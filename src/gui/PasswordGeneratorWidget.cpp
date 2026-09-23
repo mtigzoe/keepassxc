@@ -464,10 +464,12 @@ void PasswordGeneratorWidget::setAdvancedMode(bool advanced)
     if (advanced) {
         m_ui->checkBoxSpecialChars->setText("# $ % && @ ^ ` ~");
         m_ui->checkBoxSpecialChars->setToolTip(tr("Logograms"));
+        m_ui->checkBoxSpecialChars->setAccessibleName(tr("Logograms"));
         m_ui->checkBoxSpecialChars->setChecked(config()->get(Config::PasswordGenerator_Logograms).toBool());
     } else {
         m_ui->checkBoxSpecialChars->setText("/ * + && …");
         m_ui->checkBoxSpecialChars->setToolTip(tr("Special Characters"));
+        m_ui->checkBoxSpecialChars->setAccessibleName(tr("Special characters"));
         m_ui->checkBoxSpecialChars->setChecked(config()->get(Config::PasswordGenerator_SpecialChars).toBool());
     }
 
