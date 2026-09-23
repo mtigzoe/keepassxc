@@ -1336,14 +1336,22 @@
  </customwidgets>
  <tabstops>
   <tabstop>entryTotpButton</tabstop>
+  <tabstop>entryTotpLabel</tabstop>
   <tabstop>entryCloseButton</tabstop>
   <tabstop>entryTabWidget</tabstop>
+  <tabstop>toggleUsernameButton</tabstop>
+  <tabstop>entryUsernameLabel</tabstop>
   <tabstop>togglePasswordButton</tabstop>
+  <tabstop>entryPasswordLabel</tabstop>
+  <tabstop>entryUrlLabel</tabstop>
   <tabstop>toggleEntryNotesButton</tabstop>
+  <tabstop>entryNotesTextEdit</tabstop>
+  <tabstop>entryAttributesTable</tabstop>
+  <tabstop>entryAutotypeTree</tabstop>
   <tabstop>groupTabWidget</tabstop>
   <tabstop>toggleGroupNotesButton</tabstop>
+  <tabstop>groupNotesTextEdit</tabstop>
   <tabstop>groupCloseButton</tabstop>
- </tabstops>
- <resources/>
+ </tabstops> <resources/>
  <connections/>
 </ui>
