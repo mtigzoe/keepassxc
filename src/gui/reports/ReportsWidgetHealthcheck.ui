@@ -25,6 +25,9 @@
    </property>
    <item>
     <widget class="QTableView" name="healthcheckTableView">
+     <property name="tabKeyNavigation">
+      <bool>false</bool>
+     </property>
      <property name="accessibleName">
       <string>Database health check results</string>
      </property>

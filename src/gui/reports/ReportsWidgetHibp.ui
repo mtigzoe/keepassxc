@@ -145,7 +145,10 @@
        </property>
        <item>
         <widget class="QTableView" name="hibpTableView">
-         <property name="accessibleName">
+         <property name="tabKeyNavigation">
+      <bool>false</bool>
+     </property>
+     <property name="accessibleName">
           <string>Online password exposure report entries</string>
          </property>
          <property name="accessibleDescription">
