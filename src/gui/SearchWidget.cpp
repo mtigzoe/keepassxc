@@ -291,9 +291,12 @@ void SearchWidget::focusSearch()
 
 void SearchWidget::clearSearch()
 {
+    const bool clearButtonHasFocus = m_clearButton && m_clearButton->hasFocus();
+    const bool saveButtonHasFocus = m_ui->saveIcon->isVisible() && qobject_cast<QToolButton*>(QApplication::focusWidget())
+        && qobject_cast<QToolButton*>(QApplication::focusWidget())->defaultAction() == m_ui->saveIcon;
+
     m_ui->searchEdit->clear();
-    if (m_ui->saveIcon->isVisible() && qobject_cast<QToolButton*>(QApplication::focusWidget())
-        && qobject_cast<QToolButton*>(QApplication::focusWidget())->defaultAction() == m_ui->saveIcon) {
+    if (clearButtonHasFocus || saveButtonHasFocus) {
         m_ui->searchEdit->setFocus(Qt::OtherFocusReason);
     }
     m_ui->saveIcon->setVisible(false);
@@ -339,8 +342,11 @@ void SearchWidget::updateSaveButtonVisibility()
 {
     // Show save button whenever there's non-empty text in the search field.
     const bool visible = !m_ui->searchEdit->text().isEmpty();
-    if (!visible && m_ui->saveIcon->isVisible() && qobject_cast<QToolButton*>(QApplication::focusWidget())
-        && qobject_cast<QToolButton*>(QApplication::focusWidget())->defaultAction() == m_ui->saveIcon) {
+    const bool clearButtonHasFocus = m_clearButton && m_clearButton->hasFocus();
+    const bool saveButtonHasFocus = m_ui->saveIcon->isVisible() && qobject_cast<QToolButton*>(QApplication::focusWidget())
+        && qobject_cast<QToolButton*>(QApplication::focusWidget())->defaultAction() == m_ui->saveIcon;
+
+    if (!visible && (clearButtonHasFocus || saveButtonHasFocus)) {
         m_ui->searchEdit->setFocus(Qt::OtherFocusReason);
     }
     m_ui->saveIcon->setVisible(visible);

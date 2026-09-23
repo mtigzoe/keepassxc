@@ -32,6 +32,7 @@ namespace Ui
 }
 
 class PopupHelpWidget;
+class QToolButton;
 
 class SearchWidget : public QWidget
 {
@@ -88,6 +89,7 @@ private:
     QAction* m_actionLimitGroup;
     QAction* m_actionWaitForEnter;
     QMenu* m_searchMenu;
+    QToolButton* m_clearButton;
 };
 
 #endif // SEARCHWIDGET_H
