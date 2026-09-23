@@ -108,9 +108,21 @@ SearchWidget::SearchWidget(QWidget* parent)
         // action isn't one of our own three known actions is Qt's clear
         // button (or, if Qt ever adds another internal control of its
         // own, something equally nameless that needs a name either way).
-        if (action != m_ui->searchIcon && action != m_ui->helpIcon && action != m_ui->saveIcon) {
+        if (action == m_ui->searchIcon) {
+            toolButton->setAccessibleName(tr("Search options"));
+        } else if (action == m_ui->helpIcon) {
+            toolButton->setAccessibleName(tr("Search help"));
+        } else if (action == m_ui->saveIcon) {
+            toolButton->setAccessibleName(tr("Save search"));
+        } else {
             toolButton->setAccessibleName(tr("Clear Search"));
         }
+
+        // QLineEdit actions are represented by internal QToolButtons. They are
+        // not keyboard-focusable by default, which leaves the search, help,
+        // save, and clear actions inaccessible to keyboard and screen-reader
+        // users even though the actions are visible and have accessible names.
+        toolButton->setFocusPolicy(Qt::TabFocus);
     }
 }
 
