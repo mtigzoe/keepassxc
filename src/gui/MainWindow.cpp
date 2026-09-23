@@ -1753,9 +1753,10 @@ void MainWindow::updateEntryCountLabel()
         m_statusBarLabel->setText("");
     }
 
-    // QLabel text changes are silent to screen readers by default; fire an
-    // explicit NameChanged event so JAWS/braille announce the updated count.
-    QAccessibleEvent accessibleEvent(m_statusBarLabel, QAccessible::NameChanged);
+    // QLabel text changes are silent to screen readers by default. Use
+    // QAccessibleValueChangeEvent with the new text so Qt's Windows UIA
+    // bridge can expose the updated count as a status announcement.
+    QAccessibleValueChangeEvent accessibleEvent(m_statusBarLabel, m_statusBarLabel->text());
     QAccessible::updateAccessibility(&accessibleEvent);
 }
 
