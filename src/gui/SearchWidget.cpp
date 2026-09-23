@@ -265,8 +265,10 @@ void SearchWidget::toggleHelp()
 {
     if (m_helpWidget->isVisible()) {
         m_helpWidget->hide();
+        m_ui->searchEdit->setFocus(Qt::OtherFocusReason);
     } else {
         m_helpWidget->show();
+        m_helpWidget->setFocus(Qt::OtherFocusReason);
     }
 }
 
