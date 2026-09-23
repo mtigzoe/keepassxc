@@ -16,6 +16,9 @@
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QLabel" name="totpLabel">
+     <property name="accessibleName">
+      <string>TOTP code</string>
+     </property>
      <property name="font">
       <font>
        <pointsize>53</pointsize>
