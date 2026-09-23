@@ -22,6 +22,7 @@
 
 #include <core/Tools.h>
 
+#include <QApplication>
 #include <QLabel>
 #include <QVBoxLayout>
 
@@ -50,8 +51,13 @@ void AttachmentWidget::openAttachment(attachments::Attachment attachment, attach
 void AttachmentWidget::updateUi()
 {
     auto type = Tools::getMimeType(m_attachment.data);
+    bool restoreFocus = false;
 
     if (m_attachmentWidget) {
+        auto* focusedWidget = QApplication::focusWidget();
+        restoreFocus = focusedWidget
+            && (focusedWidget == m_attachmentWidget || m_attachmentWidget->isAncestorOf(focusedWidget));
+
         layout()->removeWidget(m_attachmentWidget);
         m_attachmentWidget->deleteLater();
     }
@@ -76,6 +82,26 @@ void AttachmentWidget::updateUi()
     Q_ASSERT(m_attachmentWidget);
     m_attachmentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     layout()->addWidget(m_attachmentWidget);
+
+    if (restoreFocus) {
+        // Replacing an attachment widget can destroy the widget that owns
+        // keyboard focus. Restore focus to the first usable control in the new
+        // attachment viewer instead of leaving keyboard/screen-reader focus on
+        // the deleted widget.
+        const auto focusableChildren = m_attachmentWidget->findChildren<QWidget*>();
+        for (auto* child : focusableChildren) {
+            if (child->isVisibleTo(m_attachmentWidget) && child->isEnabled()
+                && child->focusPolicy() != Qt::NoFocus) {
+                child->setFocus(Qt::OtherFocusReason);
+                break;
+            }
+        }
+        if (!QApplication::focusWidget()
+            || !(QApplication::focusWidget() == m_attachmentWidget
+                 || m_attachmentWidget->isAncestorOf(QApplication::focusWidget()))) {
+            m_attachmentWidget->setFocus(Qt::OtherFocusReason);
+        }
+    }
 }
 
 attachments::Attachment AttachmentWidget::getAttachment() const
