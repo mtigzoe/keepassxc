@@ -176,6 +176,7 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     m_searchingLabel->setVisible(false);
 
     m_shareLabel->setObjectName("KeeShareBanner");
+    m_shareLabel->setAccessibleName(tr("Shared group status"));
     m_shareLabel->setRawText(tr("Shared group…"));
     m_shareLabel->setAlignment(Qt::AlignCenter);
     m_shareLabel->setVisible(false);
@@ -1864,6 +1865,10 @@ void DatabaseWidget::onGroupChanged()
     if (!shareLabel.isEmpty()) {
         m_shareLabel->setRawText(shareLabel);
         m_shareLabel->setVisible(true);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+        QAccessibleAnnouncementEvent announcementEvent(m_shareLabel, shareLabel);
+        QAccessible::updateAccessibility(&announcementEvent);
+#endif
     } else {
         m_shareLabel->setVisible(false);
     }
