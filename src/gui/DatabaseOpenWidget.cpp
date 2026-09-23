@@ -164,9 +164,17 @@ DatabaseOpenWidget::~DatabaseOpenWidget() = default;
 
 void DatabaseOpenWidget::toggleHardwareKeyComponent(bool state)
 {
+    const bool showHardwareKeyCombo = state && m_ui->hardwareKeyCombo->count() != 1;
+    if (!showHardwareKeyCombo && m_ui->hardwareKeyCombo->hasFocus()) {
+        // The hardware-key response can arrive asynchronously while the combo
+        // box has focus. Move focus before hiding it so keyboard/screen-reader
+        // users are not left on a hidden control.
+        m_ui->useHardwareKeyCheckBox->setFocus(Qt::OtherFocusReason);
+    }
+
     m_ui->hardwareKeyProgress->setVisible(false);
     m_ui->hardwareKeyComponent->setVisible(state);
-    m_ui->hardwareKeyCombo->setVisible(state && m_ui->hardwareKeyCombo->count() != 1);
+    m_ui->hardwareKeyCombo->setVisible(showHardwareKeyCombo);
 
     m_ui->noHardwareKeysFoundLabel->setVisible(!state && m_manualHardwareKeyRefresh);
     m_ui->noHardwareKeysFoundLabel->setText(YubiKey::instance()->connectedKeys() > 0
