@@ -249,6 +249,7 @@
   <tabstop>algorithmComboBox</tabstop>
   <tabstop>stepSpinBox</tabstop>
   <tabstop>digitsSpinBox</tabstop>
+  <tabstop>buttonBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>
