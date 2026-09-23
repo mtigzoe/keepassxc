@@ -50,6 +50,8 @@ TotpDialog::TotpDialog(QWidget* parent, Entry* entry)
     new QShortcut(QKeySequence(QKeySequence::Copy), this, SLOT(copyToClipboard()));
 
     m_ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("Copy"));
+    m_ui->totpLabel->setFocusPolicy(Qt::StrongFocus);
+    m_ui->totpLabel->setFocus(Qt::OtherFocusReason);
 
     connect(m_ui->buttonBox, SIGNAL(rejected()), SLOT(close()));
     connect(m_ui->buttonBox, SIGNAL(accepted()), SLOT(copyToClipboard()));
