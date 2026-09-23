@@ -28,6 +28,9 @@
      <property name="accessibleName">
       <string>Passkey report entries</string>
      </property>
+         <property name="accessibleDescription">
+          <string>Use the arrow keys to review passkey report entries. Select a row to use Import or Export.</string>
+         </property>
      <property name="contextMenuPolicy">
       <enum>Qt::CustomContextMenu</enum>
      </property>
