@@ -670,6 +670,14 @@ void EntryPreviewWidget::setTabEnabled(QTabWidget* tabWidget, QWidget* widget, b
 {
     const int tabIndex = tabWidget->indexOf(widget);
     Q_ASSERT(tabIndex != -1);
+
+    if (!enabled && tabWidget->currentIndex() == tabIndex) {
+        if (auto* focusedWidget = QApplication::focusWidget();
+            focusedWidget && (focusedWidget == widget || widget->isAncestorOf(focusedWidget))) {
+            tabWidget->setFocus(Qt::OtherFocusReason);
+        }
+    }
+
     tabWidget->setTabEnabled(tabIndex, enabled);
 }
 
