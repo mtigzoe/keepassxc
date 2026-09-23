@@ -99,10 +99,12 @@ EditGroupWidget::EditGroupWidget(QWidget* parent)
         }
         m_mainUi->expireDatePicker->setEnabled(enabled);
     });
-    connect(m_mainUi->autoTypeSequenceCustomRadio,
-            SIGNAL(toggled(bool)),
-            m_mainUi->autoTypeSequenceCustomEdit,
-            SLOT(setEnabled(bool)));
+    connect(m_mainUi->autoTypeSequenceCustomRadio, &QRadioButton::toggled, this, [this](bool enabled) {
+        if (!enabled && m_mainUi->autoTypeSequenceCustomEdit->hasFocus()) {
+            m_mainUi->autoTypeSequenceCustomRadio->setFocus();
+        }
+        m_mainUi->autoTypeSequenceCustomEdit->setEnabled(enabled);
+    });
 
     connect(this, SIGNAL(apply()), SLOT(apply()));
     connect(this, SIGNAL(accepted()), SLOT(save()));
