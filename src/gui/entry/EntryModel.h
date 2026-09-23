@@ -75,7 +75,7 @@ private slots:
     void entryAboutToAdd(Entry* entry);
     void entryAdded(Entry* entry);
     void entryAboutToRemove(Entry* entry);
-    void entryRemoved();
+    void entryRemoved(Entry* entry);
     void entryAboutToMoveUp(int row);
     void entryMovedUp();
     void entryAboutToMoveDown(int row);
@@ -93,6 +93,7 @@ private:
     QList<Entry*> m_entries;
     QList<Entry*> m_orgEntries;
     QSet<const Group*> m_allGroups;
+    int m_pendingRemoveRow = -1;
 
     const QString HiddenContentDisplay;
 };

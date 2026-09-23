@@ -534,22 +534,37 @@ void EntryModel::entryAdded(Entry* entry)
 
 void EntryModel::entryAboutToRemove(Entry* entry)
 {
-    beginRemoveRows(QModelIndex(), m_entries.indexOf(entry), m_entries.indexOf(entry));
+    m_pendingRemoveRow = m_entries.indexOf(entry);
+    if (m_pendingRemoveRow < 0) {
+        return;
+    }
+
+    beginRemoveRows(QModelIndex(), m_pendingRemoveRow, m_pendingRemoveRow);
     if (!m_group) {
-        m_entries.removeAll(entry);
+        m_entries.removeAt(m_pendingRemoveRow);
     }
 }
 
-void EntryModel::entryRemoved()
+void EntryModel::entryRemoved(Entry* entry)
 {
+    Q_UNUSED(entry);
+    if (m_pendingRemoveRow < 0) {
+        return;
+    }
+
     if (m_group) {
         m_entries = m_group->entries();
     }
     endRemoveRows();
+    m_pendingRemoveRow = -1;
 }
 
 void EntryModel::entryAboutToMoveUp(int row)
 {
+    if (!m_group || row < 1 || row >= m_entries.size()) {
+        return;
+    }
+
     beginMoveRows(QModelIndex(), row, row, QModelIndex(), row - 1);
     if (m_group) {
         m_entries.move(row, row - 1);
@@ -558,14 +573,20 @@ void EntryModel::entryAboutToMoveUp(int row)
 
 void EntryModel::entryMovedUp()
 {
-    if (m_group) {
-        m_entries = m_group->entries();
+    if (!m_group) {
+        return;
     }
+
+    m_entries = m_group->entries();
     endMoveRows();
 }
 
 void EntryModel::entryAboutToMoveDown(int row)
 {
+    if (!m_group || row < 0 || row + 1 >= m_entries.size()) {
+        return;
+    }
+
     beginMoveRows(QModelIndex(), row, row, QModelIndex(), row + 2);
     if (m_group) {
         m_entries.move(row, row + 1);
@@ -574,9 +595,11 @@ void EntryModel::entryAboutToMoveDown(int row)
 
 void EntryModel::entryMovedDown()
 {
-    if (m_group) {
-        m_entries = m_group->entries();
+    if (!m_group) {
+        return;
     }
+
+    m_entries = m_group->entries();
     endMoveRows();
 }
 
@@ -616,7 +639,7 @@ void EntryModel::makeConnections(const Group* group)
     connect(group, SIGNAL(entryAboutToAdd(Entry*)), SLOT(entryAboutToAdd(Entry*)));
     connect(group, SIGNAL(entryAdded(Entry*)), SLOT(entryAdded(Entry*)));
     connect(group, SIGNAL(entryAboutToRemove(Entry*)), SLOT(entryAboutToRemove(Entry*)));
-    connect(group, SIGNAL(entryRemoved(Entry*)), SLOT(entryRemoved()));
+    connect(group, SIGNAL(entryRemoved(Entry*)), SLOT(entryRemoved(Entry*)));
     connect(group, SIGNAL(entryAboutToMoveUp(int)), SLOT(entryAboutToMoveUp(int)));
     connect(group, SIGNAL(entryMovedUp()), SLOT(entryMovedUp()));
     connect(group, SIGNAL(entryAboutToMoveDown(int)), SLOT(entryAboutToMoveDown(int)));
