@@ -509,7 +509,7 @@ void KMessageWidget::setCloseButtonVisible(bool show)
             const QWidget* const boundary = this;
             while (candidate && candidate != boundary) {
                 if (candidate->isVisibleTo(window()) && candidate->isEnabled()
-                    && candidate->focusPolicy() != Qt::NoFocus && !candidate->isAncestorOf(this)) {
+                    && candidate->focusPolicy() != Qt::NoFocus && !isAncestorOf(candidate)) {
                     candidate->setFocus(Qt::OtherFocusReason);
                     break;
                 }
