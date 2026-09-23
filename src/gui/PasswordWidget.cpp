@@ -329,7 +329,13 @@ void PasswordWidget::checkCapslockState()
         if (newCapslockState) {
             QTimer::singleShot(
                 150, [this] { QToolTip::showText(mapToGlobal(rect().bottomLeft()), m_capslockAction->text()); });
+            m_ui->passwordEdit->setAccessibleDescription(tr("Warning: Caps Lock enabled!"));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+            QAccessibleAnnouncementEvent announcementEvent(m_ui->passwordEdit, tr("Warning: Caps Lock enabled!"));
+            QAccessible::updateAccessibility(&announcementEvent);
+#endif
         } else if (QToolTip::isVisible()) {
+            m_ui->passwordEdit->setAccessibleDescription(m_defaultAccessibleDescription);
             QToolTip::hideText();
         }
     }
@@ -358,31 +364,3 @@ void PasswordWidget::updatePasswordStrength(const QString& password)
     case PasswordHealth::Quality::Bad:
     case PasswordHealth::Quality::Poor:
         m_ui->qualityProgressBar->setStyleSheet(
-            style.arg(qualityPalette.color(StateColorPalette::HealthCritical).name()));
-
-        m_ui->qualityProgressBar->setToolTip(tr("Quality: %1").arg(tr("Poor", "Password quality")));
-
-        break;
-
-    case PasswordHealth::Quality::Weak:
-        m_ui->qualityProgressBar->setStyleSheet(style.arg(qualityPalette.color(StateColorPalette::HealthBad).name()));
-
-        m_ui->qualityProgressBar->setToolTip(tr("Quality: %1").arg(tr("Weak", "Password quality")));
-
-        break;
-    case PasswordHealth::Quality::Good:
-        m_ui->qualityProgressBar->setStyleSheet(style.arg(qualityPalette.color(StateColorPalette::HealthOk).name()));
-
-        m_ui->qualityProgressBar->setToolTip(tr("Quality: %1").arg(tr("Good", "Password quality")));
-
-        break;
-    case PasswordHealth::Quality::Excellent:
-
-        m_ui->qualityProgressBar->setStyleSheet(
-            style.arg(qualityPalette.color(StateColorPalette::HealthExcellent).name()));
-
-        m_ui->qualityProgressBar->setToolTip(tr("Quality: %1").arg(tr("Excellent", "Password quality")));
-
-        break;
-    }
-}
