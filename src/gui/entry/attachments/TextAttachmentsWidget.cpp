@@ -61,7 +61,7 @@ void TextAttachmentsWidget::updateWidget()
         // not left on a hidden widget.
         auto* focusedWidget = QApplication::focusWidget();
         if (focusedWidget && (focusedWidget == m_editWidget || m_editWidget->isAncestorOf(focusedWidget))) {
-            m_ui->previewTextBrowser->setFocus(Qt::OtherFocusReason);
+            m_previewWidget->setFocus(Qt::OtherFocusReason);
         }
         m_splitter->setSizes({0, 1});
         m_editWidget->hide();
