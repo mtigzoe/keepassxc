@@ -142,6 +142,10 @@ void EntryPreviewWidget::setEntry(Entry* selectedEntry)
         disconnect(m_currentGroup, nullptr, this, nullptr);
     }
 
+    if (m_currentEntry && m_currentEntry != selectedEntry) {
+        m_ui->entryAttachmentsWidget->unlinkAttachments();
+    }
+
     m_currentEntry = selectedEntry;
     m_currentGroup = nullptr;
 
@@ -169,6 +173,10 @@ void EntryPreviewWidget::setGroup(Group* selectedGroup)
     }
     if (m_currentGroup) {
         disconnect(m_currentGroup, nullptr, this, nullptr);
+    }
+
+    if (m_currentEntry) {
+        m_ui->entryAttachmentsWidget->unlinkAttachments();
     }
 
     m_currentEntry = nullptr;
