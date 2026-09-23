@@ -38,6 +38,7 @@ TotpSetupDialog::TotpSetupDialog(QWidget* parent, Entry* entry)
     connect(m_ui->buttonBox, SIGNAL(rejected()), SLOT(close()));
     connect(m_ui->buttonBox, SIGNAL(accepted()), SLOT(saveSettings()));
     connect(m_ui->radioCustom, SIGNAL(toggled(bool)), SLOT(toggleCustom(bool)));
+    connect(m_ui->algorithmComboBox, SIGNAL(currentIndexChanged(int)), SLOT(algorithmChanged(int)));
     connect(m_ui->stepSpinBox, SIGNAL(valueChanged(int)), SLOT(stepChanged(int)));
     connect(m_ui->digitsSpinBox, SIGNAL(valueChanged(int)), SLOT(digitsChanged(int)));
 
@@ -45,6 +46,20 @@ TotpSetupDialog::TotpSetupDialog(QWidget* parent, Entry* entry)
 }
 
 TotpSetupDialog::~TotpSetupDialog() = default;
+
+void TotpSetupDialog::algorithmChanged(int value)
+{
+    Q_UNUSED(value);
+
+    const auto text = m_ui->algorithmComboBox->currentText();
+    QAccessibleValueChangeEvent event(m_ui->algorithmComboBox, text);
+    QAccessible::updateAccessibility(&event);
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QAccessibleAnnouncementEvent announcementEvent(m_ui->algorithmComboBox, text);
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
+}
 
 void TotpSetupDialog::stepChanged(int value)
 {
@@ -78,7 +93,7 @@ void TotpSetupDialog::saveSettings()
     if (!sanitizedKey.startsWith(key)) {
         MessageBox::information(this,
                                 tr("Invalid TOTP Secret"),
-                                tr("You have entered an invalid secret key. The key must be in Base32 format.\n"
+                                tr("You have entered an invalid secret key. The key must be in Base32 format.\\n"
                                    "Example: JBSWY3DPEHPK3PXP"));
         return;
     }
