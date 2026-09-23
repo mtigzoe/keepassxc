@@ -362,7 +362,7 @@
                  <cursorShape>PointingHandCursor</cursorShape>
                 </property>
                 <property name="focusPolicy">
-                 <enum>Qt::ClickFocus</enum>
+                 <enum>Qt::StrongFocus</enum>
                 </property>
                 <property name="text">
                  <string notr="true">https://example.com</string>
@@ -537,7 +537,7 @@
                    </size>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::ClickFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="text">
                    <string notr="true">username</string>
@@ -1191,7 +1191,7 @@
                    <string>Group notes</string>
                   </property>
                   <property name="focusPolicy">
-                   <enum>Qt::ClickFocus</enum>
+                   <enum>Qt::StrongFocus</enum>
                   </property>
                   <property name="frameShape">
                    <enum>QFrame::NoFrame</enum>
