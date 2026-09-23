@@ -96,6 +96,17 @@ PasswordWidget::PasswordWidget(QWidget* parent)
         for (QToolButton* button : m_ui->passwordEdit->findChildren<QToolButton*>()) {
             if (button->defaultAction() == action) {
                 button->setFocusPolicy(Qt::TabFocus);
+                if (action == m_toggleVisibleAction) {
+                    button->setAccessibleName(tr("Toggle password visibility"));
+                    button->setAccessibleDescription(
+                        tr("Shortcut: %1")
+                            .arg(QKeySequence(action->shortcut()).toString(QKeySequence::NativeText)));
+                } else if (action == m_passwordGeneratorAction) {
+                    button->setAccessibleName(tr("Generate password"));
+                    button->setAccessibleDescription(
+                        tr("Shortcut: %1")
+                            .arg(QKeySequence(action->shortcut()).toString(QKeySequence::NativeText)));
+                }
                 break;
             }
         }
