@@ -65,6 +65,9 @@
      <property name="accessibleName">
       <string>Categories</string>
      </property>
+     <property name="accessibleDescription">
+      <string>Select a report category to change the displayed report.</string>
+     </property>
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
