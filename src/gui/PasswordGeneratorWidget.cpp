@@ -577,6 +577,11 @@ PasswordGenerator::GeneratorFlags PasswordGeneratorWidget::generatorFlags()
 void PasswordGeneratorWidget::updateGenerator()
 {
     if (m_ui->tabWidget->currentIndex() == Password) {
+        // The passphrase wordlist warning is only meaningful on the Passphrase tab.
+        // Hide it when switching back to password generation so it does not remain
+        // in the screen reader's accessible tree as stale status information.
+        m_ui->labelWordListWarning->setVisible(false);
+
         auto classes = charClasses();
         auto flags = generatorFlags();
 
