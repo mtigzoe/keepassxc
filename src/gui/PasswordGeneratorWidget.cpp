@@ -286,8 +286,31 @@ void PasswordGeneratorWidget::updatePasswordStrength()
     }
 
     // Update the entropy text labels
-    m_ui->entropyLabel->setText(tr("Entropy: %1 bit").arg(QString::number(passwordHealth.entropy(), 'f', 2)));
+    const auto entropyText = QString::number(passwordHealth.entropy(), 'f', 2);
+    m_ui->entropyLabel->setText(tr("Entropy: %1 bit").arg(entropyText));
     m_ui->entropyProgressBar->setValue(std::min(int(passwordHealth.entropy()), m_ui->entropyProgressBar->maximum()));
+
+    // Keep the exact entropy and quality available to assistive technology.
+    // The progress bar's exposed range/value may otherwise be reported as a
+    // percentage, which does not communicate the actual entropy in bits.
+    QString qualityText;
+    switch (passwordHealth.quality()) {
+    case PasswordHealth::Quality::Bad:
+    case PasswordHealth::Quality::Poor:
+        qualityText = tr("Poor", "Password quality");
+        break;
+    case PasswordHealth::Quality::Weak:
+        qualityText = tr("Weak", "Password quality");
+        break;
+    case PasswordHealth::Quality::Good:
+        qualityText = tr("Good", "Password quality");
+        break;
+    case PasswordHealth::Quality::Excellent:
+        qualityText = tr("Excellent", "Password quality");
+        break;
+    }
+    m_ui->entropyProgressBar->setAccessibleDescription(
+        tr("Password entropy: %1 bits. Password quality: %2.").arg(entropyText, qualityText));
 
     // Update the visual strength meter
     QString style = m_ui->entropyProgressBar->styleSheet();
