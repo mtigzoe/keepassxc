@@ -589,6 +589,7 @@ TagsEdit::TagsEdit(QWidget* parent)
     setSizePolicy(size_policy);
 
     setFocusPolicy(Qt::StrongFocus);
+    setAccessibleName(tr("Tags"));
     viewport()->setCursor(Qt::IBeamCursor);
     setAttribute(Qt::WA_InputMethodEnabled, true);
     setMouseTracking(true);
