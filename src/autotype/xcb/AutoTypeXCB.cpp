@@ -392,6 +392,10 @@ bool AutoTypePlatformX11::updateKeymap()
 
     /* determine the keycode to use for modifiers */
     XModifierKeymap* modifiers = XGetModifierMapping(m_dpy);
+    if (!modifiers) {
+        qWarning("Auto-Type: Unable to load X11 modifier mapping.");
+        return false;
+    }
     for (int mod_index = ShiftMapIndex; mod_index <= Mod5MapIndex; mod_index++) {
         m_modifier_keycode[mod_index] = 0;
         for (int mod_key = 0; mod_key < modifiers->max_keypermod; mod_key++) {
@@ -401,10 +405,6 @@ bool AutoTypePlatformX11::updateKeymap()
                 break;
             }
         }
-    }
-    if (!modifiers) {
-        qWarning("Auto-Type: Unable to load X11 modifier mapping.");
-        return false;
     }
     XFreeModifiermap(modifiers);
     return true;
