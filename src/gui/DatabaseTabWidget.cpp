@@ -759,9 +759,12 @@ bool DatabaseTabWidget::lockDatabases()
 {
     int numLocked = 0;
     int c = count();
-    for (int i = 0; i < c; ++i) {
+    // Iterate backwards because locking a new/temporary database can close its tab,
+    // which shifts all following indexes and can otherwise cause a skipped tab or
+    // an out-of-range access.
+    for (int i = c - 1; i >= 0; --i) {
         auto dbWidget = databaseWidgetFromIndex(i);
-        if (dbWidget->lock()) {
+        if (dbWidget && dbWidget->lock()) {
             ++numLocked;
             if (dbWidget->database()->filePath().isEmpty()) {
                 // If we locked a database without a file close the tab
