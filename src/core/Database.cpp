@@ -360,7 +360,12 @@ bool Database::saveAs(const QString& filePath, SaveAction action, const QString&
         m_ignoreFileChangesUntilSaved = false;
         m_fileWatcher->start(realFilePath, 30, 1);
     } else {
-        // Saving failed, don't rewatch file since it does not represent our database
+        // An atomic save failure leaves the existing file untouched because QSaveFile
+        // only replaces it during commit(). Keep watching it so external changes are
+        // still detected.
+        if (savingCurrentFile && action == Atomic) {
+            m_fileWatcher->start(realFilePath, 30, 1);
+        }
         markAsModified();
     }
 
