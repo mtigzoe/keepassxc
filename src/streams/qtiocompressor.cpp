@@ -520,65 +520,83 @@ qint64 QtIOCompressor::readData(char *data, qint64 maxSize)
 {
     Q_D(QtIOCompressor);
 
+    if (maxSize <= 0)
+        return 0;
+
     if (d->state == QtIOCompressorPrivate::EndOfStream)
         return 0;
 
     if (d->state == QtIOCompressorPrivate::Error)
         return -1;
 
-    // We are going to try to fill the data buffer
-    d->zlibStream.next_out = reinterpret_cast<ZlibByte *>(data);
-    d->zlibStream.avail_out = maxSize;
+    qint64 totalBytesRead = 0;
+    while (totalBytesRead < maxSize) {
+        const ZlibSize chunkSize =
+            static_cast<ZlibSize>(qMin<qint64>(maxSize - totalBytesRead, std::numeric_limits<ZlibSize>::max()));
+        d->zlibStream.next_out = reinterpret_cast<ZlibByte *>(data + totalBytesRead);
+        d->zlibStream.avail_out = chunkSize;
 
-    int status;
-    do {
-        // Read data if if the input buffer is empty. There could be data in the buffer
-        // from a previous readData call.
-        if (d->zlibStream.avail_in == 0) {
-            qint64 bytesAvailable = d->device->read(reinterpret_cast<char *>(d->buffer), d->bufferSize);
-            d->zlibStream.next_in = d->buffer;
-            d->zlibStream.avail_in = bytesAvailable;
+        int status;
+        do {
+            if (d->zlibStream.avail_in == 0) {
+                qint64 bytesAvailable =
+                    d->device->read(reinterpret_cast<char *>(d->buffer), d->bufferSize);
+                d->zlibStream.next_in = d->buffer;
+                d->zlibStream.avail_in = bytesAvailable;
 
-            if (bytesAvailable == -1) {
-                d->state = QtIOCompressorPrivate::Error;
-                setErrorString(QT_TRANSLATE_NOOP("QtIOCompressor", "Error reading data from underlying device: ") + d->device->errorString());
-                return -1;
+                if (bytesAvailable == -1) {
+                    d->state = QtIOCompressorPrivate::Error;
+                    setErrorString(QT_TRANSLATE_NOOP("QtIOCompressor",
+                                                     "Error reading data from underlying device: ")
+                                   + d->device->errorString());
+                    return -1;
+                }
+
+                if (d->state != QtIOCompressorPrivate::InStream) {
+                    if (bytesAvailable == 0)
+                        return totalBytesRead;
+                    if (bytesAvailable > 0)
+                        d->state = QtIOCompressorPrivate::InStream;
+                }
             }
 
-            if (d->state != QtIOCompressorPrivate::InStream) {
-                // If we are not in a stream and get 0 bytes, we are probably trying to read from an empty device.
-                if(bytesAvailable == 0)
-                    return 0;
-                else if (bytesAvailable > 0)
-                    d->state = QtIOCompressorPrivate::InStream;
-            }
-        }
-
-        // Decompress.
-        status = inflate(&d->zlibStream, Z_SYNC_FLUSH);
-        switch (status) {
+            status = inflate(&d->zlibStream, Z_SYNC_FLUSH);
+            switch (status) {
             case Z_NEED_DICT:
             case Z_DATA_ERROR:
             case Z_MEM_ERROR:
                 d->state = QtIOCompressorPrivate::Error;
-                d->setZlibError(QT_TRANSLATE_NOOP("QtIOCompressor", "Internal zlib error when decompressing: "), status);
+                d->setZlibError(
+                    QT_TRANSLATE_NOOP("QtIOCompressor", "Internal zlib error when decompressing: "), status);
                 return -1;
-            case Z_BUF_ERROR: // No more input and zlib can not provide more output - Not an error, we can try to read again when we have more input.
-                return 0;
+            case Z_BUF_ERROR:
+                return totalBytesRead + (chunkSize - d->zlibStream.avail_out);
+            default:
+                break;
+            }
+        } while (d->zlibStream.avail_out != 0 && status != Z_STREAM_END);
+
+        totalBytesRead += chunkSize - d->zlibStream.avail_out;
+
+        if (status == Z_STREAM_END) {
+            d->state = QtIOCompressorPrivate::EndOfStream;
+
+            for (int i = d->zlibStream.avail_in - 1; i >= 0; --i) {
+                if (!d->device->ungetChar(*reinterpret_cast<char *>(d->zlibStream.next_in + i))) {
+                    d->state = QtIOCompressorPrivate::Error;
+                    setErrorString(QT_TRANSLATE_NOOP("QtIOCompressor",
+                                                     "Error restoring unread compressed data."));
+                    return -1;
+                }
+            }
+            break;
         }
-    // Loop util data buffer is full or we reach the end of the input stream.
-    } while (d->zlibStream.avail_out != 0 && status != Z_STREAM_END);
 
-    if (status == Z_STREAM_END) {
-        d->state = QtIOCompressorPrivate::EndOfStream;
-
-        // Unget any data left in the read buffer.
-        for (int i = d->zlibStream.avail_in - 1; i >= 0; --i)
-            d->device->ungetChar(*reinterpret_cast<char *>(d->zlibStream.next_in + i));
+        if (d->zlibStream.avail_out != 0)
+            break;
     }
 
-    const ZlibSize outputSize = maxSize - d->zlibStream.avail_out;
-    return outputSize;
+    return totalBytesRead;
 }
 
 
