@@ -47,7 +47,10 @@ void HashedBlockStream::init()
     m_bufferPos = 0;
     m_blockIndex = 0;
     m_eof = false;
-    m_error = false;
+    m_error = m_blockSize <= 0;
+    if (m_error) {
+        setErrorString("Invalid block size.");
+    }
 }
 
 bool HashedBlockStream::reset()
