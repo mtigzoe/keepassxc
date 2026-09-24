@@ -18,18 +18,29 @@
 
 #include "CsvExporter.h"
 
-#include <QFile>
+#include <QSaveFile>
 
 #include "core/Group.h"
 
 bool CsvExporter::exportDatabase(const QString& filename, const QSharedPointer<const Database>& db)
 {
-    QFile file(filename);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+    QSaveFile file(filename);
+    if (!file.open(QIODevice::WriteOnly)) {
         m_error = file.errorString();
         return false;
     }
-    return exportDatabase(&file, db);
+
+    if (!exportDatabase(&file, db)) {
+        file.cancelWriting();
+        return false;
+    }
+
+    if (!file.commit()) {
+        m_error = file.errorString();
+        return false;
+    }
+
+    return true;
 }
 
 bool CsvExporter::exportDatabase(QIODevice* device, const QSharedPointer<const Database>& db)
