@@ -2283,6 +2283,9 @@ void DatabaseWidget::reloadDatabaseFile(bool triggeredBySave)
     auto reloadCanceled = [this, reloadFinish] {
         // Mark db as modified since existing data may differ from file or file was deleted
         m_db->markAsModified();
+        // A canceled reload must not leave the autosave guard set. Otherwise
+        // the next modification can be silently skipped by the autosave path.
+        m_blockAutoSave = false;
 
         emit updateSyncProgress(100, tr("Reload canceled"));
         reloadFinish(false);
