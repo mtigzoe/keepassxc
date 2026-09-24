@@ -144,6 +144,11 @@ bool SymmetricCipherStream::readBlock()
 
     if (!m_streamCipher && m_buffer.size() != blockSize()) {
         m_bufferFilling = true;
+        if (m_baseDevice->atEnd()) {
+            m_error = true;
+            setErrorString("Incomplete cipher block.");
+            return false;
+        }
         return false;
     } else {
         m_bufferPos = 0;
