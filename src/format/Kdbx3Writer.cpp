@@ -101,7 +101,10 @@ bool Kdbx3Writer::writeDatabase(QIODevice* device, Database* db)
 
     // write cipher stream
     SymmetricCipherStream cipherStream(device);
-    cipherStream.init(mode, SymmetricCipher::Encrypt, finalKey, encryptionIV);
+    if (!cipherStream.init(mode, SymmetricCipher::Encrypt, finalKey, encryptionIV)) {
+        raiseError(cipherStream.errorString());
+        return false;
+    }
     if (!cipherStream.open(QIODevice::WriteOnly)) {
         raiseError(cipherStream.errorString());
         return false;
