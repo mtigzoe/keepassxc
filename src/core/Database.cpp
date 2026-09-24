@@ -625,7 +625,11 @@ bool Database::backupDatabase(const QString& filePath, const QString& destinatio
         return false;
     }
 
-    if (!QFile::remove(destinationFilePath) || !QFile::rename(tempFile.fileName(), destinationFilePath)) {
+    if (QFile::exists(destinationFilePath) && !QFile::remove(destinationFilePath)) {
+        QFile::remove(tempFile.fileName());
+        return false;
+    }
+    if (!QFile::rename(tempFile.fileName(), destinationFilePath)) {
         QFile::remove(tempFile.fileName());
         return false;
     }
