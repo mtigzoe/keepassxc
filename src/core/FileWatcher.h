@@ -57,6 +57,7 @@ private:
     int m_fileChecksumSizeBytes = -1;
     bool m_ignoreFileChange = false;
     bool m_paused = false;
+    quint64 m_generation = 0;
 };
 
 #endif // KEEPASSXC_FILEWATCHER_H
