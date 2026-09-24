@@ -597,6 +597,7 @@ void Database::releaseData()
 
     m_fileBlockHash.clear();
     m_ignoreFileChangesUntilSaved = false;
+    setEmitModified(true);
 }
 
 /**
