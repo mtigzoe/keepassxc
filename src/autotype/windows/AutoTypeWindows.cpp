@@ -290,40 +290,47 @@ AutoTypeAction::Result AutoTypeExecutorWin::execBegin(const AutoTypeBegin* actio
 
 AutoTypeAction::Result AutoTypeExecutorWin::execType(const AutoTypeKey* action)
 {
+    bool modifiersOk = true;
     if (action->modifiers & Qt::ShiftModifier) {
-        if (!m_platform->setKeyState(Qt::Key_Shift, true)) return AutoTypeAction::Result::Failed(tr("Failed to inject keyboard input."));
+        modifiersOk = m_platform->setKeyState(Qt::Key_Shift, true) && modifiersOk;
     }
     if (action->modifiers & Qt::ControlModifier) {
-        if (!m_platform->setKeyState(Qt::Key_Control, true)) return AutoTypeAction::Result::Failed(tr("Failed to inject keyboard input."));
+        modifiersOk = m_platform->setKeyState(Qt::Key_Control, true) && modifiersOk;
     }
     if (action->modifiers & Qt::AltModifier) {
-        if (!m_platform->setKeyState(Qt::Key_Alt, true)) return AutoTypeAction::Result::Failed(tr("Failed to inject keyboard input."));
+        modifiersOk = m_platform->setKeyState(Qt::Key_Alt, true) && modifiersOk;
     }
     if (action->modifiers & Qt::MetaModifier) {
-        if (!m_platform->setKeyState(Qt::Key_Meta, true)) return AutoTypeAction::Result::Failed(tr("Failed to inject keyboard input."));
+        modifiersOk = m_platform->setKeyState(Qt::Key_Meta, true) && modifiersOk;
     }
 
-    if (action->key != Qt::Key_unknown) {
-        if (!m_platform->setKeyState(action->key, true) || !m_platform->setKeyState(action->key, false)) return AutoTypeAction::Result::Failed(tr("Failed to inject keyboard input."));
-    } else {
-        if (mode == Mode::VIRTUAL || action->modifiers != Qt::NoModifier) {
-            if (!m_platform->sendCharVirtual(action->character)) return AutoTypeAction::Result::Failed(tr("Failed to inject keyboard input."));
+    bool sent = false;
+    if (modifiersOk) {
+        if (action->key != Qt::Key_unknown) {
+            sent = m_platform->setKeyState(action->key, true) && m_platform->setKeyState(action->key, false);
+        } else if (mode == Mode::VIRTUAL || action->modifiers != Qt::NoModifier) {
+            sent = m_platform->sendCharVirtual(action->character);
         } else {
-            if (!m_platform->sendChar(action->character)) return AutoTypeAction::Result::Failed(tr("Failed to inject keyboard input."));
+            sent = m_platform->sendChar(action->character);
         }
     }
 
+    bool releaseOk = true;
     if (action->modifiers & Qt::ShiftModifier) {
-        if (!m_platform->setKeyState(Qt::Key_Shift, false)) return AutoTypeAction::Result::Failed(tr("Failed to inject keyboard input."));
+        releaseOk = m_platform->setKeyState(Qt::Key_Shift, false) && releaseOk;
     }
     if (action->modifiers & Qt::ControlModifier) {
-        if (!m_platform->setKeyState(Qt::Key_Control, false)) return AutoTypeAction::Result::Failed(tr("Failed to inject keyboard input."));
+        releaseOk = m_platform->setKeyState(Qt::Key_Control, false) && releaseOk;
     }
     if (action->modifiers & Qt::AltModifier) {
-        if (!m_platform->setKeyState(Qt::Key_Alt, false)) return AutoTypeAction::Result::Failed(tr("Failed to inject keyboard input."));
+        releaseOk = m_platform->setKeyState(Qt::Key_Alt, false) && releaseOk;
     }
     if (action->modifiers & Qt::MetaModifier) {
-        if (!m_platform->setKeyState(Qt::Key_Meta, false)) return AutoTypeAction::Result::Failed(tr("Failed to inject keyboard input."));
+        releaseOk = m_platform->setKeyState(Qt::Key_Meta, false) && releaseOk;
+    }
+
+    if (!modifiersOk || !sent || !releaseOk) {
+        return AutoTypeAction::Result::Failed(tr("Failed to inject keyboard input."));
     }
 
     Tools::sleep(execDelayMs);
