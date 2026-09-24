@@ -41,7 +41,7 @@ public:
     QString activeWindowTitle() override;
     bool raiseWindow(WId window) override;
     AutoTypeExecutor& executor() const override;
-    void updateKeymap();
+    bool updateKeymap();
 
     AutoTypeAction::Result sendKey(KeySym keysym, unsigned int modifiers = Qt::NoModifier);
 
