@@ -42,9 +42,9 @@ public:
     bool raiseWindow(WId window) override;
     AutoTypeExecutor& executor() const override;
 
-    void sendCharVirtual(const QChar& ch);
-    void sendChar(const QChar& ch);
-    void setKeyState(Qt::Key key, bool down);
+    bool sendCharVirtual(const QChar& ch);
+    bool sendChar(const QChar& ch);
+    bool setKeyState(Qt::Key key, bool down);
 
 private:
     AutoTypeExecutor* m_executor = nullptr;
