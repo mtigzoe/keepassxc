@@ -1189,7 +1189,13 @@ int DatabaseWidget::addChildWidget(QWidget* w)
 
 void DatabaseWidget::syncWithRemote(const RemoteParams* params)
 {
-    // Preserve the focused control while the database widget is disabled for remote sync.
+    if (!params) {
+        return;
+    }
+
+    // Copy the parameters for the entire sync lifetime. Locking the database can replace
+    // RemoteSettings while the nested event loop is running, invalidating the original pointer.
+    auto syncParams = QSharedPointer<RemoteParams>::create(*params);
     m_remoteSyncFocusWidget = QApplication::focusWidget();
     setDisabled(true);
     emit databaseSyncInProgress();
@@ -1200,17 +1206,17 @@ void DatabaseWidget::syncWithRemote(const RemoteParams* params)
     result.errorMessage = tr("Remote Sync did not contain any download or upload commands.");
 
     // Download the database
-    if (!params->downloadCommand.isEmpty()) {
+    if (!syncParams->downloadCommand.isEmpty()) {
         emit updateSyncProgress(25, tr("Downloading..."));
         // Start a download first then merge and upload in the callback
-        result = remoteHandler->download(params);
+        result = remoteHandler->download(syncParams.data());
         if (result.success) {
             QString error;
             QSharedPointer<Database> remoteDb = QSharedPointer<Database>::create();
             if (!remoteDb->open(result.filePath, m_db->key(), &error)) {
                 // Failed to open downloaded remote database with same key
                 // Unlock downloaded remote database via dialog
-                syncDatabaseWithLockedDatabase(result.filePath, params);
+                syncDatabaseWithLockedDatabase(result.filePath, syncParams);
                 return;
             }
             remoteDb->markAsTemporaryDatabase();
@@ -1222,10 +1228,10 @@ void DatabaseWidget::syncWithRemote(const RemoteParams* params)
         }
     }
 
-    uploadAndFinishSync(params, result);
+    uploadAndFinishSync(syncParams, result);
 }
 
-void DatabaseWidget::syncDatabaseWithLockedDatabase(const QString& filePath, const RemoteParams* params)
+void DatabaseWidget::syncDatabaseWithLockedDatabase(const QString& filePath, const QSharedPointer<RemoteParams>& params)
 {
     // disconnect any previously added slots to these signal
     disconnect(this, &DatabaseWidget::databaseSyncUnlocked, nullptr, nullptr);
@@ -1241,18 +1247,18 @@ void DatabaseWidget::syncDatabaseWithLockedDatabase(const QString& filePath, con
     emit unlockDatabaseInDialogForSync(filePath);
 }
 
-void DatabaseWidget::uploadAndFinishSync(const RemoteParams* params, RemoteHandler::RemoteResult result)
+void DatabaseWidget::uploadAndFinishSync(const QSharedPointer<RemoteParams>& params, RemoteHandler::RemoteResult result)
 {
     QScopedPointer<RemoteHandler> remoteHandler(new RemoteHandler(this));
     if (result.success && !params->uploadCommand.isEmpty()) {
         emit updateSyncProgress(75, tr("Uploading..."));
-        result = remoteHandler->upload(result.filePath, params);
+        result = remoteHandler->upload(result.filePath, params.data());
     }
 
     finishSync(params, result);
 }
 
-void DatabaseWidget::finishSync(const RemoteParams* params, RemoteHandler::RemoteResult result)
+void DatabaseWidget::finishSync(const QSharedPointer<RemoteParams>& params, RemoteHandler::RemoteResult result)
 {
     setDisabled(false);
     if (m_remoteSyncFocusWidget && m_remoteSyncFocusWidget->isVisible() && m_remoteSyncFocusWidget->isEnabled()) {
