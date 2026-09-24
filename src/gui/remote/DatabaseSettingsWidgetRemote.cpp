@@ -202,6 +202,12 @@ void DatabaseSettingsWidgetRemote::testDownload()
     // in case the settings dialog is closed during that wait.
     QPointer<DatabaseSettingsWidgetRemote> self(this);
     QScopedPointer<RemoteHandler> remoteHandler(new RemoteHandler(nullptr));
+    // The test button is disabled while the synchronous download runs. Move focus
+    // to the command field first so keyboard and screen-reader focus never remains on
+    // a disabled control during the operation.
+    if (m_ui->testDownloadCommandButton->hasFocus()) {
+        m_ui->downloadCommand->setFocus(Qt::OtherFocusReason);
+    }
     m_ui->testDownloadCommandButton->setEnabled(false);
 
     RemoteHandler::RemoteResult result = remoteHandler->download(&params);
