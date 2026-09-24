@@ -66,7 +66,10 @@ bool KdbxReader::readMagicNumbers(QIODevice* device, quint32& sig1, quint32& sig
  */
 bool KdbxReader::readDatabase(QIODevice* device, QSharedPointer<const CompositeKey> key, Database* db)
 {
-    device->seek(0);
+    if (!device->seek(0)) {
+        raiseError(tr("Failed to seek to the beginning of the database file."));
+        return false;
+    }
 
     m_db = db;
     m_masterSeed.clear();
@@ -75,7 +78,10 @@ bool KdbxReader::readDatabase(QIODevice* device, QSharedPointer<const CompositeK
     m_protectedStreamKey.clear();
 
     StoreDataStream headerStream(device);
-    headerStream.open(QIODevice::ReadOnly);
+    if (!headerStream.open(QIODevice::ReadOnly)) {
+        raiseError(headerStream.errorString());
+        return false;
+    }
 
     // read KDBX magic numbers
     quint32 sig1, sig2, version;
