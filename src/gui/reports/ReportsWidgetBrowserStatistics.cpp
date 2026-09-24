@@ -72,7 +72,6 @@ BrowserStatistics::BrowserStatistics(QSharedPointer<Database> db)
     : m_db(db)
 {
     for (auto group : db->rootGroup()->groupsRecursive(true)) {
-        // Skip recycle bin
         if (group->isRecycled()) {
             continue;
         }
@@ -154,15 +153,20 @@ void ReportsWidgetBrowserStatistics::addStatisticsRow(bool hasUrls,
     row << new QStandardItem(allowedUrlsList.join('\n'));
     row << new QStandardItem(deniedUrlsList.join('\n'));
 
-    // Set tooltips
+    // Set both tooltips and accessible descriptions so the same contextual
+    // information is available to screen readers without relying on hover.
     row[2]->setToolTip(urlToolTip);
+    row[2]->setData(urlToolTip, Qt::AccessibleDescriptionRole);
     row[3]->setToolTip(allowedUrlsToolTip);
+    row[3]->setData(allowedUrlsToolTip, Qt::AccessibleDescriptionRole);
     row[4]->setToolTip(deniedUrlsToolTip);
+    row[4]->setData(deniedUrlsToolTip, Qt::AccessibleDescriptionRole);
     if (excluded) {
-        row[0]->setToolTip(tr("This entry is being excluded from reports"));
+        const auto excludedDescription = tr("This entry is being excluded from reports");
+        row[0]->setToolTip(excludedDescription);
+        row[0]->setData(excludedDescription, Qt::AccessibleDescriptionRole);
     }
 
-    // Store entry pointer per table row (used in double click handler)
     m_referencesModel->appendRow(row);
     m_rowToEntry.append({group, entry});
 }
@@ -184,7 +188,6 @@ void ReportsWidgetBrowserStatistics::showEvent(QShowEvent* event)
     QWidget::showEvent(event);
 
     if (!m_statisticsCalculated) {
-        // Perform stats calculation on next event loop to allow widget to appear
         m_statisticsCalculated = true;
         QTimer::singleShot(0, this, SLOT(calculateBrowserStatistics()));
     }
@@ -194,7 +197,6 @@ void ReportsWidgetBrowserStatistics::calculateBrowserStatistics()
 {
     m_referencesModel->clear();
 
-    // Perform the statistics check
     const QScopedPointer<BrowserStatistics> browserStatistics(
         AsyncTask::runAndWaitForFuture([this] { return new BrowserStatistics(m_db); }));
 
@@ -202,30 +204,24 @@ void ReportsWidgetBrowserStatistics::calculateBrowserStatistics()
     const auto showEntriesWithUrlOnly = m_ui->showEntriesWithUrlOnlyCheckBox->isChecked();
     const auto showOnlyEntriesWithSettings = m_ui->showAllowDenyCheckBox->isChecked();
 
-    // Display the entries
     m_rowToEntry.clear();
     for (const auto& item : browserStatistics->items()) {
-        // Check if the entry should be displayed
         if (!showExpired && item->entry->isExpired()) {
             continue;
         }
 
-        // Exclude this entry if URL are not set
         if (showEntriesWithUrlOnly && !item->hasUrls) {
             continue;
         }
 
-        // Exclude this entry if it doesn't have any Browser Integration settings
         if (showOnlyEntriesWithSettings
             && !item->entry->customData()->contains(BrowserService::KEEPASSXCBROWSER_NAME)) {
             continue;
         }
 
-        // Show the entry in the report
         addStatisticsRow(item->hasUrls, item->hasSettings, item->group, item->entry, item->exclude);
     }
 
-    // Set the table header
     if (m_referencesModel->rowCount() == 0) {
         m_referencesModel->setHorizontalHeaderLabels(
             QStringList() << tr("No entries with a URL, or none has browser extension settings saved."));
@@ -261,10 +257,8 @@ void ReportsWidgetBrowserStatistics::customMenuRequested(QPoint pos)
         return;
     }
 
-    // Create the context menu
     const auto menu = new QMenu(this);
 
-    // Create the "edit entry" menu item (only if 1 row is selected)
     if (selected.size() == 1) {
         const auto edit = new QAction(icons()->icon("entry-edit"), tr("Edit Entry…"), this);
         menu->addAction(edit);
@@ -275,18 +269,15 @@ void ReportsWidgetBrowserStatistics::customMenuRequested(QPoint pos)
         });
     }
 
-    // Create the "expire entry" menu item
     const auto expEntry = new QAction(icons()->icon("entry-expire"), tr("Expire Entry(s)…", "", selected.size()), this);
     menu->addAction(expEntry);
     connect(expEntry, &QAction::triggered, this, &ReportsWidgetBrowserStatistics::expireSelectedEntries);
 
-    // Create the "delete entry" menu item
     const auto deleteEntry =
         new QAction(icons()->icon("entry-delete"), tr("Delete Entry(s)…", "", selected.size()), this);
     menu->addAction(deleteEntry);
     connect(deleteEntry, &QAction::triggered, this, &ReportsWidgetBrowserStatistics::deleteSelectedEntries);
 
-    // Create the "delete plugin data" menu item
     const auto deletePluginData =
         new QAction(icons()->icon("entry-delete"), tr("Delete plugin data from Entry(s)…", "", selected.size()), this);
     menu->addAction(deletePluginData);
@@ -295,7 +286,6 @@ void ReportsWidgetBrowserStatistics::customMenuRequested(QPoint pos)
             this,
             &ReportsWidgetBrowserStatistics::deletePluginDataFromSelectedEntries);
 
-    // Create the "exclude from reports" menu item
     const auto exclude = new QAction(icons()->icon("reports-exclude"), tr("Exclude from reports"), this);
 
     bool isExcluded = false;
@@ -303,7 +293,6 @@ void ReportsWidgetBrowserStatistics::customMenuRequested(QPoint pos)
         auto row = m_modelProxy->mapToSource(index).row();
         auto entry = m_rowToEntry[row].second;
         if (entry && entry->excludeFromReports()) {
-            // If at least one entry is excluded switch to inclusion
             isExcluded = true;
             break;
         }
@@ -323,13 +312,11 @@ void ReportsWidgetBrowserStatistics::customMenuRequested(QPoint pos)
         calculateBrowserStatistics();
     });
 
-    // Show the context menu
     menu->popup(m_ui->browserStatisticsTableView->viewport()->mapToGlobal(pos));
 }
 
 void ReportsWidgetBrowserStatistics::saveSettings()
 {
-    // Nothing to do - the tab is passive
 }
 
 QList<Entry*> ReportsWidgetBrowserStatistics::getSelectedEntries()
@@ -400,9 +387,8 @@ QMap<QString, QStringList> ReportsWidgetBrowserStatistics::getBrowserConfigFromE
 
             QStringList denied;
             foreach (const auto& value, deniedSites) {
-                auto url = value.toString();
-                if (!url.isEmpty()) {
-                    denied << url;
+                if (!value.toString().isEmpty()) {
+                    denied << value.toString();
                 }
             }
 
