@@ -165,11 +165,12 @@ bool QtIOCompressorPrivate::writeBytes(ZlibByte *buffer, ZlibSize outputSize)
     // Loop until all bytes are written to the underlying device.
     do {
         const qint64 bytesWritten = device->write(reinterpret_cast<char *>(buffer), outputSize);
-        if (bytesWritten == -1) {
+        if (bytesWritten <= 0) {
             q->setErrorString(QT_TRANSLATE_NOOP("QtIOCompressor", "Error writing to underlying device: ") + device->errorString());
+            state = QtIOCompressorPrivate::Error;
             return false;
         }
-        totalBytesWritten += bytesWritten;
+        totalBytesWritten += static_cast<ZlibSize>(bytesWritten);
     } while (totalBytesWritten != outputSize);
 
     // put up a flag so that the device will be flushed on close.
@@ -418,6 +419,8 @@ bool QtIOCompressor::open(OpenMode mode)
     // Handle error.
     if (status != Z_OK) {
         d->setZlibError(QT_TRANSLATE_NOOP("QtIOCompressor::open", "Internal zlib error: "), status);
+        if (d->manageDevice)
+            d->device->close();
         return false;
     }
     return QIODevice::open(mode);
