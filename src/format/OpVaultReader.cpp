@@ -293,6 +293,11 @@ QJsonObject OpVaultReader::readAndAssertJsonFile(QFile& file, const QString& str
         return {};
     }
     filePayload = file.readAll();
+    if (file.error() != QFile::NoError) {
+        qCritical() << QString("Unable to read \"%1\": %2").arg(absFilePath, file.errorString());
+        file.close();
+        return {};
+    }
     file.close();
     if (!stripLeading.isEmpty()) {
         QByteArray prefix = stripLeading.toUtf8();
