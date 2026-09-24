@@ -1259,6 +1259,13 @@ void DatabaseWidget::finishSync(const RemoteParams* params, RemoteHandler::Remot
         m_remoteSyncFocusWidget->setFocus();
     }
     m_remoteSyncFocusWidget.clear();
+    // Remote downloads are stored as temporary plaintext database files. They are
+    // only needed for the duration of the sync (including the optional unlock
+    // dialog), so remove them once the operation has reached its terminal state.
+    if (!result.filePath.isEmpty()) {
+        QFile::remove(result.filePath);
+    }
+
     emit updateSyncProgress(-1, "");
     if (result.success) {
         emit databaseSyncCompleted(params->name);
