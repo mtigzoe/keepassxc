@@ -80,8 +80,9 @@ void HashedBlockStream::close()
     // Write final block(s) only if device is writable and we haven't
     // already written a final block.
     if (isWritable() && (!m_buffer.isEmpty() || m_blockIndex != 0)) {
-        if (!m_buffer.isEmpty()) {
-            writeHashedBlock();
+        if (!m_buffer.isEmpty() && !writeHashedBlock()) {
+            LayeredStream::close();
+            return;
         }
 
         // write empty final block
@@ -185,7 +186,7 @@ qint64 HashedBlockStream::writeData(const char* data, qint64 maxSize)
     Q_ASSERT(maxSize >= 0);
 
     if (m_error) {
-        return 0;
+        return -1;
     }
 
     qint64 bytesRemaining = maxSize;
