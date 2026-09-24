@@ -55,6 +55,10 @@ bool OpData01::decode(const QByteArray& data, const QByteArray& key, const QByte
      */
     qlonglong len;
     in >> len;
+    if (in.status() != QDataStream::Ok || len < 0) {
+        m_errorStr = tr("Invalid OpData01 clear-text length");
+        return false;
+    }
 
     /*!
      * The next 16 bytes are the randomly chosen initialization vector.
@@ -95,7 +99,7 @@ bool OpData01::decode(const QByteArray& data, const QByteArray& key, const QByte
 
     const auto clear_len = len + randomBytes;
     QByteArray qbaCT(static_cast<qsizetype>(clear_len), '\0');
-    if (in.readRawData(qbaCT.data(), static_cast<int>(clear_len)) != clear_len) {
+    if (in.readRawData(qbaCT.data(), clear_len) != clear_len) {
         m_errorStr = tr("Unable to read all ciphertext bytes");
         return false;
     }
