@@ -257,8 +257,10 @@ AutoTypeAction::Result AutoTypeExecutorMac::execType(const AutoTypeKey* action)
                 || !m_platform->sendKey(static_cast<Qt::Key>(ch), false, action->modifiers)) return AutoTypeAction::Result::Failed(tr("Failed to create keyboard event."));
         } else if (mode == Mode::VIRTUAL) {
             int ch = action->character.toLatin1();
-            m_platform->sendKey(static_cast<Qt::Key>(ch), true, action->modifiers);
-            m_platform->sendKey(static_cast<Qt::Key>(ch), false, action->modifiers);
+            if (!m_platform->sendKey(static_cast<Qt::Key>(ch), true, action->modifiers)
+                || !m_platform->sendKey(static_cast<Qt::Key>(ch), false, action->modifiers)) {
+                return AutoTypeAction::Result::Failed(tr("Failed to create keyboard event."));
+            }
         } else {
             if (!m_platform->sendChar(action->character, true) || !m_platform->sendChar(action->character, false)) return AutoTypeAction::Result::Failed(tr("Failed to create keyboard event."));
         }
@@ -271,8 +273,13 @@ AutoTypeAction::Result AutoTypeExecutorMac::execType(const AutoTypeKey* action)
 AutoTypeAction::Result AutoTypeExecutorMac::execClearField(const AutoTypeClearField* action)
 {
     Q_UNUSED(action);
-    execType(new AutoTypeKey(Qt::Key_Left, Qt::ControlModifier));
-    execType(new AutoTypeKey(Qt::Key_Right, Qt::ControlModifier | Qt::ShiftModifier));
-    execType(new AutoTypeKey(Qt::Key_Backspace));
-    return AutoTypeAction::Result::Ok();
+    auto result = execType(new AutoTypeKey(Qt::Key_Left, Qt::ControlModifier));
+    if (!result.isOk()) {
+        return result;
+    }
+    result = execType(new AutoTypeKey(Qt::Key_Right, Qt::ControlModifier | Qt::ShiftModifier));
+    if (!result.isOk()) {
+        return result;
+    }
+    return execType(new AutoTypeKey(Qt::Key_Backspace));
 }
