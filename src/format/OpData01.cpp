@@ -85,18 +85,28 @@ bool OpData01::decode(const QByteArray& data, const QByteArray& key, const QByte
         // add random block
         randomBytes = blockSize;
     }
-    qlonglong clear_len = len + randomBytes;
-    QByteArray qbaCT(clear_len, '\0');
-    in.readRawData(qbaCT.data(), clear_len);
+
+    constexpr qsizetype fixedSize = 8 + sizeof(quint64) + 16 + (256 / 8);
+    if (data.size() < fixedSize || static_cast<quint64>(len) + static_cast<quint64>(randomBytes)
+        != static_cast<quint64>(data.size() - fixedSize)) {
+        m_errorStr = tr("Invalid OpData01 clear-text length");
+        return false;
+    }
+
+    const auto clear_len = len + randomBytes;
+    QByteArray qbaCT(static_cast<qsizetype>(clear_len), '\0');
+    if (in.readRawData(qbaCT.data(), static_cast<int>(clear_len)) != clear_len) {
+        m_errorStr = tr("Unable to read all ciphertext bytes");
+        return false;
+    }
 
     /*!
      * The HMAC-SHA256 is computed over the entirety of the opdata including header, length, IV and ciphertext
      * using a 256-bit MAC key. The 256-bit MAC is not truncated. It is appended to the ciphertext.
      */
     const int hmacLen = 256 / 8;
-    QByteArray hmacSig(hmacLen, '\0'); // 256 / 8, '\0');
-    in.readRawData(hmacSig.data(), hmacLen);
-    if (hmacSig.size() != hmacLen) {
+    QByteArray hmacSig(hmacLen, '\0');
+    if (in.readRawData(hmacSig.data(), hmacLen) != hmacLen) {
         m_errorStr = tr("Unable to read all HMAC signature bytes");
         return false;
     }
