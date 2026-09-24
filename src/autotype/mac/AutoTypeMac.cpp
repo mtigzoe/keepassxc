@@ -273,13 +273,17 @@ AutoTypeAction::Result AutoTypeExecutorMac::execType(const AutoTypeKey* action)
 AutoTypeAction::Result AutoTypeExecutorMac::execClearField(const AutoTypeClearField* action)
 {
     Q_UNUSED(action);
-    auto result = execType(new AutoTypeKey(Qt::Key_Left, Qt::ControlModifier));
+    AutoTypeKey left(Qt::Key_Left, Qt::ControlModifier);
+    AutoTypeKey right(Qt::Key_Right, Qt::ControlModifier | Qt::ShiftModifier);
+    AutoTypeKey backspace(Qt::Key_Backspace);
+
+    auto result = execType(&left);
     if (!result.isOk()) {
         return result;
     }
-    result = execType(new AutoTypeKey(Qt::Key_Right, Qt::ControlModifier | Qt::ShiftModifier));
+    result = execType(&right);
     if (!result.isOk()) {
         return result;
     }
-    return execType(new AutoTypeKey(Qt::Key_Backspace));
+    return execType(&backspace);
 }
