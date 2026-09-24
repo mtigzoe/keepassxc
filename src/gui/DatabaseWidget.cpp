@@ -2237,8 +2237,10 @@ void DatabaseWidget::reloadDatabaseFile(bool triggeredBySave)
             MessageBox::Yes | MessageBox::No);
 
         if (result == MessageBox::No) {
-            // Notify everyone the database does not match the file
+            // Notify everyone the database does not match the file. Reloading
+            // temporarily blocks autosave, so restore that state on cancellation.
             m_db->markAsModified();
+            m_blockAutoSave = false;
             m_reloading = false;
 
             emit reloadEnd();
