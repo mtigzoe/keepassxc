@@ -494,10 +494,11 @@ void DatabaseWidget::replaceDatabase(QSharedPointer<Database> db)
         newParentUuid = m_newParent->uuid();
     }
 
-    // TODO: instead of increasing the ref count temporarily, there should be a clean
-    // break from the old database. Without this crashes occur due to the change
-    // signals triggering dangling pointers.
+    // Disconnect the old database before replacing it. The old Database object can
+    // remain alive through other QSharedPointer owners after releaseData(), and its
+    // signals must not continue driving this widget's slots.
     auto oldDb = m_db;
+    disconnect(oldDb.data(), nullptr, this, nullptr);
     m_db = std::move(db);
     connectDatabaseSignals();
     m_groupView->changeDatabase(m_db);
