@@ -611,10 +611,26 @@ bool Database::backupDatabase(const QString& filePath, const QString& destinatio
         }
     }
     auto perms = QFile::permissions(filePath);
-    QFile::remove(destinationFilePath);
-    bool res = QFile::copy(filePath, destinationFilePath);
-    QFile::setPermissions(destinationFilePath, perms);
-    return res;
+
+    // Build the backup completely before replacing the previous backup. This
+    // preserves the last known-good backup if the source cannot be copied.
+    QTemporaryFile tempFile(QFileInfo(destinationFilePath).absolutePath() + QDir::separator()
+                            + QFileInfo(destinationFilePath).fileName() + ".XXXXXX");
+    if (!tempFile.open()) {
+        return false;
+    }
+    tempFile.close();
+
+    if (!QFile::remove(tempFile.fileName()) || !QFile::copy(filePath, tempFile.fileName())) {
+        return false;
+    }
+
+    if (!QFile::remove(destinationFilePath) || !QFile::rename(tempFile.fileName(), destinationFilePath)) {
+        QFile::remove(tempFile.fileName());
+        return false;
+    }
+
+    return QFile::setPermissions(destinationFilePath, perms);
 }
 
 /**
