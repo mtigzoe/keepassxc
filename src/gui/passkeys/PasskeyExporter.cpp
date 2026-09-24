@@ -24,8 +24,8 @@
 #include "core/EntryAttributes.h"
 #include "core/Tools.h"
 #include "gui/MessageBox.h"
-#include <QFile>
 #include <QJsonDocument>
+#include <QSaveFile>
 #include <QJsonObject>
 
 PasskeyExporter::PasskeyExporter(QWidget* parent)
@@ -87,7 +87,7 @@ void PasskeyExporter::exportSelectedEntry(const Entry* entry, const QString& fol
         }
     }
 
-    QFile passkeyFile(fullPath);
+    QSaveFile passkeyFile(fullPath);
     if (!passkeyFile.open(QIODevice::WriteOnly)) {
         MessageBox::information(
             m_parent, tr("Cannot open file"), tr("Cannot open file \"%1\" for writing.").arg(fullPath));
@@ -103,10 +103,16 @@ void PasskeyExporter::exportSelectedEntry(const Entry* entry, const QString& fol
     passkeyObject["privateKey"] = entry->attributes()->value(EntryAttributes::KPEX_PASSKEY_PRIVATE_KEY_PEM);
 
     QJsonDocument document(passkeyObject);
-    if (passkeyFile.write(document.toJson()) < 0) {
+    const auto jsonData = document.toJson();
+    if (passkeyFile.write(jsonData) != jsonData.size()) {
+        MessageBox::information(
+            m_parent, tr("Cannot write to file"), tr("Cannot write file \"%1\".").arg(fullPath));
+        passkeyFile.cancelWriting();
+        return;
+    }
+
+    if (!passkeyFile.commit()) {
         MessageBox::information(
             m_parent, tr("Cannot write to file"), tr("Cannot write file \"%1\".").arg(fullPath));
     }
-
-    passkeyFile.close();
 }
