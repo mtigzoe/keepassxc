@@ -105,7 +105,7 @@ void PasskeyExporter::exportSelectedEntry(const Entry* entry, const QString& fol
     QJsonDocument document(passkeyObject);
     if (passkeyFile.write(document.toJson()) < 0) {
         MessageBox::information(
-            nullptr, tr("Cannot write to file"), tr("Cannot open file \"%1\" for writing.").arg(fullPath));
+            m_parent, tr("Cannot write to file"), tr("Cannot write file \"%1\".").arg(fullPath));
     }
 
     passkeyFile.close();
