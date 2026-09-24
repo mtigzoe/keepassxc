@@ -290,6 +290,7 @@ QJsonObject OpVaultReader::readAndAssertJsonFile(QFile& file, const QString& str
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qCritical() << QString("Unable to open \"%1\" readonly+text").arg(absFilePath);
+        return {};
     }
     filePayload = file.readAll();
     file.close();
@@ -307,9 +308,9 @@ QJsonObject OpVaultReader::readAndAssertJsonFile(QFile& file, const QString& str
         }
     }
 
-    QJsonParseError* error = Q_NULLPTR;
-    QJsonDocument jDoc = QJsonDocument::fromJson(filePayload, error);
-    if (!jDoc.isObject()) {
+    QJsonParseError error;
+    QJsonDocument jDoc = QJsonDocument::fromJson(filePayload, &error);
+    if (error.error != QJsonParseError::NoError || !jDoc.isObject()) {
         qCritical() << "Expected " << filePayload << "to be a JSON Object";
         return {};
     }
