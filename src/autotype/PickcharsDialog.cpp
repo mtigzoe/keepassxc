@@ -30,6 +30,7 @@ PickcharsDialog::PickcharsDialog(const QString& string, QWidget* parent)
 {
     if (string.isEmpty()) {
         reject();
+        return;
     }
 
     // Places the window on the active (virtual) desktop instead of where the main window is.
