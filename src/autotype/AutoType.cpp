@@ -316,6 +316,7 @@ void AutoType::executeAutoTypeActions(const Entry* entry,
                                     tr("KeePassXC requires the Accessibility permission in order to perform entry "
                                        "level Auto-Type. If you already granted permission, you may have to restart "
                                        "KeePassXC."));
+            m_inAutoType.unlock();
             return;
         }
 
