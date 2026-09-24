@@ -66,7 +66,7 @@ bool Kdbx4Writer::writeDatabase(QIODevice* device, Database* db)
         QBuffer header;
         header.open(QIODevice::WriteOnly);
 
-        writeMagicNumbers(&header, KeePass2::SIGNATURE_1, KeePass2::SIGNATURE_2, db->formatVersion());
+        CHECK_RETURN_FALSE(writeMagicNumbers(&header, KeePass2::SIGNATURE_1, KeePass2::SIGNATURE_2, db->formatVersion()));
 
         CHECK_RETURN_FALSE(
             writeHeaderField<quint32>(&header, KeePass2::HeaderFieldID::CipherID, db->cipher().toRfc4122()));
