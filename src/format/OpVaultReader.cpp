@@ -25,7 +25,8 @@
 
 #include <QDebug>
 #include <QJsonDocument>
-#include <QJsonObject>\n\n#include <limits>
+#include <QJsonObject>
+
 
 #include <botan/pwdhash.h>
 
@@ -147,12 +148,15 @@ QString OpVaultReader::errorString()
 bool OpVaultReader::processProfileJson(QJsonObject& profileJson, const QString& password, Group* rootGroup)
 {
     const auto iterationsValue = profileJson["iterations"];
-    if (!iterationsValue.isDouble() || iterationsValue.toDouble() < 1
-        || iterationsValue.toDouble() > static_cast<double>(std::numeric_limits<unsigned long>::max())) {
+    if (!iterationsValue.isDouble()) {
         m_error = tr("Invalid password derivation iterations");
         return false;
     }
-    const auto iterations = static_cast<unsigned long>(iterationsValue.toDouble());
+    const auto iterations = iterationsValue.toInteger();
+    if (iterations < 1) {
+        m_error = tr("Invalid password derivation iterations");
+        return false;
+    }
     // QString lastUpdatedBy = profileJson["lastUpdatedBy"].toString();
     QString masterKeyB64 = profileJson["masterKey"].toString();
     QString overviewKeyB64 = profileJson["overviewKey"].toString();
