@@ -158,7 +158,7 @@ bool AutoTypePlatformMac::raiseOwnWindow()
 // Send unicode character to active window
 // see: Quartz Event Services
 //
-void AutoTypePlatformMac::sendChar(const QChar& ch, bool isKeyDown)
+bool AutoTypePlatformMac::sendChar(const QChar& ch, bool isKeyDown)
 {
     CGEventRef keyEvent = ::CGEventCreateKeyboardEvent(nullptr, 0, isKeyDown);
     if (keyEvent != nullptr) {
@@ -166,18 +166,20 @@ void AutoTypePlatformMac::sendChar(const QChar& ch, bool isKeyDown)
         ::CGEventKeyboardSetUnicodeString(keyEvent, 1, &unicode);
         ::CGEventPost(kCGSessionEventTap, keyEvent);
         ::CFRelease(keyEvent);
+        return true;
     }
+    return false;
 }
 
 //
 // Send key code to active window
 // see: Quartz Event Services
 //
-void AutoTypePlatformMac::sendKey(Qt::Key key, bool isKeyDown, Qt::KeyboardModifiers modifiers)
+bool AutoTypePlatformMac::sendKey(Qt::Key key, bool isKeyDown, Qt::KeyboardModifiers modifiers)
 {
     uint16 keyCode = macUtils()->qtToNativeKeyCode(key);
     if (keyCode == INVALID_KEYCODE) {
-        return;
+        return false;
     }
 
     CGEventRef keyEvent = ::CGEventCreateKeyboardEvent(nullptr, keyCode, isKeyDown);
@@ -186,7 +188,9 @@ void AutoTypePlatformMac::sendKey(Qt::Key key, bool isKeyDown, Qt::KeyboardModif
         ::CGEventSetFlags(keyEvent, nativeModifiers);
         ::CGEventPost(kCGSessionEventTap, keyEvent);
         ::CFRelease(keyEvent);
+        return true;
     }
+    return false;
 }
 
 //
@@ -242,22 +246,21 @@ AutoTypeAction::Result AutoTypeExecutorMac::execType(const AutoTypeKey* action)
 
 
     if (action->key != Qt::Key_unknown) {
-        m_platform->sendKey(action->key, true, action->modifiers);
-        m_platform->sendKey(action->key, false, action->modifiers);
+        if (!m_platform->sendKey(action->key, true, action->modifiers)
+            || !m_platform->sendKey(action->key, false, action->modifiers)) return AutoTypeAction::Result::Failed(tr("Failed to create keyboard event."));
     } else {
         if (action->modifiers != Qt::NoModifier) {
             // If we have modifiers set than we intend to send a key sequence
             // convert to uppercase to align with Qt Key mappings
             int ch = action->character.toUpper().toLatin1();
-            m_platform->sendKey(static_cast<Qt::Key>(ch), true, action->modifiers);
-            m_platform->sendKey(static_cast<Qt::Key>(ch), false, action->modifiers);
+            if (!m_platform->sendKey(static_cast<Qt::Key>(ch), true, action->modifiers)
+                || !m_platform->sendKey(static_cast<Qt::Key>(ch), false, action->modifiers)) return AutoTypeAction::Result::Failed(tr("Failed to create keyboard event."));
         } else if (mode == Mode::VIRTUAL) {
             int ch = action->character.toLatin1();
             m_platform->sendKey(static_cast<Qt::Key>(ch), true, action->modifiers);
             m_platform->sendKey(static_cast<Qt::Key>(ch), false, action->modifiers);
         } else {
-            m_platform->sendChar(action->character, true);
-            m_platform->sendChar(action->character, false);
+            if (!m_platform->sendChar(action->character, true) || !m_platform->sendChar(action->character, false)) return AutoTypeAction::Result::Failed(tr("Failed to create keyboard event."));
         }
     }
 
