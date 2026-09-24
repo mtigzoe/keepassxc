@@ -72,6 +72,8 @@ void FileWatcher::start(const QString& filePath, int checksumIntervalSeconds, in
 
 void FileWatcher::stop()
 {
+    ++m_generation;
+
     if (!m_filePath.isEmpty()) {
         m_fileWatcher.removePath(m_filePath);
     }
@@ -117,9 +119,14 @@ void FileWatcher::checkFileChanged()
     // Prevent reentrance
     m_ignoreFileChange = true;
 
+    const auto generation = m_generation;
     AsyncTask::runThenCallback([this] { return calculateChecksum(); },
                                this,
-                               [this](const QByteArray& checksum) {
+                               [this, generation](const QByteArray& checksum) {
+                                   if (generation != m_generation) {
+                                       return;
+                                   }
+
                                    if (checksum != m_fileChecksum) {
                                        m_fileChecksum = checksum;
                                        m_fileChangeDelayTimer.start(0);
