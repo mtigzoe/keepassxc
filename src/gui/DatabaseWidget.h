@@ -129,7 +129,7 @@ public:
     void setSearchStringForAutoType(const QString& search);
 
     void syncWithRemote(const RemoteParams* params);
-    void syncDatabaseWithLockedDatabase(const QString& filePath, const RemoteParams* params);
+    void syncDatabaseWithLockedDatabase(const QString& filePath, const QSharedPointer<RemoteParams>& params);
     QList<RemoteParams*> getRemoteParams() const;
 
 signals:
@@ -288,8 +288,8 @@ private slots:
     void mergeDatabase(bool accepted);
     void syncUnlockedDatabase(bool accepted);
     bool syncWithDatabase(const QSharedPointer<Database>& otherDb, QString& error);
-    void uploadAndFinishSync(const RemoteParams* params, RemoteHandler::RemoteResult result);
-    void finishSync(const RemoteParams* params, RemoteHandler::RemoteResult result);
+    void uploadAndFinishSync(const QSharedPointer<RemoteParams>& params, RemoteHandler::RemoteResult result);
+    void finishSync(const QSharedPointer<RemoteParams>& params, RemoteHandler::RemoteResult result);
     void emitCurrentModeChanged();
     // Database autoreload slots
     void reloadDatabaseFile(bool triggeredBySave);
