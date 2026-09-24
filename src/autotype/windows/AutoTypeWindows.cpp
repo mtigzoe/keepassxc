@@ -139,7 +139,7 @@ bool AutoTypePlatformWin::sendCharVirtual(const QChar& ch)
     in[1] = in[0];
     in[1].ki.dwFlags |= KEYEVENTF_KEYUP;
 
-    const bool sent = ::SendInput(2, &in[0], sizeof(INPUT)) == 2;
+    bool sent = modifiersOk && (::SendInput(2, &in[0], sizeof(INPUT)) == 2);
 
     if (HIBYTE(vKey) & 0x6) {
         sent = setKeyState(Qt::Key_AltGr, false) && sent;
