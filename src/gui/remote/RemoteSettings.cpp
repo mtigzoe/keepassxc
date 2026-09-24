@@ -31,10 +31,14 @@ RemoteSettings::RemoteSettings(const QSharedPointer<Database>& db, QObject* pare
     setDatabase(db);
 }
 
-RemoteSettings::~RemoteSettings() = default;
+RemoteSettings::~RemoteSettings()
+{
+    qDeleteAll(m_remoteParams);
+}
 
 void RemoteSettings::setDatabase(const QSharedPointer<Database>& db)
 {
+    qDeleteAll(m_remoteParams);
     m_remoteParams.clear();
     m_db = db;
     loadSettings();
@@ -46,12 +50,22 @@ void RemoteSettings::addRemoteParams(RemoteParams* params)
         qWarning() << "RemoteSettings::addRemoteParams: Remote parameters name is empty";
         return;
     }
-    m_remoteParams.insert(params->name, params);
+    auto it = m_remoteParams.find(params->name);
+    if (it != m_remoteParams.end()) {
+        delete it.value();
+        it.value() = params;
+    } else {
+        m_remoteParams.insert(params->name, params);
+    }
 }
 
 void RemoteSettings::removeRemoteParams(const QString& name)
 {
-    m_remoteParams.remove(name);
+    auto it = m_remoteParams.find(name);
+    if (it != m_remoteParams.end()) {
+        delete it.value();
+        m_remoteParams.erase(it);
+    }
 }
 
 RemoteParams* RemoteSettings::getRemoteParams(const QString& name) const
@@ -101,6 +115,7 @@ QString RemoteSettings::toConfig() const
 
 void RemoteSettings::fromConfig(const QString& data)
 {
+    qDeleteAll(m_remoteParams);
     m_remoteParams.clear();
 
     QJsonDocument json = QJsonDocument::fromJson(data.toUtf8());
