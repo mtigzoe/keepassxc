@@ -331,7 +331,12 @@ void AutoType::executeAutoTypeActions(const Entry* entry,
         // Restore window state (macOS only) then raise the target window
         restoreWindowState();
         QCoreApplication::processEvents();
-        m_platform->raiseWindow(window);
+        if (!m_platform->raiseWindow(window)) {
+            qWarning() << "Unable to raise the target window, interrupting auto-type.";
+            emit autotypeFinished();
+            m_inAutoType.unlock();
+            return;
+        }
     }
 
     // Restore executor mode
