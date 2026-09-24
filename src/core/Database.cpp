@@ -365,7 +365,24 @@ bool Database::saveAs(const QString& filePath, SaveAction action, const QString&
         // An atomic save failure leaves the existing file untouched because QSaveFile
         // only replaces it during commit(). Keep watching it so external changes are
         // still detected.
-        if (savingCurrentFile && action == Atomic) {
+        // Atomic saves leave the watched file untouched on failure. TempFile saves
+        // may also leave it intact when writing the temporary file fails or when the
+        // original file is successfully restored from backup. Restart the watcher only
+        // when the original file is still verifiably unchanged; a failed TempFile save
+        // can otherwise leave the watcher stopped indefinitely.
+        bool currentFileIntact = savingCurrentFile && action == TempFile && !m_fileBlockHash.isEmpty();
+        if (currentFileIntact) {
+            QFile dbFile(realFilePath);
+            if (!dbFile.open(QIODevice::ReadOnly)) {
+                currentFileIntact = false;
+            } else {
+                const auto fileBlockData = dbFile.read(kFileBlockToHashSizeBytes);
+                currentFileIntact = fileBlockData.size() == kFileBlockToHashSizeBytes
+                                    && QCryptographicHash::hash(fileBlockData, QCryptographicHash::Md5) == m_fileBlockHash;
+            }
+        }
+
+        if (savingCurrentFile && (action == Atomic || currentFileIntact)) {
             m_fileWatcher->start(realFilePath, 30, 1);
         }
         markAsModified();
