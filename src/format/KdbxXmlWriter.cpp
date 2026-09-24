@@ -19,6 +19,7 @@
 
 #include <QBuffer>
 #include <QFile>
+#include <QSaveFile>
 #include <QMap>
 
 #include "core/Endian.h"
@@ -77,9 +78,20 @@ void KdbxXmlWriter::writeDatabase(QIODevice* device,
 
 void KdbxXmlWriter::writeDatabase(const QString& filename, Database* db)
 {
-    QFile file(filename);
-    if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-        writeDatabase(&file, db);
+    QSaveFile file(filename);
+    if (!file.open(QIODevice::WriteOnly)) {
+        raiseError(file.errorString());
+        return;
+    }
+
+    writeDatabase(&file, db);
+    if (hasError()) {
+        file.cancelWriting();
+        return;
+    }
+
+    if (!file.commit()) {
+        raiseError(file.errorString());
     }
 }
 
