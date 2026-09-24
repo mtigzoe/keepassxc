@@ -17,7 +17,7 @@
 
 #include "HtmlExporter.h"
 
-#include <QFile>
+#include <QSaveFile>
 
 #include "core/Group.h"
 #include "core/Metadata.h"
@@ -99,12 +99,22 @@ bool HtmlExporter::exportDatabase(const QString& filename,
                                   bool sorted,
                                   bool ascending)
 {
-    QFile file(filename);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+    // Write through QSaveFile so a failed export cannot leave a partially
+    // written plaintext HTML file in place of an existing export.
+    QSaveFile file(filename);
+    if (!file.open(QIODevice::WriteOnly)) {
         m_error = file.errorString();
         return false;
     }
-    return exportDatabase(&file, db, sorted, ascending);
+    if (!exportDatabase(&file, db, sorted, ascending)) {
+        file.cancelWriting();
+        return false;
+    }
+    if (!file.commit()) {
+        m_error = file.errorString();
+        return false;
+    }
+    return true;
 }
 
 QString HtmlExporter::errorString() const
