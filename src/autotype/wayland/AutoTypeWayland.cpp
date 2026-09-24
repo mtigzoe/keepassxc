@@ -223,8 +223,13 @@ AutoTypeAction::Result AutoTypeExecutorWayland::execClearField(const AutoTypeCle
     AutoTypeKey home(Qt::Key_Home);
     AutoTypeKey end(Qt::Key_End, Qt::ShiftModifier);
     AutoTypeKey backspace(Qt::Key_Backspace);
-    execType(&home);
-    execType(&end);
-    execType(&backspace);
-    return AutoTypeAction::Result::Ok();
+    auto result = execType(&home);
+    if (!result.isOk()) {
+        return result;
+    }
+    result = execType(&end);
+    if (!result.isOk()) {
+        return result;
+    }
+    return execType(&backspace);
 }
