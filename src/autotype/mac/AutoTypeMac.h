@@ -43,8 +43,8 @@ public:
     bool hideOwnWindow() override;
     bool raiseOwnWindow() override;
 
-    void sendChar(const QChar& ch, bool isKeyDown);
-    void sendKey(Qt::Key key, bool isKeyDown, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
+    bool sendChar(const QChar& ch, bool isKeyDown);
+    bool sendKey(Qt::Key key, bool isKeyDown, Qt::KeyboardModifiers modifiers = Qt::NoModifier);
 
 private:
     static int windowLayer(CFDictionaryRef window);
