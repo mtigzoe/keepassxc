@@ -43,13 +43,15 @@ AutoTypePlatformX11::AutoTypePlatformX11()
     // Qt handles XCB slightly differently so we open our own connection
     if (auto* native = qGuiApp->nativeInterface<QNativeInterface::QX11Application>()) {
         m_dpy = XOpenDisplay(XDisplayString(native->display()));
-        m_rootWindow = DefaultRootWindow(native->display());
+        if (!m_dpy) {
+            qWarning("Auto-Type: Unable to connect to X server, Auto-Type is disabled.");
+            return;
+        }
+        m_rootWindow = DefaultRootWindow(m_dpy);
     } else {
         qWarning("Auto-Type: Unable to connect to X server, Auto-Type is disabled.");
         return;
     }
-
-    Q_ASSERT(m_dpy);
 
     m_atomWmState = XInternAtom(m_dpy, "WM_STATE", True);
     m_atomWmName = XInternAtom(m_dpy, "WM_NAME", True);
