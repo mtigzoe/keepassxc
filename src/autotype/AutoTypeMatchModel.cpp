@@ -70,11 +70,17 @@ void AutoTypeMatchModel::setMatchList(const QList<AutoTypeMatch>& matches)
     severConnections();
 
     m_allGroups.clear();
-    m_matches = matches;
+    m_matches.clear();
+    m_matches.reserve(matches.size());
 
     QSet<Database*> databases;
 
-    for (AutoTypeMatch& match : m_matches) {
+    for (const auto& match : matches) {
+        if (!match.first) {
+            continue;
+        }
+
+        m_matches.append(match);
         databases.insert(match.first->group()->database());
     }
 
