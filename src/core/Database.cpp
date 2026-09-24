@@ -290,8 +290,14 @@ bool Database::saveAs(const QString& filePath, SaveAction action, const QString&
         return false;
     }
 
-    // Make sure we don't overwrite external modifications unless explicitly allowed
-    if (!m_ignoreFileChangesUntilSaved && !m_fileBlockHash.isEmpty() && filePath == m_data.filePath) {
+    QFileInfo fileInfo(filePath);
+    auto realFilePath = fileInfo.exists() ? fileInfo.canonicalFilePath() : fileInfo.absoluteFilePath();
+    const bool savingCurrentFile = !m_data.filePath.isEmpty() && realFilePath == canonicalFilePath();
+
+    // Make sure we don't overwrite external modifications unless explicitly allowed.
+    // Compare canonical paths so a symlink or alternate spelling of the current file
+    // cannot bypass the external-change protection.
+    if (!m_ignoreFileChangesUntilSaved && !m_fileBlockHash.isEmpty() && savingCurrentFile) {
         QFile dbFile(filePath);
         if (dbFile.exists()) {
             if (!dbFile.open(QIODevice::ReadOnly)) {
@@ -319,10 +325,6 @@ bool Database::saveAs(const QString& filePath, SaveAction action, const QString&
             }
         }
     }
-
-    QFileInfo fileInfo(filePath);
-    auto realFilePath = fileInfo.exists() ? fileInfo.canonicalFilePath() : fileInfo.absoluteFilePath();
-    const bool savingCurrentFile = !m_data.filePath.isEmpty() && realFilePath == canonicalFilePath();
 
     // Clear read-only flag only when replacing the database file being watched.
     // A Save As to a different path must keep watching the current database if
