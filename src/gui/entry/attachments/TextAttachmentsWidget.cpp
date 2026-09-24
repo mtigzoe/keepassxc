@@ -39,7 +39,6 @@ void TextAttachmentsWidget::openAttachment(attachments::Attachment attachment, a
 {
     m_attachment = std::move(attachment);
     m_mode = mode;
-
     updateWidget();
 }
 
@@ -48,17 +47,12 @@ attachments::Attachment TextAttachmentsWidget::getAttachment() const
     if (m_mode == attachments::OpenMode::ReadWrite) {
         return m_editWidget->getAttachment();
     }
-
     return m_attachment;
 }
 
 void TextAttachmentsWidget::updateWidget()
 {
     if (m_mode == attachments::OpenMode::ReadOnly) {
-        // Only show the preview widget in read-only mode. If the editor (or
-        // one of its children) currently owns focus, move focus to the
-        // preview before hiding it so keyboard and screen-reader users are
-        // not left on a hidden widget.
         auto* focusedWidget = QApplication::focusWidget();
         if (focusedWidget && (focusedWidget == m_editWidget || m_editWidget->isAncestorOf(focusedWidget))) {
             m_previewWidget->setFocus(Qt::OtherFocusReason);
@@ -66,17 +60,19 @@ void TextAttachmentsWidget::updateWidget()
         m_splitter->setSizes({0, 1});
         m_editWidget->hide();
         m_previewWidget->openAttachment(m_attachment, m_mode);
+        m_editWidget->findChild<QPushButton*>("previewPushButton")->setChecked(false);
     } else {
-        // Show the edit widget and hide the preview by default in read-write mode
         m_splitter->setSizes({1, 0});
         m_editWidget->show();
         m_editWidget->openAttachment(m_attachment, m_mode);
+        m_editWidget->findChild<QPushButton*>("previewPushButton")->setChecked(false);
     }
 }
 
 void TextAttachmentsWidget::updatePreviewWidget()
 {
     m_previewVisible = isPreviewVisible();
+    m_editWidget->findChild<QPushButton*>("previewPushButton")->setChecked(m_previewVisible);
     if (m_previewVisible) {
         m_attachment = m_editWidget->getAttachment();
         m_previewWidget->openAttachment(m_attachment, attachments::OpenMode::ReadOnly);
@@ -92,40 +88,31 @@ void TextAttachmentsWidget::initWidget()
     m_previewUpdateTimer->setSingleShot(true);
     m_previewUpdateTimer->setInterval(500);
 
-    // Only update the preview after a set timeout and if it is visible
     connect(m_previewUpdateTimer, &QTimer::timeout, this, &TextAttachmentsWidget::updatePreviewWidget);
-    connect(m_editWidget,
-            &TextAttachmentsEditWidget::scrollChanged,
-            m_previewWidget,
-            &TextAttachmentsPreviewWidget::matchScroll);
-
-    connect(
-        m_editWidget, &TextAttachmentsEditWidget::textChanged, m_previewUpdateTimer, QOverload<>::of(&QTimer::start));
+    connect(m_editWidget, &TextAttachmentsEditWidget::scrollChanged, m_previewWidget, &TextAttachmentsPreviewWidget::matchScroll);
+    connect(m_editWidget, &TextAttachmentsEditWidget::textChanged, m_previewUpdateTimer, QOverload<>::of(&QTimer::start));
 
     connect(m_editWidget, &TextAttachmentsEditWidget::previewButtonClicked, [this] {
-        // Split the display in half if showing the preview widget
         const auto previewSize = isPreviewVisible() ? 0 : m_splitter->width() / 2;
         const auto editSize = m_splitter->width() - previewSize;
         m_splitter->setSizes({editSize, previewSize});
         updatePreviewWidget();
     });
 
-    // Check if the preview panel is manually collapsed or shown
     connect(m_splitter, &QSplitter::splitterMoved, this, [this](int, int) {
-        // Trigger a preview update if it has become visible
         auto visible = isPreviewVisible();
         if (visible && !m_previewVisible) {
             updatePreviewWidget();
+        } else {
+            m_previewVisible = visible;
+            m_editWidget->findChild<QPushButton*>("previewPushButton")->setChecked(visible);
         }
-        m_previewVisible = visible;
     });
 
     m_splitter->addWidget(m_editWidget);
     m_splitter->addWidget(m_previewWidget);
-    // Prevent collapsing of the edit widget
     m_splitter->setCollapsible(0, false);
 
-    // Setup this widget with the splitter
     auto layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_splitter);
