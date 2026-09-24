@@ -456,7 +456,15 @@ bool Database::performSave(const QString& filePath, SaveAction action, const QSt
         // Open the original database file for direct-write
         QFile dbFile(filePath);
         if (dbFile.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-            dbFile.write(dbBuffer.data());
+            const auto data = dbBuffer.data();
+            const auto bytesWritten = dbFile.write(data);
+            if (bytesWritten != data.size()) {
+                if (error) {
+                    *error = dbFile.errorString();
+                }
+                dbFile.close();
+                return false;
+            }
             dbFile.close();
             // store the new hash
             m_fileBlockHash = hashingStream.hashingResult();
