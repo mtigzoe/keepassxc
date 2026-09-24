@@ -337,12 +337,16 @@ unsigned long AutoTypePlatformX11::appUserTime(Window window)
  * We need the KeyboardMapping for AddKeysym.
  * Modifier mapping is required for clearing the modifiers.
  */
-void AutoTypePlatformX11::updateKeymap()
+bool AutoTypePlatformX11::updateKeymap()
 {
     if (m_xkb) {
         XkbFreeKeyboard(m_xkb, XkbAllComponentsMask, True);
     }
     m_xkb = XkbGetMap(m_dpy, XkbAllClientInfoMask, XkbUseCoreKbd);
+    if (!m_xkb) {
+        qWarning("Auto-Type: Unable to load XKB keyboard map.");
+        return false;
+    }
 
     /* workaround X11 bug https://gitlab.freedesktop.org/xorg/xserver/-/issues/1155 */
     XkbSetMap(m_dpy, XkbAllClientInfoMask, m_xkb);
@@ -398,7 +402,12 @@ void AutoTypePlatformX11::updateKeymap()
             }
         }
     }
+    if (!modifiers) {
+        qWarning("Auto-Type: Unable to load X11 modifier mapping.");
+        return false;
+    }
     XFreeModifiermap(modifiers);
+    return true;
 }
 
 // --------------------------------------------------------------------------
@@ -622,7 +631,9 @@ AutoTypeExecutorX11::AutoTypeExecutorX11(AutoTypePlatformX11* platform)
 AutoTypeAction::Result AutoTypeExecutorX11::execBegin(const AutoTypeBegin* action)
 {
     Q_UNUSED(action);
-    m_platform->updateKeymap();
+    if (!m_platform->updateKeymap()) {
+        return AutoTypeAction::Result::Failed(tr("Unable to initialize the X11 keyboard mapping."));
+    }
     return AutoTypeAction::Result::Ok();
 }
 
