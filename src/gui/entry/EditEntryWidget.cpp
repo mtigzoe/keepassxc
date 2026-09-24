@@ -1160,7 +1160,7 @@ void EditEntryWidget::setForms(Entry* entry, bool restore)
     if (m_history) {
         editTriggers = QAbstractItemView::NoEditTriggers;
     } else {
-        editTriggers = QAbstractItemView::DoubleClicked;
+        editTriggers = QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed;
     }
     m_advancedUi->attributesView->setEditTriggers(editTriggers);
     m_advancedUi->excludeReportsCheckBox->setChecked(entry->excludeFromReports());
