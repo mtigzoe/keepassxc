@@ -80,8 +80,13 @@ void AutoTypeMatchModel::setMatchList(const QList<AutoTypeMatch>& matches)
             continue;
         }
 
+        const auto* group = match.first->group();
+        if (!group || !group->database()) {
+            continue;
+        }
+
         m_matches.append(match);
-        databases.insert(match.first->group()->database());
+        databases.insert(group->database());
     }
 
     for (Database* db : asConst(databases)) {
