@@ -42,9 +42,13 @@ namespace
         }
 
         // Read export.data into memory
+        if (unzOpenCurrentFile(uf) != UNZ_OK) {
+            qWarning("Failed to open 1PUX document entry: %s", qPrintable(filename));
+            return {};
+        }
+
         int bytes, bytesRead = 0;
         QByteArray data;
-        unzOpenCurrentFile(uf);
         do {
             data.resize(data.size() + 8192);
             bytes = unzReadCurrentFile(uf, data.data() + bytesRead, 8192);
@@ -52,9 +56,14 @@ namespace
                 bytesRead += bytes;
             }
         } while (bytes > 0);
-        unzCloseCurrentFile(uf);
-        data.truncate(bytesRead);
 
+        const auto closeResult = unzCloseCurrentFile(uf);
+        if (bytes < 0 || closeResult != UNZ_OK) {
+            qWarning("Failed to read 1PUX document entry: %s", qPrintable(filename));
+            return {};
+        }
+
+        data.truncate(bytesRead);
         return data;
     }
 
