@@ -157,6 +157,7 @@ bool Kdbx4Writer::writeDatabase(QIODevice* device, Database* db)
 
     // Write attachments to the inner header
     auto idxMap = writeAttachments(outputDevice, db);
+    CHECK_RETURN_FALSE(!m_error);
 
     CHECK_RETURN_FALSE(writeInnerHeaderField(outputDevice, KeePass2::InnerHeaderFieldID::End, QByteArray()));
 
@@ -241,7 +242,9 @@ KdbxXmlWriter::BinaryIdxMap Kdbx4Writer::writeAttachments(QIODevice* device, Dat
             // Deduplicate attachments with the same hash
             const auto hashResult = hash.result();
             if (!writtenAttachments.contains(hashResult)) {
-                writeInnerHeaderField(device, KeePass2::InnerHeaderFieldID::Binary, data);
+                if (!writeInnerHeaderField(device, KeePass2::InnerHeaderFieldID::Binary, data)) {
+                    return idxMap;
+                }
                 writtenAttachments.insert(hashResult, nextIdx++);
             }
             idxMap.insert(qMakePair(entry, key), writtenAttachments[hashResult]);
