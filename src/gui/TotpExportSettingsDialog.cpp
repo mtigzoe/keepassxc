@@ -135,7 +135,18 @@ void TotpExportSettingsDialog::copyToClipboard()
 void TotpExportSettingsDialog::autoClose()
 {
     if (--m_secTillClose > 0) {
-        m_countDown->setText(tr("Closing in %1 seconds.").arg(m_secTillClose));
+        const auto countdownText = tr("Closing in %1 seconds.").arg(m_secTillClose);
+        m_countDown->setText(countdownText);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+        // The dialog closes automatically. Announce the final countdown milestones
+        // so screen-reader users are not left unaware that the window is about to
+        // disappear while focus remains on another control.
+        if (m_secTillClose <= 5 || m_secTillClose == 10) {
+            QAccessibleAnnouncementEvent announcementEvent(m_countDown, countdownText);
+            announcementEvent.setPoliteness(QAccessible::AnnouncementPoliteness::Assertive);
+            QAccessible::updateAccessibility(&announcementEvent);
+        }
+#endif
     } else {
         m_timer->stop();
         close();
