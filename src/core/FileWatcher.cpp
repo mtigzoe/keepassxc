@@ -129,6 +129,11 @@ void FileWatcher::checkFileChanged()
                                        return;
                                    }
 
+                                   if (m_paused) {
+                                       m_ignoreFileChange = false;
+                                       return;
+                                   }
+
                                    if (checksum != m_fileChecksum) {
                                        m_fileChecksum = checksum;
                                        m_fileChangeDelayTimer.start(0);
