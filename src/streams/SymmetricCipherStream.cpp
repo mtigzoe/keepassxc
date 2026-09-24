@@ -78,11 +78,11 @@ bool SymmetricCipherStream::reset()
 
 void SymmetricCipherStream::close()
 {
-    if (isWritable() && m_dataWritten) {
-        writeBlock(true);
-    }
+    const bool writeFailed = isWritable() && m_dataWritten && !writeBlock(true);
 
-    resetInternalState();
+    if (!writeFailed) {
+        resetInternalState();
+    }
 
     LayeredStream::close();
 }
