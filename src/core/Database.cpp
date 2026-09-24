@@ -320,8 +320,16 @@ bool Database::saveAs(const QString& filePath, SaveAction action, const QString&
         }
     }
 
-    // Clear read-only flag
-    m_fileWatcher->stop();
+    QFileInfo fileInfo(filePath);
+    auto realFilePath = fileInfo.exists() ? fileInfo.canonicalFilePath() : fileInfo.absoluteFilePath();
+    const bool savingCurrentFile = !m_data.filePath.isEmpty() && realFilePath == canonicalFilePath();
+
+    // Clear read-only flag only when replacing the database file being watched.
+    // A Save As to a different path must keep watching the current database if
+    // the save later fails.
+    if (savingCurrentFile) {
+        m_fileWatcher->stop();
+    }
 
     // Add random data to prevent side-channel data deduplication attacks
     int length = Random::instance()->randomUIntRange(64, 512);
@@ -330,8 +338,6 @@ bool Database::saveAs(const QString& filePath, SaveAction action, const QString&
     // Prevent destructive operations while saving
     QMutexLocker locker(&m_saveMutex);
 
-    QFileInfo fileInfo(filePath);
-    auto realFilePath = fileInfo.exists() ? fileInfo.canonicalFilePath() : fileInfo.absoluteFilePath();
     bool isNewFile = !QFile::exists(realFilePath);
 
 #ifdef Q_OS_WIN
