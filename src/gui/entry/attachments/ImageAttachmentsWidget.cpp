@@ -23,6 +23,7 @@
 #include <cmath>
 #include <utility>
 
+#include <QAccessible>
 #include <QDebug>
 #include <QEvent>
 #include <QGraphicsScene>
@@ -47,7 +48,6 @@ namespace
         auto zoomTextTrimmed = zoomText.trimmed();
 
         if (auto percentIndex = zoomTextTrimmed.indexOf('%'); percentIndex != -1) {
-            // Remove the '%' character and parse the number
             zoomTextTrimmed = zoomTextTrimmed.left(percentIndex).trimmed();
         }
 
@@ -98,7 +98,6 @@ void ImageAttachmentsWidget::initZoomComboBox()
     for (const auto& zoom : ZoomList) {
         auto zoomText = formatZoomText(zoom);
         textWidth = std::max(textWidth, m_ui->zoomComboBox->fontMetrics().horizontalAdvance(zoomText));
-
         m_ui->zoomComboBox->addItem(zoomText, zoom);
     }
 
@@ -111,7 +110,6 @@ void ImageAttachmentsWidget::initZoomComboBox()
         onZoomChanged(m_ui->zoomComboBox->lineEdit()->text());
     });
 
-    // Fit by default
     m_ui->zoomComboBox->setCurrentIndex(m_ui->zoomComboBox->findData(0.0));
     onZoomChanged(m_ui->zoomComboBox->currentText());
 }
@@ -121,7 +119,6 @@ void ImageAttachmentsWidget::onWheelZoomEvent(QWheelEvent* event)
     m_ui->imagesView->disableAutoFitInView();
 
     auto finInViewFactor = m_ui->imagesView->calculateFitInViewFactor();
-    // Limit the fit-in-view factor to a maximum of 100%
     m_zoomHelper->setMinZoomOutFactor(std::isnan(finInViewFactor) ? 1.0 : std::min(finInViewFactor, 1.0));
 
     event->angleDelta().y() > 0 ? m_zoomHelper->zoomIn() : m_zoomHelper->zoomOut();
@@ -135,7 +132,6 @@ void ImageAttachmentsWidget::onZoomFactorChanged(double zoomFactor)
 
     m_ui->imagesView->setTransform(QTransform::fromScale(zoomFactor, zoomFactor));
 
-    // Update the zoom combo box to reflect the current zoom factor
     if (!m_ui->zoomComboBox->lineEdit()->hasFocus()) {
         m_ui->zoomComboBox->setCurrentText(formatZoomText(zoomFactor));
     }
@@ -147,7 +143,6 @@ void ImageAttachmentsWidget::onZoomChanged(const QString& zoomText)
 
     if (zoomText == tr("Fit")) {
         m_ui->imagesView->enableAutoFitInView();
-
         zoomFactor = std::min(m_ui->imagesView->calculateFitInViewFactor(), zoomFactor);
     } else {
         zoomFactor = parseZoomText(zoomText);
@@ -184,10 +179,15 @@ void ImageAttachmentsWidget::loadImage()
     pixmap.loadFromData(m_attachment.data);
     if (pixmap.isNull()) {
         qWarning() << "Failed to load image from data";
+        m_scene->clear();
+        m_ui->imagesView->setAccessibleDescription(tr("Unable to display attachment image"));
+        QAccessibleEvent alertEvent(m_ui->imagesView, QAccessible::Alert);
+        QAccessible::updateAccessibility(&alertEvent);
         return;
     }
 
     m_scene->clear();
+    m_ui->imagesView->setAccessibleDescription({});
     m_scene->addPixmap(std::move(pixmap));
 }
 
