@@ -185,19 +185,19 @@ void DatabaseSettingsWidgetRemote::clearFields()
 
 void DatabaseSettingsWidgetRemote::testDownload()
 {
-    auto* params = new RemoteParams();
-    params->name = m_ui->nameLineEdit->text();
-    params->downloadCommand = m_ui->downloadCommand->text();
-    params->downloadInput = m_ui->inputForDownload->toPlainText();
-    params->downloadTimeoutMsec = m_ui->downloadTimeoutSec->value() * 1000;
+    RemoteParams params;
+    params.name = m_ui->nameLineEdit->text();
+    params.downloadCommand = m_ui->downloadCommand->text();
+    params.downloadInput = m_ui->inputForDownload->toPlainText();
+    params.downloadTimeoutMsec = m_ui->downloadTimeoutSec->value() * 1000;
 
     QScopedPointer<RemoteHandler> remoteHandler(new RemoteHandler(this));
-    if (params->downloadCommand.isEmpty()) {
+    if (params.downloadCommand.isEmpty()) {
         m_ui->messageWidget->showMessage(tr("Download command cannot be empty."), MessageWidget::Warning);
         return;
     }
 
-    RemoteHandler::RemoteResult result = remoteHandler->download(params);
+    RemoteHandler::RemoteResult result = remoteHandler->download(&params);
     if (!result.success) {
         m_ui->messageWidget->showMessage(tr("Download failed with error: %1").arg(result.errorMessage),
                                          MessageWidget::Error);
@@ -211,4 +211,5 @@ void DatabaseSettingsWidgetRemote::testDownload()
     }
 
     m_ui->messageWidget->showMessage(tr("Download successful."), MessageWidget::Positive);
+    QFile::remove(result.filePath);
 }
