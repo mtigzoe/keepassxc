@@ -4,7 +4,7 @@
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 2 or (at your option)
- *  version 3 of the License.
+ *  3 of the License.
  *
  *  This program is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -190,6 +190,12 @@ void IconDownloaderDialog::updateProgressBar()
     m_ui->progressBar->setMaximum(total);
     m_ui->progressLabel->setText(
         tr("Downloading favicons (%1/%2)…").arg(QString::number(value), QString::number(total)));
+
+    // The progress text changes asynchronously while focus remains elsewhere.
+    // Explicitly notify accessibility clients so screen readers can announce the
+    // current download progress instead of requiring the user to revisit the label.
+    QAccessibleEvent event(m_ui->progressLabel, QAccessible::TextUpdated);
+    QAccessible::updateAccessibility(&event);
 }
 
 void IconDownloaderDialog::updateCancelButton()
