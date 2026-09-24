@@ -19,6 +19,7 @@
 
 #include <QApplication>
 #include <QFileInfo>
+#include <QSaveFile>
 #include <QTabBar>
 
 #include "autotype/AutoType.h"
@@ -571,14 +572,28 @@ void DatabaseTabWidget::exportToXML()
     QString err;
     if (!db->extract(xmlData, &err)) {
         emit messageGlobal(tr("Writing the XML file failed").append("\n").append(err), MessageWidget::Error);
+        return;
     }
 
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+    QSaveFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly)) {
+        emit messageGlobal(tr("Writing the XML file failed").append("\n").append(file.errorString()),
+                           MessageWidget::Error);
+        return;
+    }
+
+    const auto bytesWritten = file.write(xmlData);
+    if (bytesWritten != xmlData.size()) {
+        emit messageGlobal(tr("Writing the XML file failed").append("\n").append(file.errorString()),
+                           MessageWidget::Error);
+        file.cancelWriting();
+        return;
+    }
+
+    if (!file.commit()) {
         emit messageGlobal(tr("Writing the XML file failed").append("\n").append(file.errorString()),
                            MessageWidget::Error);
     }
-    file.write(xmlData);
 }
 
 bool DatabaseTabWidget::warnOnExport()
