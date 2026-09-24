@@ -251,12 +251,24 @@ void KdbxXmlWriter::writeBinaries()
 
             QtIOCompressor compressor(&buffer);
             compressor.setStreamFormat(QtIOCompressor::GzipFormat);
-            compressor.open(QIODevice::WriteOnly);
+            if (!compressor.open(QIODevice::WriteOnly)) {
+                raiseError(compressor.errorString());
+                m_xml.writeEndElement();
+                continue;
+            }
 
-            qint64 bytesWritten = compressor.write(i.value());
-            Q_ASSERT(bytesWritten == i.value().size());
-            Q_UNUSED(bytesWritten);
+            const qint64 bytesWritten = compressor.write(i.value());
+            if (bytesWritten != i.value().size()) {
+                raiseError(compressor.errorString());
+                m_xml.writeEndElement();
+                continue;
+            }
             compressor.close();
+            if (!compressor.errorString().isEmpty()) {
+                raiseError(compressor.errorString());
+                m_xml.writeEndElement();
+                continue;
+            }
 
             buffer.seek(0);
             data = buffer.readAll();
