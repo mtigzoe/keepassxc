@@ -90,7 +90,11 @@ bool Kdbx4Writer::writeDatabase(QIODevice* device, Database* db)
         QVariantMap publicCustomData = db->publicCustomData();
         if (!publicCustomData.isEmpty()) {
             QByteArray serialized;
-            serializeVariantMap(publicCustomData, serialized);
+            if (!serializeVariantMap(publicCustomData, serialized)) {
+                //: Translation comment: variant map = data structure for storing meta data
+                raiseError(tr("Failed to serialize public custom data variant map"));
+                return false;
+            }
             CHECK_RETURN_FALSE(
                 writeHeaderField<quint32>(&header, KeePass2::HeaderFieldID::PublicCustomData, serialized));
         }
