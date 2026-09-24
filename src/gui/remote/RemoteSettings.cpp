@@ -21,6 +21,7 @@
 #include "core/Metadata.h"
 
 #include <QDebug>
+#include <QtAlgorithms>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
