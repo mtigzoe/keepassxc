@@ -77,11 +77,16 @@ bool OpVaultReader::readAttachment(const QString& filePath,
         return false;
     }
 
-    int iconLen = 0;
-    for (int i = 0, len = iconLenBytes.size(); i < len; ++i) {
-        char ch = iconLenBytes[i];
-        auto b = static_cast<unsigned char>(ch & 0xFF);
-        iconLen = (b << (i * 8)) | iconLen;
+    quint32 iconLen = 0;
+    for (int i = 0; i < iconLenBytes.size(); ++i) {
+        const auto b = static_cast<unsigned char>(iconLenBytes[i]);
+        iconLen |= static_cast<quint32>(b) << (i * 8);
+    }
+
+    if (iconLen > static_cast<quint32>(file.bytesAvailable())) {
+        qCritical() << "Attachment icon length exceeds remaining file data; wanted " << iconLen << "bytes, got "
+                    << file.bytesAvailable();
+        return false;
     }
 
     QByteArray metadataJsonBytes = file.read(metadataLen);
@@ -90,7 +95,7 @@ bool OpVaultReader::readAttachment(const QString& filePath,
                     << metadataJsonBytes.size();
         return false;
     }
-    QByteArray iconBytes = file.read(iconLen);
+    QByteArray iconBytes = file.read(static_cast<qint64>(iconLen));
     if (iconBytes.size() != iconLen) {
         qCritical() << "Unable to read all icon bytes; wanted " << iconLen << "but read " << iconBytes.size();
         // apologies for the icon being fatal, but it would take some gear-turning
