@@ -79,6 +79,7 @@ void ExportDialog::exportDatabase()
             fileName, m_db, sortBy != ExportSortingStrategy::BY_DATABASE_ORDER, ascendingOrder)) {
         emit exportFailed(htmlExporter.errorString());
         reject();
+        return;
     }
 
     accept();
