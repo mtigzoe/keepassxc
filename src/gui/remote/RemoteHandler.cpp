@@ -95,6 +95,12 @@ RemoteHandler::RemoteResult RemoteHandler::download(const RemoteParams* params)
                 tr("Command `%1` did not finish in time. Process was killed.").arg(params->downloadCommand);
         }
 
+        // A failed download does not return filePath to the caller, so clean up
+        // the temporary database here rather than leaving it in the temp folder.
+        if (!result.success) {
+            QFile::remove(filePath);
+        }
+
         return result;
     });
 }
