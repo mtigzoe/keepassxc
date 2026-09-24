@@ -591,32 +591,41 @@ qint64 QtIOCompressor::writeData(const char *data, qint64 maxSize)
     if (maxSize < 1)
         return 0;
     Q_D(QtIOCompressor);
-    d->zlibStream.next_in = reinterpret_cast<ZlibByte *>(const_cast<char *>(data));
-    d->zlibStream.avail_in = maxSize;
-
     if (d->state == QtIOCompressorPrivate::Error)
         return -1;
 
-    do {
-        d->zlibStream.next_out = d->buffer;
-        d->zlibStream.avail_out = d->bufferSize;
-        const int status = deflate(&d->zlibStream, Z_NO_FLUSH);
-        if (status != Z_OK) {
-            d->state = QtIOCompressorPrivate::Error;
-            d->setZlibError(QT_TRANSLATE_NOOP("QtIOCompressor", "Internal zlib error when compressing: "), status);
-            return -1;
-        }
+    qint64 totalBytesWritten = 0;
+    while (totalBytesWritten < maxSize) {
+        const ZlibSize chunkSize = static_cast<ZlibSize>(qMin<qint64>(maxSize - totalBytesWritten, std::numeric_limits<ZlibSize>::max()));
+        d->zlibStream.next_in =
+            reinterpret_cast<ZlibByte *>(const_cast<char *>(data + totalBytesWritten));
+        d->zlibStream.avail_in = chunkSize;
 
-        ZlibSize outputSize = d->bufferSize - d->zlibStream.avail_out;
+        do {
+            d->zlibStream.next_out = d->buffer;
+            d->zlibStream.avail_out = d->bufferSize;
+            const int status = deflate(&d->zlibStream, Z_NO_FLUSH);
+            if (status != Z_OK) {
+                d->state = QtIOCompressorPrivate::Error;
+                d->setZlibError(QT_TRANSLATE_NOOP("QtIOCompressor", "Internal zlib error when compressing: "), status);
+                return -1;
+            }
 
-        // Try to write data from the buffer to to the underlying device, return -1 on failure.
-        if (d->writeBytes(d->buffer, outputSize) == false)
-            return -1;
+            ZlibSize outputSize = d->bufferSize - d->zlibStream.avail_out;
 
-    } while (d->zlibStream.avail_out == 0); // run until output is not full.
-    Q_ASSERT(d->zlibStream.avail_in == 0);
+            // Try to write data from the buffer to the underlying device, return -1 on failure.
+            if (d->writeBytes(d->buffer, outputSize) == false)
+                return -1;
 
-    return maxSize;
+        } while (d->zlibStream.avail_out == 0); // run until output is not full.
+
+        const ZlibSize consumed = chunkSize - d->zlibStream.avail_in;
+        totalBytesWritten += consumed;
+        if (consumed == 0)
+            break;
+    }
+
+    return totalBytesWritten == maxSize ? maxSize : -1;
 }
 
 /*
