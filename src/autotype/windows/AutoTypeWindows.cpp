@@ -109,22 +109,23 @@ bool AutoTypePlatformWin::sendChar(const QChar& ch)
 bool AutoTypePlatformWin::sendCharVirtual(const QChar& ch)
 {
     auto vKey = VkKeyScanExW(ch.unicode(), GetKeyboardLayout(0));
+    bool modifiersOk = true;
     if (vKey == -1) {
         // VKey not found, send as Unicode character
         return sendChar(ch);
     }
 
     if (HIBYTE(vKey) & 0x6) {
-        setKeyState(Qt::Key_AltGr, true);
+        modifiersOk = setKeyState(Qt::Key_AltGr, true);
     } else {
         if (HIBYTE(vKey) & 0x1) {
-            if (!setKeyState(Qt::Key_Shift, true)) return false;
+            modifiersOk = setKeyState(Qt::Key_Shift, true) && modifiersOk;
         }
         if (HIBYTE(vKey) & 0x2) {
-            if (!setKeyState(Qt::Key_Control, true)) return false;
+            modifiersOk = setKeyState(Qt::Key_Control, true) && modifiersOk;
         }
         if (HIBYTE(vKey) & 0x4) {
-            if (!setKeyState(Qt::Key_Alt, true)) return false;
+            modifiersOk = setKeyState(Qt::Key_Alt, true) && modifiersOk;
         }
     }
 
@@ -160,7 +161,7 @@ bool AutoTypePlatformWin::sendCharVirtual(const QChar& ch)
 //
 // Send virtual key code to foreground window
 //
-void AutoTypePlatformWin::setKeyState(Qt::Key key, bool down)
+bool AutoTypePlatformWin::setKeyState(Qt::Key key, bool down)
 {
     WORD nativeKeyCode = winUtils()->qtToNativeKeyCode(key);
     DWORD nativeFlags = KEYEVENTF_SCANCODE;
@@ -332,8 +333,17 @@ AutoTypeAction::Result AutoTypeExecutorWin::execType(const AutoTypeKey* action)
 AutoTypeAction::Result AutoTypeExecutorWin::execClearField(const AutoTypeClearField* action)
 {
     Q_UNUSED(action);
-    execType(new AutoTypeKey(Qt::Key_Home, Qt::ControlModifier));
-    execType(new AutoTypeKey(Qt::Key_End, Qt::ControlModifier | Qt::ShiftModifier));
-    execType(new AutoTypeKey(Qt::Key_Backspace));
-    return AutoTypeAction::Result::Ok();
+    AutoTypeKey home(Qt::Key_Home, Qt::ControlModifier);
+    AutoTypeKey end(Qt::Key_End, Qt::ControlModifier | Qt::ShiftModifier);
+    AutoTypeKey backspace(Qt::Key_Backspace);
+
+    auto result = execType(&home);
+    if (!result.isOk()) {
+        return result;
+    }
+    result = execType(&end);
+    if (!result.isOk()) {
+        return result;
+    }
+    return execType(&backspace);
 }
