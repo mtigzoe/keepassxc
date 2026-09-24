@@ -25,7 +25,10 @@ RemoteProcess::RemoteProcess(QObject* parent)
 {
 }
 
-RemoteProcess::~RemoteProcess() = default;
+RemoteProcess::~RemoteProcess()
+{
+}
+
 
 void RemoteProcess::setTempFileLocation(const QString& tempFile)
 {
