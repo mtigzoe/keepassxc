@@ -137,7 +137,8 @@ public:
         m_tableView->setSelectionMode(QAbstractItemView::SingleSelection);
         m_tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-        connect(m_tableView, &QTableView::doubleClicked, this, &ShortcutSettingsWidget::onDoubleClicked);\n        connect(m_tableView, &QTableView::activated, this, &ShortcutSettingsWidget::onDoubleClicked);
+        connect(m_tableView, &QTableView::doubleClicked, this, &ShortcutSettingsWidget::onDoubleClicked);
+        connect(m_tableView, &QTableView::activated, this, &ShortcutSettingsWidget::onDoubleClicked);
     }
 
     void loadSettings()
