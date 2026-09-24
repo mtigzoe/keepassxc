@@ -199,9 +199,14 @@ void KdbxReader::setTransformRounds(const QByteArray& data)
     }
 
     auto rounds = Endian::bytesToSizedInt<quint64>(data, KeePass2::BYTEORDER);
+    if (rounds < 1 || rounds >= INT_MAX) {
+        raiseError(tr("Invalid transform rounds"));
+        return;
+    }
+
     auto kdf = m_db->kdf();
-    if (!kdf.isNull()) {
-        kdf->setRounds(static_cast<int>(rounds));
+    if (!kdf.isNull() && !kdf->setRounds(static_cast<int>(rounds))) {
+        raiseError(tr("Invalid transform rounds"));
     }
 }
 
@@ -214,7 +219,7 @@ void KdbxReader::setEncryptionIV(const QByteArray& data)
 }
 
 /**
- * @param data key for random (inner) stream as bytes
+ * @param data key for random (inner) stream
  */
 void KdbxReader::setProtectedStreamKey(const QByteArray& data)
 {
@@ -255,7 +260,7 @@ void KdbxReader::setInnerRandomStreamID(const QByteArray& data)
 /**
  * Raise an error. Use in case of an unexpected read error.
  *
- * @param errorMessage error message
+ * @param errorMessage errorMessage
  */
 void KdbxReader::raiseError(const QString& errorMessage)
 {
