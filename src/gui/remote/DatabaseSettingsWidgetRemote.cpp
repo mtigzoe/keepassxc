@@ -26,6 +26,7 @@
 #include "gui/MessageBox.h"
 
 #include <QFile>
+#include <QPointer>
 
 DatabaseSettingsWidgetRemote::DatabaseSettingsWidgetRemote(QWidget* parent)
     : DatabaseSettingsWidget(parent)
@@ -191,25 +192,40 @@ void DatabaseSettingsWidgetRemote::testDownload()
     params.downloadInput = m_ui->inputForDownload->toPlainText();
     params.downloadTimeoutMsec = m_ui->downloadTimeoutSec->value() * 1000;
 
-    QScopedPointer<RemoteHandler> remoteHandler(new RemoteHandler(this));
     if (params.downloadCommand.isEmpty()) {
         m_ui->messageWidget->showMessage(tr("Download command cannot be empty."), MessageWidget::Warning);
         return;
     }
 
+    // RemoteHandler::download() runs a nested event loop while waiting for the worker.
+    // Keep the handler independent from this widget and guard all post-download UI access
+    // in case the settings dialog is closed during that wait.
+    QPointer<DatabaseSettingsWidgetRemote> self(this);
+    QScopedPointer<RemoteHandler> remoteHandler(new RemoteHandler(nullptr));
+    m_ui->testDownloadCommandButton->setEnabled(false);
+
     RemoteHandler::RemoteResult result = remoteHandler->download(&params);
     if (!result.success) {
-        m_ui->messageWidget->showMessage(tr("Download failed with error: %1").arg(result.errorMessage),
-                                         MessageWidget::Error);
+        if (self) {
+            m_ui->testDownloadCommandButton->setEnabled(true);
+            m_ui->messageWidget->showMessage(tr("Download failed with error: %1").arg(result.errorMessage),
+                                             MessageWidget::Error);
+        }
         return;
     }
 
     if (!QFile::exists(result.filePath)) {
-        m_ui->messageWidget->showMessage(tr("Download finished, but file %1 could not be found.").arg(result.filePath),
-                                         MessageWidget::Error);
+        if (self) {
+            m_ui->testDownloadCommandButton->setEnabled(true);
+            m_ui->messageWidget->showMessage(
+                tr("Download finished, but file %1 could not be found.").arg(result.filePath), MessageWidget::Error);
+        }
         return;
     }
 
-    m_ui->messageWidget->showMessage(tr("Download successful."), MessageWidget::Positive);
     QFile::remove(result.filePath);
+    if (self) {
+        m_ui->testDownloadCommandButton->setEnabled(true);
+        m_ui->messageWidget->showMessage(tr("Download successful."), MessageWidget::Positive);
+    }
 }
