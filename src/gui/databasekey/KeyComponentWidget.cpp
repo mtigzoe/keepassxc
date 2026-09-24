@@ -100,11 +100,35 @@ void KeyComponentWidget::updateAddStatus(bool added)
 void KeyComponentWidget::doAdd()
 {
     changeVisiblePage(Page::Edit);
+
+    // The button that activates the edit page is hidden by the stacked
+    // widget. Move focus into the newly-created editor so keyboard and
+    // screen-reader users do not lose focus when the page changes.
+    if (m_componentWidget) {
+        for (auto* widget : m_componentWidget->findChildren<QWidget*>(QString(), Qt::FindChildrenRecursively)) {
+            if (widget->isEnabled() && widget->isVisible() && widget->focusPolicy() != Qt::NoFocus) {
+                widget->setFocus(Qt::OtherFocusReason);
+                break;
+            }
+        }
+    }
 }
 
 void KeyComponentWidget::doEdit()
 {
     changeVisiblePage(Page::Edit);
+
+    // The Change button is hidden when the editor page is shown. Put focus
+    // on the first usable editor control rather than leaving focus on the
+    // hidden button.
+    if (m_componentWidget) {
+        for (auto* widget : m_componentWidget->findChildren<QWidget*>(QString(), Qt::FindChildrenRecursively)) {
+            if (widget->isEnabled() && widget->isVisible() && widget->focusPolicy() != Qt::NoFocus) {
+                widget->setFocus(Qt::OtherFocusReason);
+                break;
+            }
+        }
+    }
 }
 
 void KeyComponentWidget::doRemove()
