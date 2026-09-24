@@ -415,11 +415,24 @@ QSharedPointer<Database> BitwardenReader::convert(const QString& path, const QSt
             salt = saltHash.result();
 
             Argon2Kdf argon2(Argon2Kdf::Type::Argon2id);
-            argon2.setSeed(salt);
-            argon2.setRounds(json.value("kdfIterations").toInt());
-            argon2.setMemory(json.value("kdfMemory").toInt() * 1024);
-            argon2.setParallelism(json.value("kdfParallelism").toInt());
-            argon2.transform(password.toUtf8(), key);
+            if (!argon2.setSeed(salt)) {
+                m_error = buildError(QObject::tr("Invalid Argon2 salt"));
+                return {};
+            }
+
+            const auto iterations = json.value("kdfIterations").toInt();
+            const auto memory = json.value("kdfMemory").toInt();
+            const auto parallelism = json.value("kdfParallelism").toInt();
+            if (iterations <= 0 || !argon2.setRounds(iterations) || memory <= 0 || !argon2.setMemory(static_cast<quint64>(memory) * 1024)
+                || parallelism <= 0 || !argon2.setParallelism(parallelism)) {
+                m_error = buildError(QObject::tr("Invalid Argon2 parameters"));
+                return {};
+            }
+
+            if (!argon2.transform(password.toUtf8(), key)) {
+                m_error = buildError(QObject::tr("Cannot derive encryption key"));
+                return {};
+            }
         } else {
             m_error = buildError(QObject::tr("Only PBKDF and Argon2 are supported, cannot decrypt json file"));
             return {};
