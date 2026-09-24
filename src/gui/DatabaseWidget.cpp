@@ -2144,6 +2144,10 @@ bool DatabaseWidget::lock()
                 QApplication::processEvents();
                 disconnect(connection);
                 if (reloadTriggered) {
+                    // The reload path takes over while processing events. Clear the
+                    // lock-attempt guard before returning so a later lock request is
+                    // not permanently rejected.
+                    m_attemptingLock = false;
                     return false;
                 }
             }
