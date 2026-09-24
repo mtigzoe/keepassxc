@@ -213,8 +213,12 @@ ApplicationSettingsWidget::ApplicationSettingsWidget(QWidget* parent)
             QString error;
             if (autoType()->registerGlobalShortcut(key, modifiers, &error)) {
                 m_generalUi->autoTypeShortcutWidget->setStyleSheet("");
+                m_generalUi->autoTypeShortcutWidget->setAccessibleDescription({});
             } else {
                 QToolTip::showText(mapToGlobal(rect().bottomLeft()), error);
+                m_generalUi->autoTypeShortcutWidget->setAccessibleDescription(error);
+                QAccessibleEvent alertEvent(m_generalUi->autoTypeShortcutWidget, QAccessible::Alert);
+                QAccessible::updateAccessibility(&alertEvent);
                 StateColorPalette statePalette;
                 auto color = statePalette.color(StateColorPalette::ColorRole::Error);
                 m_generalUi->autoTypeShortcutWidget->setStyleSheet(
