@@ -174,6 +174,10 @@ bool Kdbx4Writer::writeDatabase(QIODevice* device, Database* db)
     // errors. QIODevice::close() resets errorString() etc.
     if (ioCompressor) {
         ioCompressor->close();
+        if (!ioCompressor->errorString().isEmpty()) {
+            raiseError(ioCompressor->errorString());
+            return false;
+        }
     }
     if (!cipherStream->reset()) {
         raiseError(cipherStream->errorString());
