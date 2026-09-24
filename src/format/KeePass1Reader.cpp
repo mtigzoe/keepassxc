@@ -21,6 +21,8 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QRegularExpression>
+
+#include <limits>
 #include <QStringConverter>
 
 #include "core/Endian.h"
@@ -448,13 +450,13 @@ Group* KeePass1Reader::readGroup(QIODevice* cipherStream)
             return nullptr;
         }
 
-        auto fieldSize = static_cast<int>(Endian::readSizedInt<quint32>(cipherStream, KeePass1::BYTEORDER, &ok));
-        if (!ok) {
+        const auto fieldSize = Endian::readSizedInt<quint32>(cipherStream, KeePass1::BYTEORDER, &ok);
+        if (!ok || fieldSize > static_cast<quint32>(std::numeric_limits<qint64>::max())) {
             raiseError(tr("Invalid group field size"));
             return nullptr;
         }
 
-        QByteArray fieldData = cipherStream->read(fieldSize);
+        QByteArray fieldData = cipherStream->read(static_cast<qint64>(fieldSize));
         if (fieldData.size() != fieldSize) {
             raiseError(tr("Read group field data doesn't match size"));
             return nullptr;
@@ -582,13 +584,13 @@ Entry* KeePass1Reader::readEntry(QIODevice* cipherStream)
             return nullptr;
         }
 
-        auto fieldSize = static_cast<int>(Endian::readSizedInt<quint32>(cipherStream, KeePass1::BYTEORDER, &ok));
-        if (!ok) {
+        const auto fieldSize = Endian::readSizedInt<quint32>(cipherStream, KeePass1::BYTEORDER, &ok);
+        if (!ok || fieldSize > static_cast<quint32>(std::numeric_limits<qint64>::max())) {
             raiseError(tr("Invalid entry field size"));
             return nullptr;
         }
 
-        QByteArray fieldData = cipherStream->read(fieldSize);
+        QByteArray fieldData = cipherStream->read(static_cast<qint64>(fieldSize));
         if (fieldData.size() != fieldSize) {
             raiseError(tr("Read entry field data doesn't match size"));
             return nullptr;
