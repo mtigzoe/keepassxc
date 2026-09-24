@@ -136,7 +136,10 @@ bool KeePass2Writer::writeDatabase(QIODevice* device, Database* db)
         // If we forget to re-transform, the database will be saved WITHOUT a challenge-response key component!
         auto kdf = KeePass2::uuidToKdf(KeePass2::KDF_AES_KDBX4);
         kdf->setRounds(db->kdf()->rounds());
-        db->changeKdf(kdf);
+        if (!db->changeKdf(kdf)) {
+            raiseError(tr("Unable to transform database key"));
+            return false;
+        }
     }
 
     db->setFormatVersion(m_version);
