@@ -1183,13 +1183,24 @@ QByteArray KdbxXmlReader::readCompressedBinary()
 
     QtIOCompressor compressor(&buffer);
     compressor.setStreamFormat(QtIOCompressor::GzipFormat);
-    compressor.open(QIODevice::ReadOnly);
+    if (!compressor.open(QIODevice::ReadOnly)) {
+        raiseError(compressor.errorString());
+        return {};
+    }
 
     QByteArray result;
     if (!Tools::readAllFromDevice(&compressor, result)) {
         //: Translator meant is a binary data inside an entry
         raiseError(tr("Unable to decompress binary"));
+        return {};
     }
+
+    compressor.close();
+    if (!compressor.errorString().isEmpty()) {
+        raiseError(compressor.errorString());
+        return {};
+    }
+
     return result;
 }
 
