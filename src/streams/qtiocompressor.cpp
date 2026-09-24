@@ -437,23 +437,33 @@ void QtIOCompressor::close()
     if (isOpen() == false)
         return;
 
-    // Flush and close the zlib stream.
+    QString errorString;
     if (openMode() & ReadOnly) {
         d->state = QtIOCompressorPrivate::NotReadFirstByte;
-        inflateEnd(&d->zlibStream);
+        const int status = inflateEnd(&d->zlibStream);
+        if (status != Z_OK)
+            d->setZlibError(QT_TRANSLATE_NOOP("QtIOCompressor", "Internal zlib error when closing: "), status);
     } else {
-        if (d->state == QtIOCompressorPrivate::BytesWritten) { // Only flush if we have written anything.
+        if (d->state == QtIOCompressorPrivate::BytesWritten) {
             d->state = QtIOCompressorPrivate::NoBytesWritten;
             d->flushZlib(Z_FINISH);
         }
-        deflateEnd(&d->zlibStream);
+        const int status = deflateEnd(&d->zlibStream);
+        if (status != Z_OK && d->state != QtIOCompressorPrivate::Error)
+            d->setZlibError(QT_TRANSLATE_NOOP("QtIOCompressor", "Internal zlib error when closing: "), status);
     }
 
-    // Close the underlying device if we are managing it.
+    const bool hadError = d->state == QtIOCompressorPrivate::Error;
+    if (hadError)
+        errorString = this->errorString();
+
     if (d->manageDevice)
         d->device->close();
 
     QIODevice::close();
+
+    if (hadError)
+        setErrorString(errorString);
 }
 
 /*!
