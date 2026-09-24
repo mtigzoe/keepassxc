@@ -50,7 +50,7 @@ bool OpVaultReader::readAttachment(const QString& filePath,
     }
 
     QByteArray version = file.read(1);
-    if (version[0] != '\001' && version[0] != '\002') {
+    if (version.size() != 1 || (version[0] != '\001' && version[0] != '\002')) {
         qCritical() << "Unexpected version number; wanted 1 or 2, got <<" << version << ">>";
         return false;
     }
