@@ -75,6 +75,9 @@ void KdbxWriter::extractDatabase(QByteArray& xmlOutput, Database* db)
     KdbxXmlWriter writer(db->formatVersion(), idxMap);
     writer.disableInnerStreamProtection(true);
     writer.writeDatabase(&buffer, db);
+    if (writer.hasError()) {
+        raiseError(writer.errorString());
+    }
 }
 
 /**
