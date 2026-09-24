@@ -569,7 +569,7 @@ qint64 QtIOCompressor::readData(char *data, qint64 maxSize)
         d->state = QtIOCompressorPrivate::EndOfStream;
 
         // Unget any data left in the read buffer.
-        for (int i = d->zlibStream.avail_in;  i >= 0; --i)
+        for (int i = d->zlibStream.avail_in - 1; i >= 0; --i)
             d->device->ungetChar(*reinterpret_cast<char *>(d->zlibStream.next_in + i));
     }
 
