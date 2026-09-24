@@ -88,6 +88,13 @@ void KeyComponentWidget::updateAddStatus(bool added)
             }
         }
         emit editCanceled();
+    } else if (!added && m_ui->stackedWidget->currentIndex() == Page::LeaveOrRemove) {
+        // Removing/resetting an existing component hides the Change/Remove page.
+        // If either of its buttons has focus, move focus before switching pages
+        // so keyboard and screen-reader users are not left on a hidden control.
+        if (m_ui->changeButton->hasFocus() || m_ui->removeButton->hasFocus()) {
+            m_ui->addButton->setFocus(Qt::OtherFocusReason);
+        }
     }
 
     if (added) {
