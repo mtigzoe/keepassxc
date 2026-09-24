@@ -159,6 +159,10 @@ bool Database::open(const QString& filePath, QSharedPointer<const CompositeKey> 
         return false;
     }
 
+    // Suppress modification signals while the file is being loaded. Restore the
+    // previous state on every failure path so a failed open cannot leave the
+    // database permanently suppressing modification notifications.
+    const wasModifiedSignalEnabled = modifiedSignalEnabled();
     setEmitModified(false);
 
     // update the hash of the first block
@@ -169,6 +173,7 @@ bool Database::open(const QString& filePath, QSharedPointer<const CompositeKey> 
             if (error) {
                 *error = tr("Database file read error.");
             }
+            setEmitModified(wasModifiedSignalEnabled);
             return false;
         }
     } else {
@@ -180,6 +185,7 @@ bool Database::open(const QString& filePath, QSharedPointer<const CompositeKey> 
         if (error) {
             *error = tr("Error while reading the database: %1").arg(reader.errorString());
         }
+        setEmitModified(wasModifiedSignalEnabled);
         return false;
     }
 
@@ -190,7 +196,7 @@ bool Database::open(const QString& filePath, QSharedPointer<const CompositeKey> 
 
     emit databaseOpened();
     m_fileWatcher->start(canonicalFilePath(), 30, 1);
-    setEmitModified(true);
+    setEmitModified(wasModifiedSignalEnabled);
 
     return true;
 }
