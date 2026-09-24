@@ -122,9 +122,28 @@ void FileWatcher::checkFileChanged()
     m_ignoreFileChange = true;
 
     const auto generation = m_generation;
-    AsyncTask::runThenCallback([this] { return calculateChecksum(); },
-                               this,
-                               [this, generation](const QByteArray& checksum) {
+    // Copy the worker inputs before launching the task. start()/stop() can change
+    // these members while the checksum is running, which would otherwise create
+    // a cross-thread data race and could make the worker read a different path
+    // or checksum size from the generation it belongs to.
+    const auto filePath = m_filePath;
+    const auto checksumSizeBytes = m_fileChecksumSizeBytes;
+    AsyncTask::runThenCallback(
+        [filePath, checksumSizeBytes] {
+            QFile file(filePath);
+            if (!filePath.isEmpty() && file.open(QFile::ReadOnly)) {
+                QCryptographicHash hash(QCryptographicHash::Sha256);
+                if (checksumSizeBytes > 0) {
+                    hash.addData(file.read(checksumSizeBytes));
+                } else {
+                    hash.addData(&file);
+                }
+                return hash.result();
+            }
+            return QByteArray();
+        },
+        this,
+        [this, generation](const QByteArray& checksum) {
                                    if (generation != m_generation) {
                                        return;
                                    }
