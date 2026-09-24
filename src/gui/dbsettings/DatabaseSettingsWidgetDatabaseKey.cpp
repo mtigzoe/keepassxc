@@ -260,11 +260,17 @@ void DatabaseSettingsWidgetDatabaseKey::showAdditionalKeyOptions()
 
     // m_additionalKeyOptionsToggle hides itself as part of showing this section, so the
     // button a keyboard/screen reader user just activated disappears from under focus with
-    // nowhere sensible for focus to land on its own. Send focus to the first control of the
-    // newly revealed content instead, following the same findChild<QPushButton*>("...")
-    // convention already used above in loadSettings().
-    if (auto* addButton = m_keyFileEditWidget->findChild<QPushButton*>("addButton")) {
-        addButton->setFocus();
+    // nowhere sensible for focus to land on its own. Focus the first usable control in the
+    // newly revealed content. The key-file component may already be configured, in which
+    // case its Add button is hidden and the Change/Remove controls are the visible targets.
+    if (m_keyFileEditWidget) {
+        for (auto* widget :
+             m_keyFileEditWidget->findChildren<QWidget*>(QString(), Qt::FindChildrenRecursively)) {
+            if (widget->isEnabled() && widget->isVisible() && widget->focusPolicy() != Qt::NoFocus) {
+                widget->setFocus(Qt::OtherFocusReason);
+                break;
+            }
+        }
     }
 }
 
