@@ -139,6 +139,23 @@ void TestDatabase::testSaveAs()
     QCOMPARE(error, QString("Could not save, database has not been initialized!"));
 }
 
+void TestDatabase::testReleaseDataAndReopen()
+{
+    auto db = QSharedPointer<Database>::create();
+    auto key = QSharedPointer<CompositeKey>::create();
+    key->addKey(QSharedPointer<PasswordKey>::create("a"));
+
+    QString error;
+    QVERIFY(db->open(dbFileName, key, &error));
+    db->releaseData();
+    QVERIFY(!db->isInitialized());
+
+    QSignalSpy spyModified(db.data(), SIGNAL(modified()));
+    QVERIFY(db->open(dbFileName, key, &error));
+    db->metadata()->setName("reopened");
+    QTRY_COMPARE(spyModified.count(), 1);
+}
+
 void TestDatabase::testSignals()
 {
     TemporaryFile tempFile;
