@@ -128,8 +128,9 @@ void FileWatcher::checkFileChanged()
     // or checksum size from the generation it belongs to.
     const auto filePath = m_filePath;
     const auto checksumSizeBytes = m_fileChecksumSizeBytes;
+    const auto fallbackChecksum = m_fileChecksum;
     AsyncTask::runThenCallback(
-        [filePath, checksumSizeBytes] {
+        [filePath, checksumSizeBytes, fallbackChecksum] {
             QFile file(filePath);
             if (!filePath.isEmpty() && file.open(QFile::ReadOnly)) {
                 QCryptographicHash hash(QCryptographicHash::Sha256);
@@ -140,7 +141,9 @@ void FileWatcher::checkFileChanged()
                 }
                 return hash.result();
             }
-            return QByteArray();
+            // Match calculateChecksum(): a transient read failure must not
+            // manufacture a file change notification.
+            return fallbackChecksum;
         },
         this,
         [this, generation](const QByteArray& checksum) {
