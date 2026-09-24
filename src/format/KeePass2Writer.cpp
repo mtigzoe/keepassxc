@@ -15,7 +15,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <QFile>
+#include <QSaveFile>
 
 #include "core/Group.h"
 #include "core/Metadata.h"
@@ -32,12 +32,23 @@
  */
 bool KeePass2Writer::writeDatabase(const QString& filename, Database* db)
 {
-    QFile file(filename);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+    QSaveFile file(filename);
+    if (!file.open(QIODevice::WriteOnly)) {
         raiseError(file.errorString());
         return false;
     }
-    return writeDatabase(&file, db);
+
+    if (!writeDatabase(&file, db)) {
+        file.cancelWriting();
+        return false;
+    }
+
+    if (!file.commit()) {
+        raiseError(file.errorString());
+        return false;
+    }
+
+    return true;
 }
 
 #define VERSION_MAX(a, b)                                                                                              \
