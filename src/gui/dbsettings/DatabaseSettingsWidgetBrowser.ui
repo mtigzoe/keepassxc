@@ -117,7 +117,7 @@
     <bool>false</bool>
    </property>
            <property name="editTriggers">
-            <set>QAbstractItemView::NoEditTriggers</set>
+            <set>QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
            </property>
            <property name="selectionBehavior">
             <enum>QAbstractItemView::SelectRows</enum>
