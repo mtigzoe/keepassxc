@@ -363,9 +363,14 @@ void PasswordWidget::checkCapslockState()
             QAccessibleAnnouncementEvent announcementEvent(m_ui->passwordEdit, tr("Warning: Caps Lock enabled!"));
             QAccessible::updateAccessibility(&announcementEvent);
 #endif
-        } else if (QToolTip::isVisible()) {
+        } else {
+            // The tooltip can disappear independently of the Caps Lock state.
+            // Keep the screen-reader state synchronized even when there is no
+            // tooltip left to hide.
             m_ui->passwordEdit->setAccessibleDescription(m_defaultAccessibleDescription);
-            QToolTip::hideText();
+            if (QToolTip::isVisible()) {
+                QToolTip::hideText();
+            }
         }
     }
 }
