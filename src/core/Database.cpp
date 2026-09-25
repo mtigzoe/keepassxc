@@ -162,7 +162,7 @@ bool Database::open(const QString& filePath, QSharedPointer<const CompositeKey> 
     // Suppress modification signals while the file is being loaded. Restore the
     // previous state on every failure path so a failed open cannot leave the
     // database permanently suppressing modification notifications.
-    const wasModifiedSignalEnabled = modifiedSignalEnabled();
+    const auto wasModifiedSignalEnabled = modifiedSignalEnabled();
     setEmitModified(false);
 
     // update the hash of the first block
@@ -656,21 +656,49 @@ bool Database::backupDatabase(const QString& filePath, const QString& destinatio
     if (!tempFile.open()) {
         return false;
     }
+
+    QFile sourceFile(filePath);
+    if (!sourceFile.open(QIODevice::ReadOnly)) {
+        return false;
+    }
+
+    if (!tempFile.resize(0)) {
+        return false;
+    }
+
+    while (!sourceFile.atEnd()) {
+        const auto data = sourceFile.read(1024 * 1024);
+        if (data.isEmpty()) {
+            if (sourceFile.error() != QFileDevice::NoError) {
+                return false;
+            }
+            break;
+        }
+
+        qsizetype written = 0;
+        while (written < data.size()) {
+            const auto result = tempFile.write(data.constData() + written, data.size() - written);
+            if (result <= 0) {
+                return false;
+            }
+            written += result;
+        }
+    }
+
+    if (!tempFile.flush()) {
+        return false;
+    }
     tempFile.close();
 
-    if (!QFile::remove(tempFile.fileName()) || !QFile::copy(filePath, tempFile.fileName())) {
-        return false;
-    }
-
     if (QFile::exists(destinationFilePath) && !QFile::remove(destinationFilePath)) {
-        QFile::remove(tempFile.fileName());
-        return false;
-    }
-    if (!QFile::rename(tempFile.fileName(), destinationFilePath)) {
-        QFile::remove(tempFile.fileName());
         return false;
     }
 
+    if (!tempFile.rename(destinationFilePath)) {
+        return false;
+    }
+
+    tempFile.setAutoRemove(false);
     return QFile::setPermissions(destinationFilePath, perms);
 }
 
