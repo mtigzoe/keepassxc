@@ -162,7 +162,7 @@ bool Database::open(const QString& filePath, QSharedPointer<const CompositeKey> 
     // Suppress modification signals while the file is being loaded. Restore the
     // previous state on every failure path so a failed open cannot leave the
     // database permanently suppressing modification notifications.
-    const auto wasModifiedSignalEnabled = modifiedSignalEnabled();
+    const bool wasModifiedSignalEnabled = modifiedSignalEnabled();
     setEmitModified(false);
 
     // update the hash of the first block

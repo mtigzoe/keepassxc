@@ -5,7 +5,7 @@
             "name": "KeePassXC",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build-vscode-x64/src/Debug/KeePassXC.exe",
+            "program": "${workspaceFolder}/build/src/KeePassXC.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/build-vscode-x64/src/Debug",
