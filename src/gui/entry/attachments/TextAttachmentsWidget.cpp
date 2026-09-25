@@ -21,6 +21,7 @@
 
 #include <QApplication>
 #include <QSplitter>
+#include <QPushButton>
 #include <QTextEdit>
 #include <QTimer>
 #include <QVBoxLayout>

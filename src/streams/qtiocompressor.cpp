@@ -591,15 +591,9 @@ qint64 QtIOCompressor::readData(char *data, qint64 maxSize)
         if (status == Z_STREAM_END) {
             d->state = QtIOCompressorPrivate::EndOfStream;
 
-            for (int i = d->zlibStream.avail_in - 1; i >= 0; --i) {
-                if (!d->device->ungetChar(*reinterpret_cast<char *>(d->zlibStream.next_in + i))) {
-                    d->state = QtIOCompressorPrivate::Error;
-                    setErrorString(QT_TRANSLATE_NOOP("QtIOCompressor",
-                                                     "Error restoring unread compressed data."));
-                    return -1;
-                }
-            }
-            break;
+            // Unget any data left in the read buffer.
+            for (int i = d->zlibStream.avail_in - 1; i >= 0; --i)
+                d->device->ungetChar(*reinterpret_cast<char *>(d->zlibStream.next_in + i));
         }
 
         if (d->zlibStream.avail_out != 0)

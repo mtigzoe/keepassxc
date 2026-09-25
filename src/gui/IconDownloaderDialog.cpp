@@ -211,7 +211,15 @@ void IconDownloaderDialog::updateTable(const QString& url, const QString& messag
 {
     for (int i = 0; i < m_dataModel->rowCount(); ++i) {
         if (m_dataModel->item(i, 0)->text() == url) {
-            auto* statusItem = m_dataModel->item(i, 1);\n            statusItem->setText(message);\n            statusItem->setData(message, Qt::AccessibleDescriptionRole);\n\n            // Download results arrive asynchronously while focus normally remains\n            // on Cancel or Close. Notify accessibility clients that the status\n            // cell changed so JAWS/NVDA can refresh the result when it is focused.\n            QAccessibleEvent event(m_ui->tableView, QAccessible::TextUpdated);\n            QAccessible::updateAccessibility(&event);
+            auto* statusItem = m_dataModel->item(i, 1);
+            statusItem->setText(message);
+            statusItem->setData(message, Qt::AccessibleDescriptionRole);
+
+            // Download results arrive asynchronously while focus normally remains
+            // on Cancel or Close. Notify accessibility clients that the status
+            // cell changed so JAWS/NVDA can refresh the result when it is focused.
+            QAccessibleEvent event(m_ui->tableView, QAccessible::TextUpdated);
+            QAccessible::updateAccessibility(&event);
         }
     }
 }

@@ -20,6 +20,7 @@
 #include "gui/osutils/OSUtilsBase.h"
 #include "ui_ApplicationSettingsWidgetGeneral.h"
 #include "ui_ApplicationSettingsWidgetSecurity.h"
+#include <QAccessible>
 #include <QDesktopServices>
 #include <QDir>
 #include <QLabel>

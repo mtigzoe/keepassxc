@@ -638,7 +638,7 @@ cmake -S . -B build `
     -DCMAKE_BUILD_TYPE=Debug `
     -DCMAKE_TOOLCHAIN_FILE="$VcpkgToolchain" `
     -DQt6_DIR="$QtDir" `
-    -DWITH_TESTS=OFF
+    -DWITH_TESTS=ON
 
 if ($LASTEXITCODE -ne 0) {
     throw "CMake configuration failed."

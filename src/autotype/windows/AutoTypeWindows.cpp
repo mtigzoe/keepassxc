@@ -330,7 +330,7 @@ AutoTypeAction::Result AutoTypeExecutorWin::execType(const AutoTypeKey* action)
     }
 
     if (!modifiersOk || !sent || !releaseOk) {
-        return AutoTypeAction::Result::Failed(tr("Failed to inject keyboard input."));
+        return AutoTypeAction::Result::Failed(QObject::tr("Failed to inject keyboard input."));
     }
 
     Tools::sleep(execDelayMs);

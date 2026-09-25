@@ -91,7 +91,18 @@ void TotpDialog::updateProgressBar()
 void TotpDialog::updateSeconds()
 {
     uint epoch = Clock::currentSecondsSinceEpoch() - 1;
-    const auto remaining = m_step - (epoch % m_step);\n    m_ui->timerLabel->setText(tr("Expires in <b>%n</b> second(s)", "", remaining));\n\n    if (remaining <= 10 && remaining >= 1) {\n        QAccessible::updateAccessibility(\n            new QAccessibleEvent(m_ui->timerLabel, QAccessible::TextUpdated));\n#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)\n        QAccessibleAnnouncementEvent announcementEvent(\n            m_ui->timerLabel, tr("TOTP code expires in %n second(s)", "", remaining));\n        QAccessible::updateAccessibility(&announcementEvent);\n#endif\n    }
+    const auto remaining = m_step - (epoch % m_step);
+    m_ui->timerLabel->setText(tr("Expires in <b>%n</b> second(s)", "", remaining));
+
+    if (remaining <= 10 && remaining >= 1) {
+        QAccessible::updateAccessibility(
+            new QAccessibleEvent(m_ui->timerLabel, QAccessible::TextUpdated));
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+        QAccessibleAnnouncementEvent announcementEvent(
+            m_ui->timerLabel, tr("TOTP code expires in %n second(s)", "", remaining));
+        QAccessible::updateAccessibility(&announcementEvent);
+#endif
+    }
 }
 
 void TotpDialog::updateTotp()

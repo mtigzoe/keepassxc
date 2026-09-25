@@ -73,7 +73,7 @@ void AutoTypeMatchModel::setMatchList(const QList<AutoTypeMatch>& matches)
     m_matches.clear();
     m_matches.reserve(matches.size());
 
-    QSet<Database*> databases;
+    QSet<const Database*> databases;
 
     for (const auto& match : matches) {
         if (!match.first) {
@@ -89,7 +89,7 @@ void AutoTypeMatchModel::setMatchList(const QList<AutoTypeMatch>& matches)
         databases.insert(group->database());
     }
 
-    for (Database* db : asConst(databases)) {
+    for (const Database* db : asConst(databases)) {
         Q_ASSERT(db);
         for (const Group* group : db->rootGroup()->groupsRecursive(true)) {
             m_allGroups.append(group);
