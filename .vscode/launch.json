@@ -8,11 +8,11 @@
             "program": "${workspaceFolder}/build/src/KeePassXC.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/build-vscode-x64/src/Debug",
+            "cwd": "${workspaceFolder}/build/src",
             "environment": [
                 {
                     "name": "PATH",
-                    "value": "${workspaceFolder}/build-vscode-x64/src/Debug;${workspaceFolder}/../vcpkg/installed/x64-windows/debug/bin;${workspaceFolder}/build-vscode-x64/vcpkg_installed/x64-windows/debug/bin;${env:PATH}"
+                    "value": "${workspaceFolder}/build/src;${workspaceFolder}/../vcpkg/installed/x64-windows/debug/bin;${env:PATH}"
                 },
                 {
                     "name": "QT_QPA_PLATFORM_PLUGIN_PATH",
