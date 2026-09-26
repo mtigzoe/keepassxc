@@ -58,13 +58,14 @@ void UpdateCheckDialog::showUpdateCheckResponse(bool hasUpdate, const QString& v
                 .arg(version, KEEPASSXC_VERSION));
     } else {
         m_ui->statusLabel->setText(tr("You have the latest version of KeePassXC"));
-        QAccessibleEvent statusChanged(m_ui->statusLabel, QAccessible::Alert);
+    }
+
+    QAccessibleEvent statusChanged(m_ui->statusLabel, QAccessible::Alert);
     QAccessible::updateAccessibility(&statusChanged);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
     QAccessibleAnnouncementEvent announcementEvent(m_ui->statusLabel, m_ui->statusLabel->text());
     QAccessible::updateAccessibility(&announcementEvent);
 #endif
-}
 }
 
 UpdateCheckDialog::~UpdateCheckDialog()
