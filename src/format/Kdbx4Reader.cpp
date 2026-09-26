@@ -253,7 +253,10 @@ bool Kdbx4Reader::readInnerHeaderField(QIODevice* device)
 {
     QByteArray fieldIDArray = device->read(1);
     if (fieldIDArray.size() != 1) {
-        raiseError(tr("Invalid inner header id size"));
+        raiseError(tr("Invalid inner header id size (%1)")
+                       .arg(device->errorString().isEmpty()
+                                ? QStringLiteral("unexpected end of inner header stream")
+                                : device->errorString()));
         return false;
     }
     auto fieldID = static_cast<KeePass2::InnerHeaderFieldID>(fieldIDArray.at(0));
