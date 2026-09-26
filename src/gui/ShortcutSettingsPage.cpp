@@ -45,6 +45,7 @@ public:
                                             | QDialogButtonBox::RestoreDefaults,
                                         this))
     {
+        setWindowTitle(QObject::tr("Change Shortcut"));
         auto* l = new QVBoxLayout(this);
         connect(m_btnBox, &QDialogButtonBox::accepted, this, &QDialog::accept);
         connect(m_btnBox, &QDialogButtonBox::rejected, this, &QDialog::reject);
