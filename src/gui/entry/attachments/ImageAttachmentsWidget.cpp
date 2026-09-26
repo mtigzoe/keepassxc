@@ -23,6 +23,8 @@
 #include <cmath>
 #include <utility>
 
+#include <QAccessible>
+
 #include <QDebug>
 #include <QEvent>
 #include <QGraphicsScene>
@@ -184,10 +186,15 @@ void ImageAttachmentsWidget::loadImage()
     pixmap.loadFromData(m_attachment.data);
     if (pixmap.isNull()) {
         qWarning() << "Failed to load image from data";
+        m_scene->clear();
+        m_ui->imagesView->setAccessibleDescription(tr("Unable to display attachment image"));
+        QAccessibleEvent alertEvent(m_ui->imagesView, QAccessible::Alert);
+        QAccessible::updateAccessibility(&alertEvent);
         return;
     }
 
     m_scene->clear();
+    m_ui->imagesView->setAccessibleDescription({});
     m_scene->addPixmap(std::move(pixmap));
 }
 
