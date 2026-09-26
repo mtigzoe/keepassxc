@@ -355,9 +355,8 @@ void PasswordWidget::checkCapslockState()
         repaint();
 
         if (newCapslockState) {
-            QTimer::singleShot(150,
-                              this,
-                              [this] { QToolTip::showText(mapToGlobal(rect().bottomLeft()), m_capslockAction->text()); });
+            QTimer::singleShot(
+                150, [this] { QToolTip::showText(mapToGlobal(rect().bottomLeft()), m_capslockAction->text()); });
             m_ui->passwordEdit->setAccessibleDescription(tr("Warning: Caps Lock enabled!"));
 #if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
             QAccessibleAnnouncementEvent announcementEvent(m_ui->passwordEdit, tr("Warning: Caps Lock enabled!"));
