@@ -49,7 +49,6 @@ private:
     void resetCounter();
     Entry* m_entry;
     int m_counter;
-    QString m_lastAnnouncedTotpCode;
     uint m_step;
     QTimer m_totpUpdateTimer;
 };
