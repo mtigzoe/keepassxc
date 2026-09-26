@@ -69,6 +69,14 @@ void NewDatabaseWizardPage::initializePage()
         return;
     }
 
+    if (auto* formatCombo = m_pageWidget->findChild<QComboBox*>(QStringLiteral("compatibilitySelection"))) {
+        const QString guidance = tr("%1. %2").arg(title(), subTitle());
+        formatCombo->setAccessibleName(tr("Database format. %1").arg(guidance));
+        formatCombo->setAccessibleDescription(
+            tr("Database Format and Encryption. Choose the database format and configure encryption settings."));
+    }
+    setAccessibleDescription(tr("%1. %2").arg(title(), subTitle()));
+
     m_pageWidget->loadSettings(m_db);
 }
 
