@@ -1597,6 +1597,9 @@ void MainWindow::updateEntryCountLabel()
     } else {
         m_statusBarLabel->setText("");
     }
+
+    QAccessibleValueChangeEvent accessibleEvent(m_statusBarLabel, m_statusBarLabel->text());
+    QAccessible::updateAccessibility(&accessibleEvent);
 }
 
 void MainWindow::obtainContextFocusLock()

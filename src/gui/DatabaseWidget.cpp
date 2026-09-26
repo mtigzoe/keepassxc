@@ -19,6 +19,7 @@
 #include "DatabaseWidget.h"
 
 #include <QApplication>
+#include <QAccessible>
 #include <QBoxLayout>
 #include <QCheckBox>
 #include <QDesktopServices>
@@ -170,8 +171,10 @@ DatabaseWidget::DatabaseWidget(QSharedPointer<Database> db, QWidget* parent)
     m_searchingLabel->setText(tr("Searching…"));
     m_searchingLabel->setAlignment(Qt::AlignCenter);
     m_searchingLabel->setVisible(false);
+    m_searchingLabel->setAccessibleName(tr("Search status"));
 
     m_shareLabel->setObjectName("KeeShareBanner");
+    m_shareLabel->setAccessibleName(tr("Shared group status"));
     m_shareLabel->setRawText(tr("Shared group…"));
     m_shareLabel->setAlignment(Qt::AlignCenter);
     m_shareLabel->setVisible(false);
@@ -1773,6 +1776,10 @@ void DatabaseWidget::search(const QString& searchtext)
     m_lastSearchText = searchtext;
 
     m_searchingLabel->setVisible(true);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QAccessibleAnnouncementEvent announcementEvent(m_searchingLabel, m_searchingLabel->text());
+    QAccessible::updateAccessibility(&announcementEvent);
+#endif
     m_shareLabel->setVisible(false);
 
     emit searchModeActivated();

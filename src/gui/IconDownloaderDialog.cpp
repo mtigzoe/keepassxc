@@ -31,6 +31,7 @@
 #include "gui/osutils/macutils/MacUtils.h"
 #endif
 
+#include <QAccessible>
 #include <QStandardItemModel>
 
 IconDownloaderDialog::IconDownloaderDialog(QWidget* parent)
@@ -189,6 +190,12 @@ void IconDownloaderDialog::updateProgressBar()
     m_ui->progressBar->setMaximum(total);
     m_ui->progressLabel->setText(
         tr("Downloading favicons (%1/%2)…").arg(QString::number(value), QString::number(total)));
+
+    // The progress text changes asynchronously while focus remains elsewhere.
+    // Explicitly notify accessibility clients so screen readers can announce the
+    // current download progress instead of requiring the user to revisit the label.
+    QAccessibleEvent event(m_ui->progressLabel, QAccessible::TextUpdated);
+    QAccessible::updateAccessibility(&event);
 }
 
 void IconDownloaderDialog::updateCancelButton()
@@ -200,7 +207,15 @@ void IconDownloaderDialog::updateTable(const QString& url, const QString& messag
 {
     for (int i = 0; i < m_dataModel->rowCount(); ++i) {
         if (m_dataModel->item(i, 0)->text() == url) {
-            m_dataModel->item(i, 1)->setText(message);
+            auto* statusItem = m_dataModel->item(i, 1);
+            statusItem->setText(message);
+            statusItem->setData(message, Qt::AccessibleDescriptionRole);
+
+            // Download results arrive asynchronously while focus normally remains
+            // on Cancel or Close. Notify accessibility clients that the status
+            // cell changed so JAWS/NVDA can refresh the result when it is focused.
+            QAccessibleEvent event(m_ui->tableView, QAccessible::TextUpdated);
+            QAccessible::updateAccessibility(&event);
         }
     }
 }
