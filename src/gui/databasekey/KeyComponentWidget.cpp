@@ -91,11 +91,27 @@ void KeyComponentWidget::updateAddStatus(bool added)
 void KeyComponentWidget::doAdd()
 {
     changeVisiblePage(Page::Edit);
+    if (m_componentWidget) {
+        for (auto* widget : m_componentWidget->findChildren<QWidget*>(QString(), Qt::FindChildrenRecursively)) {
+            if (widget->isEnabled() && widget->isVisible() && widget->focusPolicy() != Qt::NoFocus) {
+                widget->setFocus(Qt::OtherFocusReason);
+                break;
+            }
+        }
+    }
 }
 
 void KeyComponentWidget::doEdit()
 {
     changeVisiblePage(Page::Edit);
+    if (m_componentWidget) {
+        for (auto* widget : m_componentWidget->findChildren<QWidget*>(QString(), Qt::FindChildrenRecursively)) {
+            if (widget->isEnabled() && widget->isVisible() && widget->focusPolicy() != Qt::NoFocus) {
+                widget->setFocus(Qt::OtherFocusReason);
+                break;
+            }
+        }
+    }
 }
 
 void KeyComponentWidget::doRemove()
