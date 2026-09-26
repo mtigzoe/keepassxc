@@ -1,0 +1,379 @@
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:5:6388b0d28fdac2ca5f8ba326a6450003ed3cda33	Fix GUI accessibility and Qt 6 build issues
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:7:498e0a3ff44e5b1a01113285bd68b56543f40753	Merge remote-tracking branch 'upstream/develop' into feature/gui-accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:8:a2d417da6c82c9c50cbcb5787573fcf2eafcd500	Announce TOTP expiration countdown to screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:9:5cfa0543417d9f1a97d90f0f10ba8eef0d4d599f	Improve TOTP invalid-key accessibility announcement
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:10:4b1d519a7ef160e59d1dca229dd5899d47441b18	Improve TOTP QR dialog countdown accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:11:cd15c68d1541670fe5ee21ca3ba7d010436cf2c5	Improve favicon download result accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:12:7e838041e1bf6d94018b7449161425afa391390a	Clear stale Caps Lock accessibility warning
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:13:3b62b036f58594d9105b028947764df3ed019427	Fix focus when revealing additional database key options
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:14:634c2725cecd6c33b085544fada5026696a1cdd9	Expose Auto-Type shortcut errors to screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:15:26d2df67cfc739f5fbeb7beb47a8c7a174298b63	Fix focus loss when resetting key component state
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:16:9aeb894b9eaab990ac24b526614a4fb0414e6284	Allow keyboard editing of entry attributes
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:17:04514f61c15553c6920ecd43e60e9cfdee0bedda	Fix tag editor accessibility in history view
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:18:5274c035fb2c1a9944b301a8dee4803e27649b88	Improve TagsEdit accessible name for screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:19:35d0ae669dbbcb1503c3fa344dcd489865ce3cf5	Expose browser report context to screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:20:c7a646302962f77d311f542218f079379a750809	Improve accessibility of database statistics warnings
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:21:ac19b58f96bbb6fd8cfee9f95f8282aa1c2f0b12	Announce image attachment load failures
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:24:2b9e1cd2bafc312d3e5b607397fd3489dba8ba8a	Improve screen reader feedback for invalid URLs
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:25:5bfc3c96ef770ae35da3648ac715727cceea2a5b	Fix keyboard editing of browser custom data
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:26:2afde5d32fe77bdd86331329de4af8f883d5ab60	Fix focus when opening key component editor
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:27:4389e9993f35bf5d449c08c1d259972f73d5e9ef	Preserve focus while testing remote sync command
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:28:ba95fa2263ebcda7d07ac637e8608302181749bf	Fix SSH agent browse button accessible name
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:29:1eda33e1da932754cd5e46cd2aac1d9ccc8ddf95	Fix recent database keyboard removal
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:30:69d651b74da23b0234e02c8c460d93bedcb359b7	Fix recent database keyboard event handling
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:31:1e083eb0078cf318b03bade814b8c7379dcc4c1a	Fix keyboard focus for SSH agent external key field
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:32:c04527d0ae25cb81eb9b470a75fdb5207fc111bd	Fix keyboard focus for SSH agent external key field
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:33:fb60ab143853e3c2e61711fd0ab7598ce83af6b9	Improve accessibility announcements for favicon download progress
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:34:7fd29ffb3007b4ef69454e4d50b1cef12885a9f3	Give shortcut editor dialog an accessible window title
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:35:f2a2e11bcd452a1fee8681da9b0ed41c1bff22de	Fix malformed shortcut settings signal connection
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:36:cca669f5022b241275fe8e2e1f194a8a53467e81	Improve keyboard access to shortcut editing
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:37:fefc835e21612bbaaa8bf9edcf0964eef5c704f7	Clear displayed shortcut when resetting shortcut input
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:47:e1e4e95f0287d29648413a5607eb70341ac68daa	Improve Auto-Type help button accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:48:a0bb2029a31d6cdbb7db60eeac8564cef79459cd	Improve Pickchars dialog accessibility names
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:51:e641b6fffa22685eddd6e1248abed105351ce989	Return macOS keyboard event status
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:52:e9269900f662a9ed8c3298de3da43cd01a42657f	Propagate macOS keyboard event creation failures
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:53:96e3aecba382fb6672ea09d119c33bd654f0f06d	Return Windows keyboard injection status
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:54:7c617a5c9dce1527ddbd1af8b0611964c9aa9d86	Propagate Windows keyboard injection failures
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:56:4d6f303526a6a114aaad08905c81c65009061d59	Return X11 keyboard mapping initialization status
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:57:8292449a887c6e1d606f39939d6fdc1ee00c6079	Handle X11 keyboard mapping initialization failures
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:58:1aad771899a1258cfc986789a0ce56966cc04f08	Handle X11 keyboard mapping initialization failures
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:59:5cf7d199310fc615132bb1670798a8613f22477c	Fix Auto-Type virtual keyboard action ownership
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:150:a0cf69aa9b1d9c6285ff66f824c3078d303732db	Preserve focus when hiding advanced password options
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:151:35f86344bb4eed62ef908ea011718c15221f4636	Preserve focus while HIBP validation runs
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:152:511f8e34dffd5a9afd24c6c98561655cb3dc080d	Restore focus when attachment viewer changes
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:153:eeb811c3e8321c7fc0f468a46061e3e362ea5db3	Preserve focus when password actions hide
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:154:6d1c98a08488b36ee130560b8059f7c2b73abebd	Preserve focus when browser settings disable controls
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:155:957800715daea5b160d5258a46f14adabea8102b	Preserve focus when database key options hide
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:156:b7414a216fefc218a2acc537f76a237549b3f50a	Preserve focus when preview panel hides
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:157:120b17f06aac05b74049b0118cba15bb7ddf6c92	Preserve focus when preview tab disables
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:158:b3d136669c55a0b87a0b4a5b3914f903f752f6ee	Preserve TOTP preview focus when hiding
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:159:941dda4de0f604ce9482f25f3db0e467bd34958e	Restore focus when group preview hides
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:160:d558086b694d55b2e6f24b6bf10a9759ff5bb5c4	Restore focus when hiding entry notes
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:161:e9b39825301c53b7e371808987a5268bb74db5ca	Preserve attribute editor focus when protecting
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:162:b7333f93e963fcfbf57bca54dfc9161ae2267f65	Preserve SSH agent focus during key refresh
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:163:780868b1e4045e07f8495db9c9d64292e3b39cce	Fix Auto-Type focus transition ordering
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:164:653f5e0889be91a0c3ba9e8e2bb775fbad305504	Preserve focus when Auto-Type controls disable
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:165:59949eb25d9df905cc8708d835423792fe344972	Fix text attachment focus target
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:166:47ecf687d5c5637c511262211157b9ec263da6aa	Restore focus when text attachment editor hides
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:167:d8053e1ac8082d1475d59ea5f3b7d07be7e1da0c	Restore focus when group Auto-Type editor disables
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:168:1f99242c0c9aa0dc15afd48027dfaf9eac4c5c1d	Restore focus when entry preview hides
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:169:6386e9ecd2f20629a8fd630d95939223274f9051	Restore focus when message widget hides
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:170:fd2ecd1d8bebdab57d146f790e495d3f7d54a455	Restore focus when wordlist delete action disables
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:171:e7211357dbc2cb495a1ed136d6810c3163c53f28	Restore focus before hiding hardware key controls
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:172:bddf6315a7685cda1dfb8829d203de7f19913e25	Use restored-entry focus index
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:174:afe87c1689493d9e5a70fbda9f1d7cbda3a00708	Fix hardware-key accessibility build error
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:175:74d02e693fa7969ebad45b609b9de4786d222bc2	Restore focus when category scroll controls disappear
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:177:ac7f88aeffb486f689329d3f2b6f7c9f7ac72d11	Avoid internal message widget focus targets
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:178:16abb926c7b54e7a84d6b4e778b3c55d4b355b5a	Restore focus when hiding message close button
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:180:97e32e3e4e89533699c7c0a8a7027c98ebd804bf	Restore search focus when clear action hides
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:181:0e06d5a441cad422b606e1abd62188f8a1afcdbf	Announce asynchronous update results
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:187:99a15f5fa85100ab40b2d86a93199c811fbba6e4	Name attachment images for screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:188:38a69eaf046ec47ba487c5ca781fa14fa79d03fb	Restore attachment table focus after dialogs
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:191:0858f4bff220c567d5140e9c129c44c4c3ff5f01	Include About dialog close button in tab order
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:193:06aec0ad93b0d9c4b2b4baf569477434c7f94cd8	Announce empty recycle bin
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:200:dbcdc2be451767f2696ec136e497a435f7602776	Restore focus after closing the active database tab
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:201:c3b5cbecd3d88b7a9bc0482b6ded5bfe006df23d	Include welcome actions in tab order
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:204:43ccf20a74b88659e12dbf4c6d15f95cc33fd82c	Announce hardware key detection failure
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:205:6b805ba79605edffaa525e047e357885d03ab43c	Include expired entries in Browser Statistics tab order
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:209:719347bdd9432aa97e5a39d85c83ff1f403a880b	Improve browser statistics report accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:210:f487a7fdc014e87b0a76ae169375b365cce2da15	Add report table guidance for screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:211:71dc115a8fc552ce97fc426e143213433a92741e	Add report table guidance for screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:212:950a9244c197bf1b6fd8f98540b5fd0b096d96d4	Add report table guidance for screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:214:609a7ceacc327af989e2cc5ec30c811fe3386443	Improve passkey export table accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:215:8bdc340c45f8349e0739ed7b78cb5fc4d0b8e544	Restore PasswordWidget after truncated accessibility edit
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:217:d290b29422b9f398ba7170a2ad6c7ecd55b443e5	Give password action buttons explicit accessible names
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:218:815ca5dd0db7a950b22d5e6b0a9f7c6c37e8757a	Keep advanced mode accessibility state descriptive
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:220:7176ec1d449930fc91afa384aa7e32fa7b3e7749	Announce invalid passphrase wordlist to assistive tech
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:221:fbfff74c9d0dbf62b8d6bac7e6803ee4348fc976	Reset password quality accessibility state when empty
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:225:d0daad0ea003f55778f601bbf3a7ef9a61820ad0	Keep password generator accessible name in sync
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:226:34396264bb10d4ee3e7523bd2e10f2e6b9294e5d	Improve password generator accessibility names
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:227:3cd5a0a42f52bebd6c6d1cae7c539e103e16de7e	Add QR code accessibility text control
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:228:97e7db751bc5f908241bb69f0c107752fcb3b516	Add accessible QR code instructions
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:229:473eebeb9c5578b74fc9ba04ccafb29827769728	Improve TOTP code keyboard accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:230:64882f4a6fec7717096bc266f598fd2873464633	Expose TOTP code as accessible read-only text
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:231:77fd678bd070d33f3ba942410c50d854846f1959	Make TOTP QR code keyboard focusable
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:232:2105dd885f94203736ed22d7a329def5a7868d0b	Make TOTP code keyboard focusable
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:233:32feaccf19504ca806d009a6d961907769a68d29	Fix DatabaseWidget focus restore declaration
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:234:699ba79b2f12123c08124d2f0e5ad6f045698ba2	Remove noninteractive Edit Entry focus stop
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:235:903a33be5be9d4fae863a453283bb8ce61bbccba	Set deterministic Search action tab order
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:236:cbb63d200782ddf08257f2347985e8060a9b45e5	Make search field actions keyboard accessible
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:237:30d14488a55e36be439dc561adea030c363a1059	Make search help keyboard accessible
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:238:73a1889a8494fc952ff5bdae68f1a164386468d0	Improve popup help keyboard accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:239:13a1f62e2214275f0b32e725869b381cdb6241d2	Improve popup help keyboard accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:240:5508c5c9dfc9424432bad2487b04e9167af70bf7	Restore database focus after main view switch
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:241:c1f81aa3471c9c953ea21b4eb33074440c52f789	Preserve group view focus across database restore
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:242:f28e8682b083e024d7abdddace091e690c1298dc	Preserve group view focus across database restore
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:243:a991e35dd3f655ff8c71da1f18b9a3a4ba55b443	Announce entry count changes to screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:244:795876d1242b34eb7c7e0b03959479f95d75d6c4	Announce KeeShare status to screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:245:bccf00f92348f53399ba11c8a7dcdb1364681f59	Announce database search results to screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:246:22e29c350e3e0b6b525db96c5b048d2967c15843	Improve category list screen reader label
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:247:c4d2e7acf3770f6f6aea3a4386fc743aad90e640	Fix CSV import keyboard tab order
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:248:c084e7156ec9a06c1d916ba9abcc36d2c187dd86	Expose health status to screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:249:4b130b17ef65e64eb8e71da64ab26a081db4272f	Improve icon editor screen reader labels
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:250:145db870ac90e21a54abdbcd622247ef660ae61b	Improve merge dialog screen reader context
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:251:c5efb478d2872e2a8ac3a30bffc14920261245cc	Make entry URL keyboard focusable
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:252:bbccde878b30593558db487af1d81654cbe565c2	Add preview content to keyboard tab order
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:253:22ee57aed61fb1a7d839e16f4447728ea497e8b7	Complete keyboard access for entry preview content
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:254:8a78c370bd640d8f6f0d02c3866415f6040bdacf	Make entry preview content keyboard accessible
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:255:d3340750fb4b3c61d552cc21d768045f469a6852	Announce TOTP QR code to screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:256:f10ad79fb497f3fba4f4c1ef3af1672a69283d76	Name TOTP code for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:257:ffd16b2aec0182c7f39fab753be7dce08607dbe5	Announce TOTP code to screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:258:04e51746e93a10164731cc696151ef996644bdec	Expose TOTP code state for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:259:05762d4b5c5c2a980d662698c26308046886da5c	Improve TOTP control announcements
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:261:dde935f693857c915060a2708dd904732463aeb4	Add current EditWidget page index accessor
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:262:4dcd37cd8a1a2a6449bfa0031a1ca0e6e5274955	Fix history page access to EditWidget UI
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:265:0ab4f52add7eb81a256c8ddbafe5df8ef8b3b0d8	Fix EditEntryWidget access to stacked widget
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:266:097c5c42899f587dd4579aff005c794453c6ceb6	Merge remote-tracking branch 'origin/feature/gui-accessibility' into screen-reader
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:271:cf10b51911437780fbfcf49684bc15841502a0bf	Fix toolbar keyboard focus traversal
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:272:25d3f1a39d9ccaf574f65f4e4a0210ab93a1c9c5	Announce TOTP spin box changes to screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:273:2c9525dac641cb9b3ab1b24fef3001a439a451f1	Announce TOTP spin box changes to screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:274:619064720943c5c564f602f9db4a9e03027574b9	Add live spin button accessibility diagnostic
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:275:3ae8e68e0a88cc7aafd77eeae9067da7061a2730	Improve spin button accessibility diagnostics
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:276:db22a29002f68d0e863acb8bee8d157493cbe689	Announce KDF spin box changes to screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:277:db9c415fdfc81e1c2a296350d0cfcdfd81305138	Announce transform rounds changes to screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:278:71fdc8f2b9a7bfbcfa308c8a21f9e5cdc39fad6b	Use numeric UIA values for encryption spin boxes
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:281:a4cc0d8699b215fcf6839b9cd33f16fa25f9b265	Name favicon download results for screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:282:b78dc84b13673db1e43662063d6f905b3c0f1b20	Include Show Expired in Health Check tab order
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:283:2759781d75bf3e08f6c2a7f54328777bcf739c54	Allow screen readers to focus CSV import preview
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:284:3128d3f902a3c478a7a61a7c37383cbb94d37d97	Focus the category list for screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:286:e24a563ce053884159d001b62cfad58588a126b3	Keep focus visible after restoring entry history
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:287:67c817358a32b8a51876b2103166b2e70a04eb64	Name the Searches and Tags view for screen readers
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:288:56d535a635d8eb06cb67631647949fabe40f5be0	Keep focus when hiding the group panel
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:289:d6e24b85131f692debbbc2bd203cc580ca980015	Keep Auto-Type focus on an enabled control
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:290:338b01d81ba34b7a70552276a01f14f952208a98	Improve screen reader spin box value announcements
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:293:39b9bdac47af93ccb1a69440aca579f17e38ae8e	Inspect spin button UIA values and focus properties
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:294:983a789f4e7c92bea3d41ea992b6a7b642dea890	Improve accessibility announcements for KDF spin boxes
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:295:d35d4a118518d687644574f517b09be10d29f166	Improve xa11y accessibility inspector filtering
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:296:8acc9ad3a67bd3d476fa513acf041c27d67d548b	Improve KeePassXC accessibility inspector discovery
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:300:5e93c2e20e12098e239d3533da070ff916e22c7f	Fix search save action focus checks
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:304:324278b038e7f7af37a809b767a6225a4fae8d5a	Merge remote-tracking branch 'upstream/develop' into feature/gui-accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:305:31f4936fb6f1270ef69458de8f9bfde7bcea3597	Preserve focus when closing database tab
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:306:2bbb3592a9e8639bf4d7319feedb5d317e78f3da	Fix hardware key focus when disabling selection
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:307:3a1efd7923fdb8d9debead0c6a2e91fa722b31ab	Fix KeeShare group focus when disabling sharing controls
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:308:952549fe3847a4ed2259c520646d50982651d55d	Fix focus when disabling browser settings
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:309:0652ad452a4cea04ff7bd8eae48f402215595df5	Fix focus when disabling SSH agent settings
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:310:a60efa81ac1d624e8230c52b778213b97998a927	Fix focus when denying an FDO Secret Service entry
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:311:1e5aa6ff1cb8dde1af822ba41dc85e793ce47156	Keep focus valid when Secret Service tabs are disabled
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:312:987386dbb8952a0b3bb7e49e361976fe5f17aa1e	Keep focus valid when Secret Service settings are disabled
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:313:6c5d71a51c088589821268f8acbd89d5a516c6ff	Fix focus when key component edit page changes
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:314:2f38f374875c880b1764ef84a2e34eee40b17978	Restore focus when disabling TOTP custom settings
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:315:78a58a8693b8a5a945ca13a5aa17574b5e6bb5e3	Restore focus after database reload
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:316:36b139bd3209b144cd90b27ee3d51742075a2dff	Keep focus when database reload disables views
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:317:bc2c2efd9b3860b7941b1e918a5e332a8396f730	Keep custom data focus when remove button disables
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:318:248043544b29047b66f40187ec92ab00a978372b	Keep focus when entering entry history mode
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:319:4c68cfac6dffe1462604220c85be12be4b3fa2d8	Fix group expiration focus when disabling date picker
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:320:970e9168a9d633e61d4c1b743de630e9dec58886	Restore focus when entry expiry date is disabled
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:321:ffc8eafbea3426b918a878c97c623144037a3307	Restore focus when entry attribute selection clears
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:322:697d08330b6f5e3a206be7bcfcf2487f6a1c4d7d	Fix focus when passkey export becomes disabled
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:323:81012dc0d495b9a33713a6bda61dca65f12ea15b	Add accessible names to icon picker items
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:324:5c980862146d7a491fc85f7dd76699284fdaeb35	Preserve focus when TOTP copy becomes unavailable
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:325:92e989fe3c694b4c420147c005b87e989d8b5ea4	Preserve focus when import fields change visibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:326:bf27c60d776534eb32ee7c0de18fd6593dc5c4ff	Preserve focus when clearing search hides toolbar
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:327:2702cf43780af6ca307c7e490a1e2153daac73b6	Preserve focus when hiding search save action
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:328:494618f62065415a383b870c7a5896b3d33d1e0e	Make About dialog links keyboard accessible
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:329:12e65927134d849508035282f6c70365208962d2	Preserve focus when recent database list disappears
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:330:5f56c679290d49742019692241480e4e244223fa	Announce completed software update check result
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:331:9ce11af97cd9a948403450cb369ee6fcca0daed9	Preserve focus when favicon download cancel button disables
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:332:7a74de3deffe60435e80257efb08c955b7a050e3	Announce software update check result for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:333:8b27fa281480dd357471519cb6c5296b755131dc	Preserve message action focus during layout rebuild
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:334:1e79733865988256931654e00099dc8ffdc0f55c	Name invalid URL action for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:335:2148027f348be4bbb08525552279817e28642b56	Preserve focus when message close button disappears
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:336:00e8111da009ecaede7ff001541d24406e53e640	Preserve focus during menu and toolbar locking
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:337:6358c19036f4ec86bbb4ab7d8ba3ef579765b414	Track focus during menu and toolbar locking
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:338:6734681a187f5f3fbd639cb4d5e033429ddf34e2	Preserve focus when hiding main navigation bars
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:339:6208c03cc8d74068fc029522512bca2e17691398	Preserve focus when save action changes state
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:340:cc660e9962ab5ae90ec04e65c14a16cea5f45e6e	Preserve focus when menu actions change state
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:341:89c441c35baee4c66866352a4118cfe5edc67a6d	Name attachment image view for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:342:b49600e20ad6219ceb68c18f86d246f13999f2a7	Name attachment text preview for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:343:69a793d0bf7a777a94462c331afc35b5d02c9f20	Name attachment text for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:344:637b223f84f4dd359b6591b727c9b9ed4d2b6ab4	Preserve focus when preview controls disappear
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:345:1767dc8be6d894ffa80f0e92173e76a93728fdeb	Name TOTP QR code for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:346:24920974fc770ddfd383e66f658db575eedbf73e	Improve shortcut settings accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:347:0dc370f3f9e053b9ff445f4aeab4ff03f090626e	Preserve focus during remote sync
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:348:ba30395668dfa844ae7e380481183d4824c73d21	Preserve focus during remote sync
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:349:55eb0c8ea986dd80cd5352d5662e962c22e1e483	Preserve focus when hiding group panel
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:350:9f79653d9c1c5e34a8b563236209938f036b4bb7	Preserve focus during YubiKey prompt
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:351:da6b20e96cdd8d93931a6ffecd40b7e179c1530e	Preserve focus during YubiKey prompt
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:352:66a87ffeedd1de607cd58787756eef97c2211e12	Preserve focus when import target is disabled
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:353:f22ebf6a187491bc2ce77d7f2a1c708632c29770	Name saved sync commands list for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:354:e1645d4544f97d53788388aaf090a0f664d9ea5e	Preserve focus when removing last remote setting
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:355:cb5f60b0a644c17de1788cc70ee107c9927c6e37	Preserve focus in database general settings
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:356:969831d530b18d6dbcf4b43c250bf19a50faeb9f	Preserve focus during encryption KDF updates
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:357:93f7c385d824a230afcf9a7893eceeaad7d584e9	Preserve focus when disabling browser key removal
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:358:f8b32a1f3e4e002035ae2e6b1430531fc1524ed4	Preserve focus when disabling custom icon delete button
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:359:60fbbf8ec41fe7d5a1cfca8e77f17f60ac9097e5	Keep focus on visible settings control when disabling minimize option
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:360:66ba9041fae149c6af248c53469fd256f0b9cbc9	Preserve focus while locking database unlock controls
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:361:5306b3844080cfb4d6407c667b962021a020857d	Preserve focused control across database unlock lock state
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:362:086178a1b561b7d71ff17c5ec551c6cd31a6c33b	Preserve focus when key file controls change visibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:363:0c7fee091aea6b6ed138597d97515eba5f50ecb5	Restore YubiKey source header after focus fix
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:364:4d33ed23e0325f73af9485dfdc8775907b8130fe	Keep YubiKey focus valid during hardware-key detection
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:366:2836bff2350ad3ee0f88411617d159f47c1f70db	Preserve focus across dependent settings changes
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:367:d38d3e257568736e0c82a1636a868c33e01f9525	Preserve focus when settings controls are disabled
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:368:aa4b6d8a05c1aaf3a2d6860c6d7b2b9f57e8b25f	Preserve focus during hardware key detection
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:369:a28d773b4c706196279271552ce333570dff2b4e	Associate password labels with fields for keyboard accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:370:9328ea440b4e3fa661018adb2ae78a336e9f7b7d	Name report exclusion checkbox for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:371:52d3da8a3ccb2c4b66198248ebb31669204fd6bb	Name additional URL list for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:372:1ceca1d42231345e1ff9f351e6dfab9bcd6fed1c	Preserve focus when deleting final history entry
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:373:f8150554a7982e1fd09e992ed30da35ef9cf1226	Preserve focus when Auto-Type window sequence is disabled
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:374:f22a40ad6b4dde589b34b21a09b03c83b859a363	Preserve focus when favicon button is disabled
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:375:455b42b7d60600cb0d0d90168dea78f18e088689	Preserve focus when browser setting is disabled
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:376:57135887ef0b20d205d59fd1037e0a12b2c6f041	Preserve focus when Apply is disabled
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:379:52b395469c099df3d7bc410036533bf7c2122461	Preserve focus when edit dialog buttons change
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:380:9a4810dc1cdd1939c66d8d432e9df979c1a235aa	Preserve focus when attachment controls change
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:381:c9c757cebe63d01f08017ae1ef4274dc0e063c58	Preserve source formatting after SSH focus fix
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:382:fb685763240e1056af5bc74afdf9a1e1fd46b785	Preserve focus when rebuilding SSH agent key info
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:383:c76659b426fb4f9f56c49d4d350b521258692b4f	Preserve focus when hiding edit pages
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:384:56de48595e3fc9b7a9c3d4d3d11e05f94cb20108	Fix focus handoff order for protected attributes
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:385:9a05119ef3ca859bb520f50096f488f364363f29	Preserve focus when custom attribute controls are disabled
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:386:5aaaf01bcaf3d72f1cb80c09abdfd74423f97831	Preserve focus when reloading an edited entry
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:387:3d3adc1e7155567bcaf4ff6fb621e6c412c03e2d	Restore focus when Auto-Type controls are disabled
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:388:c6fe91d10d45d93fe9ca1d7d65bada9a9f832c44	Restore focus when history controls are disabled
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:389:5b1e4f2f14a22e9fa0ecff128e558a935ee372e9	Restore focus when browser URL controls are disabled
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:390:b4ef54985f63b3ccc8cc187054ed6f961b673713	Fix report focus comment
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:391:ff782708cc59bd0eeaadc943266e19fae55efd7f	Restore report focus after entry editing
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:392:060c805e91b25c6e239e2cfecaaff8681aa6ee5d	Preserve report focus while editing entries
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:393:31066906b2a47482c5466f1468f611194321e31d	Restore HIBP report focus when hiding controls
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:394:09e36f6eb1101cd6b6701cd44e69c3760e018917	Restore focus when HIBP results replace confirmation
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:395:b5b66dd3cc64d3f04cac7a8272a81b921fc837e2	Restore focus when hiding health check filter
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:396:f29fa4bf2052cc41b6b8c2b8ae319253e6493768	Name report table for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:397:8765555a1f57452f48d7bde439dc00dbfef245df	Name report table for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:398:a3aaddff94ae6f446a559cf42a2bf76e9111f35e	Name import wizard fields for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:399:090be29ae1e3329ab33397e2dd9a825b6c38bd05	Name report tables for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:400:11676b98c54d206fddba9a14d8e9a4cf4e094807	Name report tables for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:401:7b80f986638645761c1d70e2c5361adbffefda34	Name report tables for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:402:9145adb5249a98c896ab9e669dde45589b2bb67a	Name passkey import selectors for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:403:e64cddd201b78c24d25b88dae45e7a2a0034ec8d	Name SSH public key field for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:404:17985f9589813af6418282c9b8351acc04fe34a6	Name YubiKey detection progress for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:405:3ce9eaa6d1f03256426d2664290c5da2221d5a6b	Name unlabeled GUI controls for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:406:f90db6cf82a61d9d071d1d5ce336b738b6730559	Name unlabeled GUI controls for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:407:4cbe3d6d036c1d5c213c31c8cc217766b4ad27c8	Name group preview controls for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:408:23adc3621b2870ac4840195a77a3bf14242c30dc	Name favicon download progress for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:409:b4ec7241212f5d613690c586020117b9be1266fc	Improve entry preview accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:410:58b72cae5d760e857871784e1b22ad1783b3ccad	Improve attachment control accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:411:690d9d184626eb5ffb2cc22138a3844ed63e7159	Improve attachment control accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:412:c6e660608e6adae393486f7396f731000fd38046	Name passkey export table for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:413:b45abcf877dd1b82a4106137fc4fb8aba8f255b6	Name remote command settings for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:414:309d9fb17f456fd8af454bd4003b6c1617d323ba	Name HIBP progress for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:415:dfd91eede018546eafaeb688fa445a99b135fbad	Fix TOTP setup accessibility XML
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:416:debaa45f61bbd7f7002a6434825ec5d8dc3d4ffa	Name update check progress for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:417:7fb927e9966820e9661458ebe572ce4ab63ab103	Improve TOTP setup control labels for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:418:8270c01d78013e9dca8cfc9f7902783743143af8	Name TOTP expiration progress for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:419:8abd725b0ffb3a5847f0f8b57847d6a10f6e4fe3	Name hardware key progress indicator for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:420:45344377b596a5741c544cf46e150065dd594b2b	Name password quality indicator for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:421:b1ea7de9f59eed1091a6aa6eebe7714b36383a50	Expose password entropy progress for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:423:e25d697a46c762b8376eb7c5f464bad6a2483ae7	Name custom icon list for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:424:4650cc5fff121f573f0c7f4ea89b603b04913b1b	Name search query clear timeout for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:425:a2b49dc54c4dc5257d18a09a21ace59238f514b2	Add accessible names to password generator buttons
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:427:a1b87bb94cb867054fd9cada723426ab45d245a0	Improve accessibility of recent database count
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:428:a901e9c48c9152c8d939ecb180f695d95c09989f	Improve accessibility of alternative save method selector
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:432:7aa01b36753c56c429fa8adc3d3ecd039399cab2	Fix passphrase control accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:433:562e6a6a109ab5d619c5dc2b22c0be1d95f702f7	Fix passphrase control accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:434:0b3a44d8ebe0c885362d5cb2082af9d67a84e2b6	Focus revealed custom attribute value for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:435:752c0a02316a9b75b90f8678077724c91713013f	Improve accessibility of custom attribute name editor
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:436:c9d594808517a6ee6668827c7dbf6b5c152f8195	Merge remote-tracking branch 'upstream/develop' into feature/gui-accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:437:a9c4618c41d3f7e692a3fc05ee3e1379d7218a5b	Name public database icon chooser for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:438:ecb4735da85b9dad1c15c8fa63befb5c99cace19	Fix encryption benchmark keyboard navigation
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:440:1b427405f5999c47b55e298194ea16331a7b95ac	Accessibility cleanup updates
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:441:656fb7878fe246cf4aadcf6278a08a4d53240ee5	Merge branch 'feature/gui-accessibility' of https://github.com/mtigzoe/keepassxc into accessibility-upstream-cleanup
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:442:42261f10d222abc9606773fee2ca3f673e81ce2c	Announce database unlock warning dialogs
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:443:eb8d3fde7167ab2c3e5891c4d24d38f7af5e191c	Centralize accessibility announcements for raw message boxes
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:444:64b1f866e5988492580752a224dcbdc5931e655c	Centralize accessibility announcements for raw message boxes
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:445:1ef7727e2b25f94307ade88691d36fb7295e5504	Ignore generated accessibility tree dumps
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:446:80040dc592ced76112626f52c77426e915474baf	Remove generated UIA tree dump artifact
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:447:d719138905475338c73b3ac6208f978e186c5639	Run Windows accessibility CI on cleanup branch
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:448:cc0532b1de739b1c4cac3864939d6585ba76c727	Run AT-SPI accessibility CI on cleanup branch
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:449:c40649a7e57cdf56ef45c4fa061ee9a1696e4e75	Make UIA alert verification documentation Qt-version neutral
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:450:0799141c522fcae7d60a3ef18e10f1879447b5ab	Correct accessibility alert verification documentation
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:451:a8977d48e308149ba190a06797697980dc885ae1	Run Windows accessibility CI on cleanup branch
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:452:1ec2c5875d0f3e94ad1ecf0169d120a7477b4c05	Ignore generated Windows UIA tree dump
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:453:fd9baa92103318dda918bb5c5a2f2f71ce58e457	Remove generated UIA tree dump artifact
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:454:2b09d5d56629094f4afbde3db4b2476c6cd8b227	Remove unused proposed accessibility test
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:455:6bc5925d04038732b8e4ae5e9c62bf6223441ffe	Expand Windows accessibility warning verification
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:457:4f20062dd9f5e0e730b79378c9d28d41974435be	Announce password warning dialog to assistive technology
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:458:207245c6a0089670da0d986c584dd3584ed6b161	Make encryption benchmark keyboard accessible
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:459:11f1ccd0da7c16679e21404eaa5503fc0154fef1	Preserve password shortcut accessibility description
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:460:2e82023ce27593732e5328f7c33207d7f68984f9	Preserve password shortcut accessibility description
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:461:f6c135ecf84c0f5f3d97c85df5e889ed2cf94f42	Announce second encryption warning dialog
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:462:ba4c507fc846eeb12b254917d4f795bc4c9321a4	Announce encryption warning dialogs to assistive technology
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:463:f64802f77f9a897070c9a33abcc1d5373f6123dd	Fix accessibility state event for protected attributes
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:464:7dae423f067e6251f1dc9a2aa24b2b5efe31d2ae	Improve import destination accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:468:18b64e0b1e3968a30ee4fb88752b8083fc56a288	Clean up import review accessibility guidance
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:469:170e87519805334cb3a4cddbbfb0463f6ac6616b	Run Qt accessibility test executable directly on Windows
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:470:b2577de66b5b100d39c507825bc89cac08e19dff	Fix install-qt action reference in Windows accessibility CI
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:471:4e329f8a03dc4680bcc69ff9b51d5e3007f8904d	Fix Qt accessibility test platform in Windows CI
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:472:0e347868ae81f6c90603178ac30c405f6757c5a6	Fix vcpkg baseline fetch in Windows accessibility CI
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:473:4bf92129c20a3c44fcde3f6542e3cf3aaaa8983c	Fix Windows accessibility workflow command
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:476:e29b8c6e5c0d8c69aa99bbc63e53d68311dc0b44	Fix Windows accessibility CTest command
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:477:b625fc48908c055062f468689f2b911a62385cfc	Use TemporaryFile for Windows accessibility tree test
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:478:c4e36e005f5d3c93fd77692232eb096946a3d49c	Improve Windows accessibility tree diagnostics
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:479:cd1844a001e9b4805ed4a39b901bf823499a67d7	Remove obsolete PowerShell accessibility test runner
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:480:a09130370d463d901e2cf0ffc03fa020289b4274	Run all Windows accessibility CTest suites in CI
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:481:a519225d97803021fa6654fcc39dc985b8bc2d8a	Add CTest accessibility tasks for VS Code
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:482:3d612898259ad131eff3e1829eb7336b0c438bf1	Fix toolbar accessibility regression test
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:485:ebac14f4c39a7506b83a890d777e2ed5c05b7a22	Merge upstream/develop into feature/gui-accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:486:76428b9ba8b4a3d312e4c8213ca7d7a7f26c8bab	Reorganize accessibility and build scripts
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:487:b7f8b0880d4fac3d0cf931a1807139635ead1b80	Fixed accessibility issues
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:490:dd390edaa685b8cd8db5e4281bbd1743cf11ae5c	Fixed accessibility text field dead code
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:494:1b59782c4e1053abea57edbbf47400adad0b86a3	Fixed accessibility issues
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:495:4a8306a15e4ee20236814b5b5b8bd2f9b4f534ff	Clarify message widget accessibility comment
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:496:59e30480287ab01db5375b63f7b4f13e2874b6b2	Accessible names
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:502:558471afa4662c8b088707923d62efbd72740bf3	Fix Windows accessibility test Qt plugin discovery
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:504:69b8f0fa743ac4074d46ac100b2c2856ff0fdcc7	ci: capture Qt accessibility test diagnostics
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:505:6480c6d15cd95480fbbb9711e7168b3eab01250c	ci: expose Qt accessibility test failure details
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:506:b51807ae19440f8a5f2d1910c7bddd92580cc939	docs: document accessibility testing stack
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:507:7a35449a24626646939b8b99399ce3fd21e9b00d	test accessibility tree for toolbar controls
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:508:73b4d64ca3ac10994073e92fe296f2e709b40056	docs: document serial Qt accessibility test command
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:509:906579926f18bbb1973c740ba875a5d4567809a6	Fix CTest environment for accessibility test
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:510:799fc9b85b8ca1aba8e6e2375d1cc13fac516579	Fix Windows accessibility one-paste command quoting
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:511:8dee2dfcbfac294a4074be5f6e2dc8b52bb22190	docs(accessibility): add single paste-and-run CMake CTest workflow
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:512:5594a20bb1b3062e8084f96f4a72b3ae48ebc72f	docs(accessibility): add one-paste CMake and CTest workflow
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:513:678b6abf233f621be43ae92362401605e64b9a1d	docs(accessibility): document CMake and CTest workflow
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:514:c8842742664a83beeba5fefd67335a8a8c3e1304	Document Windows accessibility CTest command
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:516:ac643c69e93937613f99bf6c147e2759fdce031f	files in tests/accessibility/windows
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:518:4e35840477b04e8102a721963eee72dde17da836	Fixed accessibility issues for buttons
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:519:13f37701e42b1725c8408a191555857489e2661f	Merge branch 'feature/gui-accessibility' of https://github.com/mtigzoe/keepassxc into feature/gui-accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:521:bdcc9ea54f02af10560486bc6ba8965d303e36a5	docs(accessibility): document Windows debug UIA workflow
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:523:8ff49f585c02e4562fd7dc2fe6c1c86e860a6566	Update Windows UIA diagnostic script path
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:524:67402c17fc649ec2e8c26df0e681f95a30593337	Move Windows UIA diagnostic script into Windows accessibility directory
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:525:a26887467e8d37ae227723c33fd9de320473c746	Preserve Windows UIA diagnostic script while renaming
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:526:d369c3e37a73c68d079b23a0e8db9e77d49a6255	Move Windows UIA tree diagnostic script
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:530:432027e34de9cedb906a66ddf9656eb32127e0ec	Remove misspelled Windows accessibility test build script
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:531:e52225062157566dabcbc8d9ffd2f8c412f88ccc	Fix and rename Windows accessibility test build script
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:533:306d3ee8c89036382674331c07ac13c6acf89224	Windows accessibility build errors
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:534:f48282a3b052b06246725130d38853c7e74939ef	UI Winodws accessibility tests
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:535:805874408b1aad1f327ed7b844e9c1c0fe7db1c7	Document Windows UI Automation accessibility testing
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:539:b2318f6373fcb5fb0d0911dac26037f25c4c97a4	Use MSVC for Windows accessibility build
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:540:203c7f97f231a563a7907692d33b478d6f95e413	Fix Windows accessibility workflow YAML
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:542:0126e9075966ce0d8be0af5ef8085a51282ef9cb	ci(accessibility): fix Windows Qt installation
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:544:5bfc75f66adc410f97741ef3be3c080b5ffff521	ci(accessibility): add Windows accessibility test workflow
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:546:37838c5657aaa6b37cf2d97d5ecd606e3cd718c6	Test accessibility search toolbar improvement
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:547:b642c29f86ee898ba5ae1e8b76e933523e8f34db	Test accessibility cpp file
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:548:8453fc3af26e29dd4430937da43cd41980fbfa5e	test(accessibility): align title field accessible name
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:549:537556831cf79b4de2f26752ffa4064c65315935	ci(atspi): fix accessibility cache matching
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:550:0416f5b1123eee593910f8947c655a8382cc5c6b	Test suite for accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:554:31bcf765803eada06001d7e8e04bf1fcd90f5244	ci(atspi): fall back to accessibility cache trace when Qt6/Xvfb D-Bus export is unavailable
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:555:83c4e59e8632eb580fc0866354f30654ee7aba85	ci(atspi): rerun accessibility workflow on patched HEAD
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:556:4db0805fa39e517ccf29e5e9e9f6e75f12062788	ci(atspi): trigger accessibility workflow
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:559:ce3cd799bd7e61631f3ff158dfb3c19590941730	ci(atspi): trigger accessibility workflow
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:562:dbdf07374509a079787c7548b4fa8af0165a097b	Start AT-SPI registry daemon explicitly on accessibility bus
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:566:9e09b8563dd37757a24d4d567ca4352ab12d9194	Start AT-SPI registry explicitly before accessibility probe
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:575:7bfe14b7ca43b61eeafb8018a6c1562fbbf039a1	Use libatspi directly in CI accessibility check
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:576:b24f16aea316a206cbee314dcfbdad06c999ed04	Use modern GObject AT-SPI binding for accessibility dump
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:579:e8a93b11c131c89f520d0539089fa0251b4d09ab	Add focused AT-SPI diagnostics
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:585:e068d12bf3adfd80fd0901d884a79b97aacc61d1	Enable Qt accessibility logging in CI
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:586:7261fb061cf28cce1efa093d542b430b2360e6d4	Print Qt accessibility plugins in CI
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:588:dd624da13662dd53d9889341dfe92f05a188e6ad	Fix AT-SPI CI accessibility setting
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:595:ab217b088655d734767fd55b4afd9bbd121ca6cc	Accessibility atspi
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:598:ea48509d6140f91522ab536fc5dbe86053dcc991	0009-a11y keycomponentwidget focus restoration
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:607:572302f5ff62d5b2bb3458dbdcf5b9c9f336eda0	A11Y: make toolbar buttons accessible to JAWS and braille displays
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:608:12bcf80882b8b78515d99c42552c14d8ca4b5267	A11Y: expose toolbar buttons to JAWS/braille with accessible names and Tab focus
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:613:48394edf0bd4d3431155e4f1d3ae83ff1fb4cfbe	restore: EditEntryWidget.cpp from 157303f3 + Notes accessibleName for braille
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:614:b4c4a446ffa8003e0cef3f6387ca89bca9172827	a11y: restore EditEntryWidget.cpp; set Notes accessibleName for braille
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:615:5c3c3c77d30275bce756cbf4ca282ef9bcaa873a	a11y: set Notes accessibleName in code for braille
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:620:7449d906bf245de2d02a26118db82f4398a02393	a11y: clarify Notes field accessible name/description for braille
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:624:47cfe7e5c9e628b87dabfdf300df06e4951a09a5	a11y: put wizard subtitle in format combo accessibleName for braille
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:625:b79c521365c9268e557a651aae944f7dd4687919	a11y: NoFocus on encryption scrollArea to skip blank Tab stop
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:626:ee8aa737a333046fad5bf4e4b32e8cfa8259a9e9	a11y: set NoFocus on nested QScrollAreas to remove blank Tab stops
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:633:82cd2bc7ca7380b2f8b1cfce6acc70eb75f3e22f	Benchmark button accessibility
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:639:9b476d6a2f4a1e7fcc135c8ba43d3f1446b73ac9	Message alert announcement and search box
+C:\Users\Miriam\Personal_Coding\keepassxc-repo\keepassxc\accessibility-641-commits.txt:641:11a49edf88b94a8f581372737c1868ae5101458a	Accessibility issues.

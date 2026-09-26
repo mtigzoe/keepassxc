@@ -1,0 +1,115 @@
+diff --git a/src/gui/TotpSetupDialog.cpp b/src/gui/TotpSetupDialog.cpp
+index e7e0bd74..66c04881 100644
+--- a/src/gui/TotpSetupDialog.cpp
++++ b/src/gui/TotpSetupDialog.cpp
+@@ -13,10 +13,13 @@
+  *
+  *  You should have received a copy of the GNU General Public License
+  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  */
+ 
++#include <QAccessible>
++#include <QApplication>
++
+ #include "TotpSetupDialog.h"
+ #include "ui_TotpSetupDialog.h"
+ 
+ #include "core/Base32.h"
+ #include "core/Totp.h"
+@@ -33,27 +36,66 @@ TotpSetupDialog::TotpSetupDialog(QWidget* parent, Entry* entry)
+     setFixedSize(sizeHint());
+ 
+     connect(m_ui->buttonBox, SIGNAL(rejected()), SLOT(close()));
+     connect(m_ui->buttonBox, SIGNAL(accepted()), SLOT(saveSettings()));
+     connect(m_ui->radioCustom, SIGNAL(toggled(bool)), SLOT(toggleCustom(bool)));
++    connect(m_ui->algorithmComboBox, SIGNAL(currentIndexChanged(int)), SLOT(algorithmChanged(int)));
++    connect(m_ui->stepSpinBox, SIGNAL(valueChanged(int)), SLOT(stepChanged(int)));
++    connect(m_ui->digitsSpinBox, SIGNAL(valueChanged(int)), SLOT(digitsChanged(int)));
+ 
+     init();
+ }
+ 
+ TotpSetupDialog::~TotpSetupDialog() = default;
+ 
++void TotpSetupDialog::algorithmChanged(int value)
++{
++    Q_UNUSED(value);
++
++    const auto text = m_ui->algorithmComboBox->currentText();
++    QAccessibleValueChangeEvent event(m_ui->algorithmComboBox, text);
++    QAccessible::updateAccessibility(&event);
++
++#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
++    QAccessibleAnnouncementEvent announcementEvent(m_ui->algorithmComboBox, text);
++    QAccessible::updateAccessibility(&announcementEvent);
++#endif
++}
++
++void TotpSetupDialog::stepChanged(int value)
++{
++    QAccessibleValueChangeEvent event(m_ui->stepSpinBox, value);
++    QAccessible::updateAccessibility(&event);
++
++#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
++    QAccessibleAnnouncementEvent announcementEvent(m_ui->stepSpinBox, QString::number(value));
++    QAccessible::updateAccessibility(&announcementEvent);
++#endif
++}
++
++void TotpSetupDialog::digitsChanged(int value)
++{
++    QAccessibleValueChangeEvent event(m_ui->digitsSpinBox, value);
++    QAccessible::updateAccessibility(&event);
++
++#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
++    QAccessibleAnnouncementEvent announcementEvent(m_ui->digitsSpinBox, QString::number(value));
++    QAccessible::updateAccessibility(&announcementEvent);
++#endif
++}
++
+ void TotpSetupDialog::saveSettings()
+ {
+     // Secret key sanity check
+     // Convert user input to all uppercase and remove '='
+     auto key = m_ui->seedEdit->text().toUpper().remove(" ").remove("=").trimmed().toLatin1();
+     auto sanitizedKey = Base32::sanitizeInput(key);
+     // Use startsWith to ignore added '=' for padding at the end
+     if (!sanitizedKey.startsWith(key)) {
+         MessageBox::information(this,
+                                 tr("Invalid TOTP Secret"),
+-                                tr("You have entered an invalid secret key. The key must be in Base32 format.\n"
++                                tr("You have entered an invalid secret key. The key must be in Base32 format.\\n"
+                                    "Example: JBSWY3DPEHPK3PXP"));
+         return;
+     }
+ 
+     QString encShortName;
+@@ -95,10 +137,13 @@ void TotpSetupDialog::saveSettings()
+     close();
+ }
+ 
+ void TotpSetupDialog::toggleCustom(bool status)
+ {
++    if (!status && m_ui->customSettingsGroup->isAncestorOf(QApplication::focusWidget())) {
++        m_ui->radioCustom->setFocus(Qt::OtherFocusReason);
++    }
+     m_ui->customSettingsGroup->setEnabled(status);
+ }
+ 
+ void TotpSetupDialog::init()
+ {
+@@ -128,8 +173,13 @@ void TotpSetupDialog::init()
+                 m_ui->algorithmComboBox->setCurrentIndex(index);
+             }
+         }
+ 
+         auto error = Totp::checkValidSettings(settings);
+-        m_ui->invalidKeyLabel->setVisible(!error.isEmpty());
++        const bool invalid = !error.isEmpty();
++        m_ui->invalidKeyLabel->setVisible(invalid);
++        m_ui->seedEdit->setAccessibleDescription(invalid ? tr("Error: secret key is invalid") : QString());
++        if (invalid) {
++            QAccessible::updateAccessibility(new QAccessibleEvent(m_ui->invalidKeyLabel, QAccessible::Alert));
++        }
+     }
+ }
