@@ -19,6 +19,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+#include <QAccessible>
 #include <QCloseEvent>
 #include <QDesktopServices>
 #include <QDir>
