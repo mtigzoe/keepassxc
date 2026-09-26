@@ -63,17 +63,20 @@ void TextAttachmentsWidget::updateWidget()
         m_splitter->setSizes({0, 1});
         m_editWidget->hide();
         m_previewWidget->openAttachment(m_attachment, m_mode);
+        m_editWidget->findChild<QPushButton*>("previewPushButton")->setChecked(false);
     } else {
         // Show the edit widget and hide the preview by default in read-write mode
         m_splitter->setSizes({1, 0});
         m_editWidget->show();
         m_editWidget->openAttachment(m_attachment, m_mode);
+        m_editWidget->findChild<QPushButton*>("previewPushButton")->setChecked(false);
     }
 }
 
 void TextAttachmentsWidget::updatePreviewWidget()
 {
     m_previewVisible = isPreviewVisible();
+    m_editWidget->findChild<QPushButton*>("previewPushButton")->setChecked(m_previewVisible);
     if (m_previewVisible) {
         m_attachment = m_editWidget->getAttachment();
         m_previewWidget->openAttachment(m_attachment, attachments::OpenMode::ReadOnly);
