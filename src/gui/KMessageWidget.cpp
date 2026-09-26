@@ -24,6 +24,7 @@
 #include "gui/Icons.h"
 
 #include <QAction>
+#include <QApplication>
 #include <QBoxLayout>
 #include <QEvent>
 #include <QLabel>
