@@ -108,6 +108,8 @@ MainWindow::MainWindow()
         m_ui->toolBar->setIconSize({20, 20});
     }
 
+    m_ui->toolBar->setAccessibleName(tr("Database toolbar"));
+
     // Setup the search widget in the toolbar
     m_searchWidget = new SearchWidget();
     m_searchWidget->connectSignals(m_actionMultiplexer);

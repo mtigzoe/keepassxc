@@ -86,6 +86,9 @@ namespace
         {
             auto* editor = QStyledItemDelegate::createEditor(parent, option, index);
             if (auto* lineEdit = qobject_cast<QLineEdit*>(editor)) {
+                lineEdit->setAccessibleName(QCoreApplication::translate("EditEntryWidget", "Attribute name"));
+                lineEdit->setAccessibleDescription(
+                    QCoreApplication::translate("EditEntryWidget", "Name of the custom attribute being edited."));
                 if (config()->get(Config::AutocompleteSuggestions).toBool()) {
                     auto* completer = new QCompleter(m_getSuggestion ? m_getSuggestion() : QStringList(), lineEdit);
                     completer->setCaseSensitivity(Qt::CaseInsensitive);
@@ -1080,7 +1083,7 @@ void EditEntryWidget::setForms(Entry* entry, bool restore)
     if (m_history) {
         editTriggers = QAbstractItemView::NoEditTriggers;
     } else {
-        editTriggers = QAbstractItemView::DoubleClicked;
+        editTriggers = QAbstractItemView::DoubleClicked | QAbstractItemView::EditKeyPressed;
     }
     m_advancedUi->attributesView->setEditTriggers(editTriggers);
     m_advancedUi->excludeReportsCheckBox->setChecked(entry->excludeFromReports());
@@ -1621,6 +1624,7 @@ void EditEntryWidget::toggleCurrentAttributeVisibility()
             m_advancedUi->attributesEdit->setPlainText(m_entryAttributes->value(key));
             m_advancedUi->attributesEdit->setEnabled(true);
             m_advancedUi->attributesEdit->blockSignals(oldBlockSignals);
+            m_advancedUi->attributesEdit->setFocus();
         }
         m_advancedUi->revealAttributeButton->setText(tr("Hide"));
     } else {
