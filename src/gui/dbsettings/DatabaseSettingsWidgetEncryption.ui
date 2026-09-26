@@ -430,7 +430,11 @@
              <item>
               <widget class="QToolButton" name="transformBenchmarkButton">
                <property name="focusPolicy">
-                <enum>Qt::WheelFocus</enum>
+                <enum>Qt::TabFocus</enum>
+               </property>
+               <property name="accessibleName">
+                <string>Benchmark transform delay</string>
+
                </property>
               </widget>
              </item>
