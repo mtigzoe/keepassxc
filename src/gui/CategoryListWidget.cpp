@@ -121,12 +121,18 @@ void CategoryListWidget::resizeEvent(QResizeEvent* event)
 
 void CategoryListWidget::updateCategoryScrollButtons()
 {
+    const bool canScroll = m_ui->categoryList->verticalScrollBar()->maximum() > 0;
+
+    if (!canScroll && (m_ui->scrollUp->hasFocus() || m_ui->scrollDown->hasFocus())) {
+        m_ui->categoryList->setFocus(Qt::OtherFocusReason);
+    }
+
     m_ui->scrollUp->setEnabled(m_ui->categoryList->verticalScrollBar()->value() != 0);
     m_ui->scrollDown->setEnabled(m_ui->categoryList->verticalScrollBar()->value()
                                  != m_ui->categoryList->verticalScrollBar()->maximum());
 
-    m_ui->scrollUp->setVisible(m_ui->categoryList->verticalScrollBar()->maximum() > 0);
-    m_ui->scrollDown->setVisible(m_ui->scrollUp->isVisible());
+    m_ui->scrollUp->setVisible(canScroll);
+    m_ui->scrollDown->setVisible(canScroll);
 }
 
 void CategoryListWidget::scrollCategoriesUp()
