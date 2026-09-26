@@ -101,7 +101,7 @@ public:
         h->setStretch(0, 1);
 
         auto l = new QVBoxLayout(this);
-        l->addWidget(new QLabel(QObject::tr("Double click an action to change its shortcut")));
+        l->addWidget(new QLabel(QObject::tr("Double click or press Enter on an action to change its shortcut")));
         l->addLayout(h);
         l->addWidget(m_tableView);
 
@@ -134,6 +134,7 @@ public:
         m_tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
         connect(m_tableView, &QTableView::doubleClicked, this, &ShortcutSettingsWidget::onDoubleClicked);
+        connect(m_tableView, &QTableView::activated, this, &ShortcutSettingsWidget::onDoubleClicked);
     }
 
     void loadSettings()
