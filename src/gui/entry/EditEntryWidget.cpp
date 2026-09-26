@@ -772,6 +772,19 @@ void EditEntryWidget::updateSSHAgentAttachments()
 
 void EditEntryWidget::updateSSHAgentKeyInfo()
 {
+    const bool addHasFocus = m_sshAgentUi->addToAgentButton->hasFocus();
+    const bool removeHasFocus = m_sshAgentUi->removeFromAgentButton->hasFocus();
+    const bool copyHasFocus = m_sshAgentUi->copyToClipboardButton->hasFocus();
+    const bool decryptHasFocus = m_sshAgentUi->decryptButton->hasFocus();
+
+    if (addHasFocus || removeHasFocus || copyHasFocus || decryptHasFocus) {
+        if (m_sshAgentUi->attachmentRadioButton->isChecked()) {
+            m_sshAgentUi->attachmentComboBox->setFocus(Qt::OtherFocusReason);
+        } else {
+            m_sshAgentUi->externalFileEdit->setFocus(Qt::OtherFocusReason);
+        }
+    }
+
     m_sshAgentUi->addToAgentButton->setEnabled(false);
     m_sshAgentUi->removeFromAgentButton->setEnabled(false);
     m_sshAgentUi->copyToClipboardButton->setEnabled(false);
