@@ -83,6 +83,21 @@ ImportWizardPageSelect::ImportWizardPageSelect(QWidget* parent)
     connect(m_ui->importTypeList, &QListWidget::itemActivated, this, &ImportWizardPageSelect::advanceFocusFromTypeList);
     m_ui->importTypeList->setCurrentRow(0);
 
+    // Keep the wizard's keyboard traversal deterministic while allowing hidden
+    // import-specific controls to be skipped automatically when the import type changes.
+    QWidget::setTabOrder(m_ui->importTypeList, m_ui->importFileEdit);
+    QWidget::setTabOrder(m_ui->importFileEdit, m_ui->importFileButton);
+    QWidget::setTabOrder(m_ui->importFileButton, m_ui->downloadCommand);
+    QWidget::setTabOrder(m_ui->downloadCommand, m_ui->downloadCommandHelpButton);
+    QWidget::setTabOrder(m_ui->downloadCommandHelpButton, m_ui->downloadCommandInput);
+    QWidget::setTabOrder(m_ui->downloadCommandInput, m_ui->passwordEdit);
+    QWidget::setTabOrder(m_ui->passwordEdit, m_ui->keyFileEdit);
+    QWidget::setTabOrder(m_ui->keyFileEdit, m_ui->keyFileButton);
+    QWidget::setTabOrder(m_ui->keyFileButton, m_ui->newDatabaseRadio);
+    QWidget::setTabOrder(m_ui->newDatabaseRadio, m_ui->existingDatabaseRadio);
+    QWidget::setTabOrder(m_ui->existingDatabaseRadio, m_ui->existingDatabaseChoice);
+    QWidget::setTabOrder(m_ui->existingDatabaseChoice, m_ui->temporaryDatabaseRadio);
+
     connect(m_ui->importFileButton, &QAbstractButton::clicked, this, &ImportWizardPageSelect::chooseImportFile);
     connect(m_ui->keyFileButton, &QAbstractButton::clicked, this, &ImportWizardPageSelect::chooseKeyFile);
     connect(m_ui->existingDatabaseRadio, &QRadioButton::toggled, this, [this](bool state) {
