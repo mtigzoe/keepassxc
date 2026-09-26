@@ -44,7 +44,6 @@ throw "vswhere.exe was not found at the path passed to -VsWhere: $VsWhere"
 # installs the VS Installer under plain Program Files instead.
 $VsWhereOnPath = Get-Command "vswhere.exe" -ErrorAction SilentlyContinue
 
-```
     if ($VsWhereOnPath) {
         $VsWhere = $VsWhereOnPath.Source
     } else {
@@ -85,7 +84,6 @@ if (-not $VsInstallPath) {
 }
 
 $VsDevShell = Join-Path $VsInstallPath "Common7\Tools\Launch-VsDevShell.ps1"
-```
 
 }
 
@@ -177,7 +175,6 @@ $KitsRootRegistryPaths = @(
 "HKLM:\SOFTWARE\Microsoft\Windows Kits\Installed Roots"
 )
 
-```
 foreach ($RegPath in $KitsRootRegistryPaths) {
     $RegValue = Get-ItemProperty -Path $RegPath -Name "KitsRoot10" -ErrorAction SilentlyContinue
     if ($RegValue -and (Test-Path $RegValue.KitsRoot10)) {
@@ -202,7 +199,6 @@ if (-not $WindowsSdkRoot) {
 if (-not $WindowsSdkRoot) {
     throw "Could not auto-detect an installed Windows 10/11 SDK. Pass -WindowsSdkRoot explicitly."
 }
-```
 
 }
 
@@ -216,13 +212,11 @@ Where-Object { $*.Name -match '^\d+.\d+.\d+.\d+$' } |
 Sort-Object { [version]$*.Name } -Descending |
 Select-Object -First 1
 
-```
 if (-not $DetectedSdkVersion) {
     throw "Could not auto-detect an installed Windows SDK version under $WindowsSdkRoot\bin. Pass -WindowsSdkVersion explicitly."
 }
 
 $WindowsSdkVersion = $DetectedSdkVersion.Name
-```
 
 }
 
@@ -319,13 +313,11 @@ Write-Host "Qt6Config.cmake was not found."
 Write-Host "Installing Qt through vcpkg..."
 Write-Host ""
 
-```
 & $VcpkgExe install qtbase:x64-windows
 
 if ($LASTEXITCODE -ne 0) {
     throw "vcpkg failed to install qtbase."
 }
-```
 
 }
 
@@ -342,13 +334,11 @@ Write-Host "Qt may need to be rebuilt with the additional feature."
 Write-Host "This can take some time."
 Write-Host ""
 
-```
 & $VcpkgExe install "qtbase[windeployqt]:x64-windows" --recurse
 
 if ($LASTEXITCODE -ne 0) {
     throw "vcpkg failed to install qtbase[windeployqt]."
 }
-```
 
 }
 
@@ -370,13 +360,11 @@ Write-Host "Qt translations were not found."
 Write-Host "Installing qttranslations through vcpkg..."
 Write-Host ""
 
-```
 & $VcpkgExe install qttranslations:x64-windows --classic --recurse
 
 if ($LASTEXITCODE -ne 0) {
     throw "vcpkg failed to install qttranslations."
 }
-```
 
 }
 
@@ -397,13 +385,11 @@ Write-Host "Qt SVG module (Svg / SvgWidgets) was not found."
 Write-Host "Installing qtsvg through vcpkg..."
 Write-Host ""
 
-```
 & $VcpkgExe install qtsvg:x64-windows
 
 if ($LASTEXITCODE -ne 0) {
     throw "vcpkg failed to install qtsvg."
 }
-```
 
 }
 
@@ -509,7 +495,6 @@ Write-Host "Ruby was not found: $RubyExe"
 Write-Host "Looking up the latest RubyInstaller (x64, without Devkit)..."
 Write-Host ""
 
-```
     $ReleaseInfo = Invoke-RestMethod `
         -Uri "https://api.github.com/repos/oneclick/rubyinstaller2/releases/latest" `
         -UseBasicParsing
@@ -590,7 +575,6 @@ if (-not (Test-Path $AsciidoctorBat)) {
 Write-Host ""
 Write-Host "asciidoctor found:"
 Write-Host $AsciidoctorBat
-```
 
 }
 
@@ -630,11 +614,9 @@ Write-Host "============================================================"
 Write-Host "Removing previous build directory..."
 Write-Host "============================================================"
 
-```
 if (Test-Path ".\build") {
     Remove-Item ".\build" -Recurse -Force
 }
-```
 
 } else {
 Write-Host ""
