@@ -48,6 +48,9 @@ private slots:
     void chooseKeyFile();
     void updateDatabaseChoices() const;
 
+protected:
+    bool eventFilter(QObject* watched, QEvent* event) override;
+
 private:
     QString importFileFilter();
     void setCredentialState(bool passwordEnabled, bool keyFileEnable = false);
