@@ -19,6 +19,8 @@
 #include "NewDatabaseWizardPage.h"
 #include "ui_NewDatabaseWizardPage.h"
 
+#include <QComboBox>
+
 #include "core/Database.h"
 #include "gui/dbsettings/DatabaseSettingsWidget.h"
 
