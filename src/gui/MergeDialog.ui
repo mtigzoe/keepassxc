@@ -22,6 +22,9 @@
      <property name="accessibleDescription">
       <string>Lists the changes that will be applied during the database merge.</string>
      </property>
+     <property name="tabKeyNavigation">
+      <bool>false</bool>
+     </property>
     </widget>
    </item>
    <item>
