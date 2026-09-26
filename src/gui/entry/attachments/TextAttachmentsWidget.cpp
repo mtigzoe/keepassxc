@@ -20,6 +20,7 @@
 #include "TextAttachmentsPreviewWidget.h"
 
 #include <QApplication>
+#include <QPushButton>
 #include <QSplitter>
 #include <QTextEdit>
 #include <QTimer>
