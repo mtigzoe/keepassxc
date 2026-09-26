@@ -56,6 +56,7 @@ ImportWizardPageSelect::ImportWizardPageSelect(QWidget* parent)
     // focus by default, trapping keyboard/screen reader users who tab into
     // this field (see the same fix applied to EditGroupWidget's notes field).
     m_ui->downloadCommandInput->setTabChangesFocus(true);
+    m_ui->importTypeList->setTabKeyNavigation(false);
 
     new QListWidgetItem(icons()->icon("csv"), tr("Comma Separated Values (.csv)"), m_ui->importTypeList);
     new QListWidgetItem(icons()->icon("onepassword"), tr("1Password Export (.1pux)"), m_ui->importTypeList);
