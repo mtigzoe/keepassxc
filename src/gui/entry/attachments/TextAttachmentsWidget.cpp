@@ -19,6 +19,7 @@
 #include "TextAttachmentsEditWidget.h"
 #include "TextAttachmentsPreviewWidget.h"
 
+#include <QApplication>
 #include <QSplitter>
 #include <QTextEdit>
 #include <QTimer>
@@ -55,6 +56,10 @@ void TextAttachmentsWidget::updateWidget()
 {
     if (m_mode == attachments::OpenMode::ReadOnly) {
         // Only show the preview widget in read-only mode
+        auto* focusedWidget = QApplication::focusWidget();
+        if (focusedWidget && (focusedWidget == m_editWidget || m_editWidget->isAncestorOf(focusedWidget))) {
+            m_previewWidget->setFocus(Qt::OtherFocusReason);
+        }
         m_splitter->setSizes({0, 1});
         m_editWidget->hide();
         m_previewWidget->openAttachment(m_attachment, m_mode);
