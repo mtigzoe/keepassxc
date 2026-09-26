@@ -1635,8 +1635,37 @@ void EditEntryWidget::toggleCurrentAttributeVisibility()
 
 void EditEntryWidget::updateAutoTypeEnabled()
 {
-    bool autoTypeEnabled = m_autoTypeUi->enableButton->isChecked();
-    bool validIndex = m_autoTypeUi->assocView->currentIndex().isValid() && m_autoTypeAssoc->size() != 0;
+    QWidget* focusedWidget = QApplication::focusWidget();
+    const bool autoTypeEnabled = m_autoTypeUi->enableButton->isChecked();
+    const bool validIndex = m_autoTypeUi->assocView->currentIndex().isValid() && m_autoTypeAssoc->size() != 0;
+
+    const auto hasFocusWithin = [focusedWidget](QWidget* widget) {
+        return focusedWidget && (focusedWidget == widget || widget->isAncestorOf(focusedWidget));
+    };
+
+    const bool focusedControlWillDisable =
+        (hasFocusWithin(m_autoTypeUi->enableButton) && m_history)
+        || (hasFocusWithin(m_autoTypeUi->inheritSequenceButton) && (m_history || !autoTypeEnabled))
+        || (hasFocusWithin(m_autoTypeUi->customSequenceButton) && (m_history || !autoTypeEnabled))
+        || (hasFocusWithin(m_autoTypeUi->sequenceEdit)
+            && (!autoTypeEnabled || !m_autoTypeUi->customSequenceButton->isChecked()))
+        || (hasFocusWithin(m_autoTypeUi->openHelpButton) && !autoTypeEnabled)
+        || (hasFocusWithin(m_autoTypeUi->assocView) && !autoTypeEnabled)
+        || (hasFocusWithin(m_autoTypeUi->assocAddButton) && m_history)
+        || (hasFocusWithin(m_autoTypeUi->assocRemoveButton) && (m_history || !validIndex))
+        || (hasFocusWithin(m_autoTypeUi->windowTitleCombo) && (!autoTypeEnabled || !validIndex))
+        || (hasFocusWithin(m_autoTypeUi->customWindowSequenceButton)
+            && (m_history || !autoTypeEnabled || !validIndex))
+        || (hasFocusWithin(m_autoTypeUi->windowSequenceEdit)
+            && (!autoTypeEnabled || !validIndex || !m_autoTypeUi->customWindowSequenceButton->isChecked()));
+
+    if (focusedControlWillDisable) {
+        if (!m_history) {
+            m_autoTypeUi->enableButton->setFocus();
+        } else if (m_mainUi->titleEdit->isEnabled()) {
+            m_mainUi->titleEdit->setFocus();
+        }
+    }
 
     m_autoTypeUi->enableButton->setEnabled(!m_history);
     m_autoTypeUi->inheritSequenceButton->setEnabled(!m_history && autoTypeEnabled);
