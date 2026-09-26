@@ -122,15 +122,8 @@ void TotpDialog::updateTotp()
     m_ui->timerLabel->setVisible(isValid);
     m_ui->totpLabel->setText(totpCode);
 
-    if (isValid && totpCode != m_lastAnnouncedTotpCode) {
-        m_lastAnnouncedTotpCode = totpCode;
-        QAccessibleValueChangeEvent valueEvent(m_ui->totpLabel, totpCode);
-        QAccessible::updateAccessibility(&valueEvent);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
-        QAccessibleAnnouncementEvent announcementEvent(m_ui->totpLabel, tr("TOTP code %1").arg(totpCode));
-        QAccessible::updateAccessibility(&announcementEvent);
-#endif
-    }
+    // Keep the code available when the focused label is read, but do not
+    // announce the secret automatically through assistive technology.
 }
 
 void TotpDialog::resetCounter()
