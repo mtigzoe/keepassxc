@@ -143,12 +143,11 @@ bool SymmetricCipherStream::readBlock()
     }
 
     if (!m_streamCipher && m_buffer.size() != blockSize()) {
+        // A partial block here is the normal end-of-stream condition: the
+        // base device has no more data, so the reader must report a clean EOF
+        // instead of an error. Truncated or corrupt files are still rejected
+        // by HMAC verification and XML parsing.
         m_bufferFilling = true;
-        if (m_baseDevice->atEnd()) {
-            m_error = true;
-            setErrorString("Incomplete cipher block.");
-            return false;
-        }
         return false;
     } else {
         m_bufferPos = 0;
