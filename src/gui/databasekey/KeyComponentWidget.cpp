@@ -75,6 +75,10 @@ void KeyComponentWidget::updateAddStatus(bool added)
 {
     if (m_ui->stackedWidget->currentIndex() == Page::Edit) {
         emit editCanceled();
+    } else if (!added && m_ui->stackedWidget->currentIndex() == Page::LeaveOrRemove) {
+        if (m_ui->changeButton->hasFocus() || m_ui->removeButton->hasFocus()) {
+            m_ui->addButton->setFocus(Qt::OtherFocusReason);
+        }
     }
 
     if (added) {
