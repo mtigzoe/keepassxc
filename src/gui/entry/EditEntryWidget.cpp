@@ -999,6 +999,9 @@ void EditEntryWidget::useExpiryPreset(QAction* action)
 
 void EditEntryWidget::toggleHideNotes(bool visible)
 {
+    if (!visible && m_mainUi->notesEdit->hasFocus()) {
+        m_mainUi->revealNotesButton->setFocus(Qt::OtherFocusReason);
+    }
     m_mainUi->notesEdit->setVisible(visible);
     m_mainUi->revealNotesButton->setIcon(icons()->onOffIcon("password-show", visible));
 }
