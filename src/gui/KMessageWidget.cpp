@@ -394,6 +394,22 @@ bool KMessageWidget::isCloseButtonVisible() const
 void KMessageWidget::setCloseButtonVisible(bool show)
 {
     d->closeButton->setVisible(show);
+    if (!show) {
+        if (!d->buttons.isEmpty()) {
+            d->buttons.first()->setFocus(Qt::OtherFocusReason);
+        } else {
+            QWidget* candidate = d->closeButton->nextInFocusChain();
+            const QWidget* const boundary = this;
+            while (candidate && candidate != boundary) {
+                if (candidate->isVisibleTo(window()) && candidate->isEnabled()
+                    && candidate->focusPolicy() != Qt::NoFocus && !isAncestorOf(candidate)) {
+                    candidate->setFocus(Qt::OtherFocusReason);
+                    break;
+                }
+                candidate = candidate->nextInFocusChain();
+            }
+        }
+    }
     updateGeometry();
 }
 
@@ -436,6 +452,31 @@ void KMessageWidget::animatedShow()
 
 void KMessageWidget::animatedHide()
 {
+    const auto focusedWidget = QApplication::focusWidget();
+    if (focusedWidget && (focusedWidget == this || isAncestorOf(focusedWidget))) {
+        QWidget* candidate = focusedWidget->nextInFocusChain();
+        while (candidate && candidate != this) {
+            if (!isAncestorOf(candidate) && candidate->isVisibleTo(window()) && candidate->isEnabled()
+                && candidate->focusPolicy() != Qt::NoFocus) {
+                candidate->setFocus(Qt::OtherFocusReason);
+                break;
+            }
+            candidate = candidate->nextInFocusChain();
+        }
+
+        if (QApplication::focusWidget() == focusedWidget) {
+            candidate = focusedWidget->previousInFocusChain();
+            while (candidate && candidate != this) {
+                if (!isAncestorOf(candidate) && candidate->isVisibleTo(window()) && candidate->isEnabled()
+                    && candidate->focusPolicy() != Qt::NoFocus) {
+                    candidate->setFocus(Qt::OtherFocusReason);
+                    break;
+                }
+                candidate = candidate->previousInFocusChain();
+            }
+        }
+    }
+
     if (!style()->styleHint(QStyle::SH_Widget_Animate, nullptr, this)) {
         hide();
         emit hideAnimationFinished();
