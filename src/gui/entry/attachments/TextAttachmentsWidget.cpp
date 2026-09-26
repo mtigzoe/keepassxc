@@ -116,8 +116,10 @@ void TextAttachmentsWidget::initWidget()
         auto visible = isPreviewVisible();
         if (visible && !m_previewVisible) {
             updatePreviewWidget();
+        } else {
+            m_previewVisible = visible;
+            m_editWidget->findChild<QPushButton*>("previewPushButton")->setChecked(visible);
         }
-        m_previewVisible = visible;
     });
 
     m_splitter->addWidget(m_editWidget);
