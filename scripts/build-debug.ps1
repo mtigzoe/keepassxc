@@ -148,9 +148,9 @@ Write-Host ""
 Write-Host "Using:"
 Write-Host $VsDevShell
 
-. $VsDevShell -Arch amd64
+& $VsDevShell -Arch amd64
 
-if (-not (Get-Command cl.exe -ErrorAction SilentlyContinue)) {
+if ($LASTEXITCODE -ne 0) {
     throw "Visual Studio Developer environment failed to load."
 }
 
