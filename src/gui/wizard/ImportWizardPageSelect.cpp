@@ -26,8 +26,6 @@
 #include "gui/MainWindow.h"
 
 #include <QDesktopServices>
-#include <QEvent>
-#include <QKeyEvent>
 
 ImportWizardPageSelect::ImportWizardPageSelect(QWidget* parent)
     : QWizardPage(parent)
@@ -58,12 +56,9 @@ ImportWizardPageSelect::ImportWizardPageSelect(QWidget* parent)
     // focus by default, trapping keyboard/screen reader users who tab into
     // this field (see the same fix applied to EditGroupWidget's notes field).
     m_ui->downloadCommandInput->setTabChangesFocus(true);
+    // Keep arrow keys for import-type selection, but make Tab and Shift+Tab
+    // leave the list instead of moving between list items.
     m_ui->importTypeList->setTabKeyNavigation(false);
-    // QListWidget receives keyboard input through its viewport, so the
-    // event filter must cover both objects. This prevents QAbstractItemView from
-    // interpreting Tab as next-item navigation while preserving arrow-key selection.
-    m_ui->importTypeList->installEventFilter(this);
-    m_ui->importTypeList->viewport()->installEventFilter(this);
 
     new QListWidgetItem(icons()->icon("csv"), tr("Comma Separated Values (.csv)"), m_ui->importTypeList);
     new QListWidgetItem(icons()->icon("onepassword"), tr("1Password Export (.1pux)"), m_ui->importTypeList);
@@ -227,20 +222,6 @@ void ImportWizardPageSelect::advanceFocusFromTypeList()
     } else {
         m_ui->importFileEdit->setFocus();
     }
-}
-
-bool ImportWizardPageSelect::eventFilter(QObject* watched, QEvent* event)
-{
-    if ((watched == m_ui->importTypeList || watched == m_ui->importTypeList->viewport())
-        && event->type() == QEvent::KeyPress) {
-        const auto keyEvent = static_cast<QKeyEvent*>(event);
-        if (keyEvent->key() == Qt::Key_Tab) {
-            focusNextPrevChild(!(keyEvent->modifiers() & Qt::ShiftModifier));
-            return true;
-        }
-    }
-
-    return QWizardPage::eventFilter(watched, event);
 }
 
 void ImportWizardPageSelect::updateDatabaseChoices() const

@@ -30,7 +30,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QListWidget" name="importTypeList">
+    <widget class="ImportTypeListWidget" name="importTypeList">
      <property name="accessibleName">
       <string>Import format</string>
      </property>
@@ -376,6 +376,11 @@ The command has to exit. In case of `sftp` as last commend `exit` has to be sent
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>ImportTypeListWidget</class>
+   <extends>QListWidget</extends>
+   <header>ImportTypeListWidget.h</header>
+  </customwidget>
   <customwidget>
    <class>PasswordWidget</class>
    <extends>QWidget</extends>
