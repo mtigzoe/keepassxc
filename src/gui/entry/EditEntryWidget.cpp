@@ -1567,9 +1567,13 @@ void EditEntryWidget::displayAttribute(QModelIndex index, bool showProtected)
     if (index.isValid()) {
         QString key = m_attributesModel->keyByIndex(index);
         if (showProtected) {
+            const bool attributesEditHasFocus = m_advancedUi->attributesEdit->hasFocus();
             m_advancedUi->attributesEdit->setPlainText(tr("[PROTECTED] Press Reveal to view or edit"));
-            m_advancedUi->attributesEdit->setEnabled(false);
             m_advancedUi->revealAttributeButton->setEnabled(true);
+            if (attributesEditHasFocus) {
+                m_advancedUi->revealAttributeButton->setFocus(Qt::OtherFocusReason);
+            }
+            m_advancedUi->attributesEdit->setEnabled(false);
             m_advancedUi->protectAttributeButton->setChecked(true);
         } else {
             m_advancedUi->attributesEdit->setPlainText(m_entryAttributes->value(key));
