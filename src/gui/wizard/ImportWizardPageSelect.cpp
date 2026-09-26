@@ -26,6 +26,8 @@
 #include "gui/MainWindow.h"
 
 #include <QDesktopServices>
+#include <QEvent>
+#include <QKeyEvent>
 
 ImportWizardPageSelect::ImportWizardPageSelect(QWidget* parent)
     : QWizardPage(parent)
@@ -57,6 +59,7 @@ ImportWizardPageSelect::ImportWizardPageSelect(QWidget* parent)
     // this field (see the same fix applied to EditGroupWidget's notes field).
     m_ui->downloadCommandInput->setTabChangesFocus(true);
     m_ui->importTypeList->setTabKeyNavigation(false);
+    m_ui->importTypeList->installEventFilter(this);
 
     new QListWidgetItem(icons()->icon("csv"), tr("Comma Separated Values (.csv)"), m_ui->importTypeList);
     new QListWidgetItem(icons()->icon("onepassword"), tr("1Password Export (.1pux)"), m_ui->importTypeList);
@@ -220,6 +223,19 @@ void ImportWizardPageSelect::advanceFocusFromTypeList()
     } else {
         m_ui->importFileEdit->setFocus();
     }
+}
+
+bool ImportWizardPageSelect::eventFilter(QObject* watched, QEvent* event)
+{
+    if (watched == m_ui->importTypeList && event->type() == QEvent::KeyPress) {
+        const auto keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Tab) {
+            focusNextPrevChild(!(keyEvent->modifiers() & Qt::ShiftModifier));
+            return true;
+        }
+    }
+
+    return QWizardPage::eventFilter(watched, event);
 }
 
 void ImportWizardPageSelect::updateDatabaseChoices() const
