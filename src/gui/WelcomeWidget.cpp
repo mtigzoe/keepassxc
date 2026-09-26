@@ -101,9 +101,7 @@ bool WelcomeWidget::eventFilter(QObject* watched, QEvent* event)
 {
     if (watched == m_ui->recentListWidget && event->type() == QEvent::KeyPress) {
         auto* keyEvent = static_cast<QKeyEvent*>(event);
-        if (keyEvent->key() == Qt::Key_Return || keyEvent->key() == Qt::Key_Enter) {
-            openDatabaseFromFile(m_ui->recentListWidget->currentItem());
-        } else if (keyEvent->key() == Qt::Key_Delete || keyEvent->key() == Qt::Key_Backspace) {
+        if (keyEvent->key() == Qt::Key_Delete || keyEvent->key() == Qt::Key_Backspace) {
             removeFromLastDatabases(m_ui->recentListWidget->currentItem());
             return true;
         }
