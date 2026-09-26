@@ -639,6 +639,7 @@ MainWindow::MainWindow()
     // Setup the status bar
     statusBar()->setFixedHeight(24);
     m_progressBarLabel = new QLabel(statusBar());
+    m_progressBarLabel->setObjectName("progressBarLabel");
     m_progressBarLabel->setVisible(false);
     statusBar()->addPermanentWidget(m_progressBarLabel);
     m_progressBar = new QProgressBar(statusBar());
@@ -1587,6 +1588,9 @@ void MainWindow::updateProgressBar(int percentage, QString message)
         m_progressBar->setVisible(true);
         m_progressBarLabel->setText(message);
         m_progressBarLabel->setVisible(true);
+
+        QAccessibleEvent accessibleEvent(m_progressBarLabel, QAccessible::NameChanged);
+        QAccessible::updateAccessibility(&accessibleEvent);
     }
 }
 
