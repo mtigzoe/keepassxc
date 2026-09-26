@@ -98,5 +98,4 @@ bool KPToolBar::event(QEvent* event)
         break;
     }
     return QToolBar::event(event);
-    }
 }
